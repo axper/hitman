@@ -59,7 +59,7 @@ in_par = False
 print(in_par)
 
 for line in manpage.read().splitlines():
-    print('---------------------------------------------------------')
+    print('-' * 79)
 
     # Empty line
     if line == '':
