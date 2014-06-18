@@ -7,20 +7,20 @@ import argparse
 
 
 def open_unzip_manpage(filename):
-    """ Opens file in text mode and unzips if necessary """
+    ''' Opens file in text mode and unzips if necessary '''
     if mimetypes.guess_type(filename)[1] == 'gzip':
         return gzip.open(filename, mode='rt')
     else:
         return open(filename, mode='rt')
 
 def parse_title(string):
-    """ Splits string into 5 parts while taking quotes into account """
+    ''' Splits string into 5 parts while taking quotes into account '''
     title_line = string[3:].splitlines()
     return csv.reader(title_line, quotechar='"', delimiter=' ',
             quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
 def section_name(section):
-    """ Returns name of manpage section number """
+    ''' Returns name of manpage section number '''
     if section == '0':
         return 'POSIX headers'
     if section == '1':
@@ -72,21 +72,21 @@ for line in manpage.read().splitlines():
         title[0] = title[0].lower()
 
         html.write('<!doctype HTML>\n')
-        html.write("<html>\n")
+        html.write('<html>\n')
         html.write('<head>\n')
-        html.write('<meta charset=\"utf-8\">\n')
+        html.write('<meta charset=\'utf-8\'>\n')
         html.write('<title>' + title[0] + ' - ' + 
                 section_name(title[1]) + ' - ' +
                 'Man page</title>\n')
-        html.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n")
-        html.write("</head>\n")
-        html.write("<body>\n")
-        html.write("<div id=\"content\">\n")
-        html.write("<h1>" + title[0] + "</h1>\n")
+        html.write('<link rel=\'stylesheet\' type=\'text/css\' href=\'style.css\'>\n')
+        html.write('</head>\n')
+        html.write('<body>\n')
+        html.write('<div id=\'content\'>\n')
+        html.write('<h1>' + title[0] + '</h1>\n')
     # Section
     elif line[:3] == r'.SH':
         if in_par:
-            html.write("</p>\n")
+            html.write('</p>\n')
             in_par = False
 
         section_title = line[4:].capitalize()
@@ -98,7 +98,7 @@ for line in manpage.read().splitlines():
         if in_par:
             html.write(line)
         else:
-            html.write("<p>")
+            html.write('<p>')
             in_par = True
             html.write(line)
 
@@ -107,13 +107,13 @@ for line in manpage.read().splitlines():
     elif line[:3] in (r'.B ', r'.I', r'.BI', r'.BR',
             r'.IB', r'.IR', r'.RB', r'.RI', r'.SB', r'.SM'):
         line = cgi.escape(line)
-        line = line.replace('"', '')
+        line = line.replace(''', '')
         line = ' <code>' + line[3:].strip() + '</code> '
 
         if in_par:
             html.write(line)
         else:
-            html.write("<p>")
+            html.write('<p>')
             in_par = True
             html.write(line)
 
@@ -121,9 +121,9 @@ for line in manpage.read().splitlines():
     else:
         print('>>>>!!!!!!!!!!UNKNOWN:', line)
 
-html.write("</div>\n")
-html.write("</body>\n")
-html.write("</html>\n")
+html.write('</div>\n')
+html.write('</body>\n')
+html.write('</html>\n')
 
 manpage.close()
 html.close()
