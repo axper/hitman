@@ -1,5 +1,5 @@
 #!/bin/env python3
-from mimetypes import guess_type
+import mimetypes
 import gzip
 import csv
 import cgi
@@ -21,6 +21,8 @@ def parse_title(string):
 
 def section_name(section):
     """ Returns name of manpage section number """
+    if section == '0':
+        return 'POSIX headers'
     if section == '1':
         return 'Programs'
     elif section == '2':
@@ -44,16 +46,9 @@ def section_name(section):
         return '>>>>WARNING: UNKNOWN SECTION:' + section
 
 
-
 parser = argparse.ArgumentParser(description='Converts Linux manpages to HTML5.')
-parser.add_argument('file', type=str,
-                   help='manpage file to parse')
-parser.add_argument('-o', dest='accumulate', action='store_const',
-                   const=sum, default=max,
-                   help='output file')
-
+parser.add_argument('file', type=str, help='manpage file to parse')
 args = parser.parse_args()
-
 
 
 manpage = open_unzip_manpage(args.file)
