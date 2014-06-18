@@ -107,7 +107,7 @@ for line in manpage.read().splitlines():
     elif line[:3] in (r'.B ', r'.I', r'.BI', r'.BR',
             r'.IB', r'.IR', r'.RB', r'.RI', r'.SB', r'.SM'):
         line = cgi.escape(line)
-        line = line.replace(''', '')
+        line = line.replace('"', '')
         line = ' <code>' + line[3:].strip() + '</code> '
 
         if in_par:
