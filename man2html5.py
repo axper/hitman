@@ -42,8 +42,7 @@ def section_name(section):
     elif section == '9':
         return 'Kernel routines'
     else:
-        print('>>>>WARNING: UNKNOWN SECTION:' + section)
-        return '>>>>WARNING: UNKNOWN SECTION:' + section
+        return 'UNKNOWN SECTION'
 
 
 parser = argparse.ArgumentParser(description='Converts Linux manpages to HTML5.')
