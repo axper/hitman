@@ -54,18 +54,21 @@ args = parser.parse_args()
 manpage = open_unzip_manpage(args.file)
 html = open('result.html', 'wt')
 
+
 in_par = False
 print(in_par)
 
 for line in manpage.read().splitlines():
     print('========================================================')
 
+    # Newline
     if line == '':
         if in_par:
             html.write("</p>\n")
             in_par = False
 
         print('Newline')
+    # Paragraph (sentence)
     elif line[:1] != r'.':
         line = ' ' + cgi.escape(line) + ' '
         if in_par:
@@ -76,8 +79,10 @@ for line in manpage.read().splitlines():
             html.write(line)
 
         print('Paragrph:', line)
+    # Comment
     elif line[:3] == r'.\"':
         continue
+    # The title line
     elif line[:3] == r'.TH':
         title = parse_title(line)
         title[0] = title[0].lower()
@@ -94,6 +99,7 @@ for line in manpage.read().splitlines():
         html.write("<body>\n")
         html.write("<div id=\"content\">\n")
         html.write("<h1>" + title[0] + "</h1>\n")
+    # Section
     elif line[:3] == r'.SH':
         if in_par:
             html.write("</p>\n")
@@ -102,6 +108,7 @@ for line in manpage.read().splitlines():
         section_title = line[4:].capitalize()
         html.write('<h2>' + section_title + '</h2>\n')
         print('Sec     :', section_title)
+    # Code
     elif line[:3] in (r'.B ', r'.I', r'.BI', r'.BR',
             r'.IB', r'.IR', r'.RB', r'.RI', r'.SB', r'.SM'):
         line = cgi.escape(line)
