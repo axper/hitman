@@ -8,7 +8,7 @@ import argparse
 
 def open_unzip_manpage(filename):
     """ Opens file in text mode and unzips if necessary """
-    if guess_type(filename)[1] == 'gzip':
+    if mimetypes.guess_type(filename)[1] == 'gzip':
         return gzip.open(filename, mode='rt')
     else:
         return open(filename, mode='rt')
@@ -68,17 +68,6 @@ for line in manpage.read().splitlines():
             in_par = False
 
         print('Newline')
-    # Paragraph (sentence)
-    elif line[:1] != r'.':
-        line = ' ' + cgi.escape(line) + ' '
-        if in_par:
-            html.write(line)
-        else:
-            html.write("<p>")
-            in_par = True
-            html.write(line)
-
-        print('Paragrph:', line)
     # Comment
     elif line[:3] == r'.\"':
         continue
@@ -108,6 +97,17 @@ for line in manpage.read().splitlines():
         section_title = line[4:].capitalize()
         html.write('<h2>' + section_title + '</h2>\n')
         print('Sec     :', section_title)
+    # Paragraph (sentence)
+    elif line[:1] != r'.':
+        line = ' ' + cgi.escape(line) + ' '
+        if in_par:
+            html.write(line)
+        else:
+            html.write("<p>")
+            in_par = True
+            html.write(line)
+
+        print('Paragrph:', line)
     # Code
     elif line[:3] in (r'.B ', r'.I', r'.BI', r'.BR',
             r'.IB', r'.IR', r'.RB', r'.RI', r'.SB', r'.SM'):
