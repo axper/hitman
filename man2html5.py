@@ -1,4 +1,5 @@
-#!/bin/env python3
+#! /usr/bin/env python3.4
+# -*- coding: utf-8 -*-
 import mimetypes
 import gzip
 import csv
