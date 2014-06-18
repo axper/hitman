@@ -58,7 +58,7 @@ in_par = False
 print(in_par)
 
 for line in manpage.read().splitlines():
-    print('========================================================')
+    print('---------------------------------------------------------')
 
     # Empty line
     if line == '':
