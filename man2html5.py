@@ -13,6 +13,7 @@ import gzip
 import csv
 import cgi
 import argparse
+import logging
 
 
 def open_unzip_manpage(filename):
@@ -54,6 +55,8 @@ def section_name(section):
         return 'UNKNOWN SECTION'
 
 
+
+logging.basicConfig(filename='log', level=logging.DEBUG)
 parser = argparse.ArgumentParser(description='Converts Linux manpages to HTML5.')
 parser.add_argument('file', type=str, help='manpage file to parse')
 args = parser.parse_args()
@@ -66,14 +69,14 @@ html = open('result.html', 'wt')
 in_par = False
 
 for line in manpage.read().splitlines():
-    print('-' * 79)
+    logging.debug('-' * 79)
 
     # Empty line
     if line == '':
-        print('log: Empty line')
+        logging.debug('Empty line')
     # Command
-    elif line[0] in {'\'', '.'}:
-        print('log: Command')
+    elif line[0] in ['\'', '.']:
+        logging.debug('Is Command')
 
         # Comment
         if line[:3] == r'.\"':
@@ -103,7 +106,7 @@ for line in manpage.read().splitlines():
 
             section_title = line[4:].capitalize()
             html.write('<h2>' + section_title + '</h2>\n')
-            print('Sec     :', section_title)
+            logging.debug('Sec     : %s', section_title)
         # Paragraph (sentence)
         elif line[:1] != r'.':
             line = ' ' + cgi.escape(line) + ' '
@@ -114,7 +117,7 @@ for line in manpage.read().splitlines():
                 in_par = True
                 html.write(line)
 
-            print('Paragrph:', line)
+            logging.debug('Paragrph: %s', line)
         # Code
         elif line[:3] in (r'.B ', r'.I', r'.BI', r'.BR',
                 r'.IB', r'.IR', r'.RB', r'.RI', r'.SB', r'.SM'):
@@ -129,9 +132,9 @@ for line in manpage.read().splitlines():
                 in_par = True
                 html.write(line)
 
-            print('Code    :', line)
+            logging.debug('Code    : %s', line)
     else:
-        print('>>>>!!!!!!!!!!UNKNOWN:', line)
+        logging.info('>>>>!!!!!!!!!!UNKNOWN: %s', line)
 
 html.write('</div>\n')
 html.write('</body>\n')
