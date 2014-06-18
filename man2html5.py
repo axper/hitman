@@ -64,69 +64,72 @@ html = open('result.html', 'wt')
 
 
 in_par = False
-print(in_par)
 
 for line in manpage.read().splitlines():
     print('-' * 79)
 
     # Empty line
     if line == '':
-        print('Newline')
-    # Comment
-    elif line[:3] == r'.\"':
-        continue
-    # The title line
-    elif line[:3] == r'.TH':
-        title = parse_title(line)
-        title[0] = title[0].lower()
+        print('log: Empty line')
+    # Command
+    elif line[0] in {'\'', '.'}:
+        print('log: Command')
 
-        html.write('<!doctype HTML>\n')
-        html.write('<html>\n')
-        html.write('<head>\n')
-        html.write('<meta charset=\'utf-8\'>\n')
-        html.write('<title>' + title[0] + ' - ' + 
-                section_name(title[1]) + ' - ' +
-                'Man page</title>\n')
-        html.write('<link rel=\'stylesheet\' type=\'text/css\' href=\'style.css\'>\n')
-        html.write('</head>\n')
-        html.write('<body>\n')
-        html.write('<div id=\'content\'>\n')
-        html.write('<h1>' + title[0] + '</h1>\n')
-    # Section
-    elif line[:3] == r'.SH':
-        if in_par:
-            html.write('</p>\n')
-            in_par = False
+        # Comment
+        if line[:3] == r'.\"':
+            continue
+        # The title line
+        elif line[:3] == r'.TH':
+            title = parse_title(line)
+            title[0] = title[0].lower()
 
-        section_title = line[4:].capitalize()
-        html.write('<h2>' + section_title + '</h2>\n')
-        print('Sec     :', section_title)
-    # Paragraph (sentence)
-    elif line[:1] != r'.':
-        line = ' ' + cgi.escape(line) + ' '
-        if in_par:
-            html.write(line)
-        else:
-            html.write('<p>')
-            in_par = True
-            html.write(line)
+            html.write('<!doctype HTML>\n')
+            html.write('<html>\n')
+            html.write('<head>\n')
+            html.write('<meta charset=\'utf-8\'>\n')
+            html.write('<title>' + title[0] + ' - ' + 
+                    section_name(title[1]) + ' - ' +
+                    'Man page</title>\n')
+            html.write('<link rel=\'stylesheet\' type=\'text/css\' href=\'style.css\'>\n')
+            html.write('</head>\n')
+            html.write('<body>\n')
+            html.write('<div id=\'content\'>\n')
+            html.write('<h1>' + title[0] + '</h1>\n')
+        # Section
+        elif line[:3] == r'.SH':
+            if in_par:
+                html.write('</p>\n')
+                in_par = False
 
-        print('Paragrph:', line)
-    # Code
-    elif line[:3] in (r'.B ', r'.I', r'.BI', r'.BR',
-            r'.IB', r'.IR', r'.RB', r'.RI', r'.SB', r'.SM'):
-        line = cgi.escape(line)
-        line = line.replace('"', '')
-        line = ' <code>' + line[3:].strip() + '</code> '
+            section_title = line[4:].capitalize()
+            html.write('<h2>' + section_title + '</h2>\n')
+            print('Sec     :', section_title)
+        # Paragraph (sentence)
+        elif line[:1] != r'.':
+            line = ' ' + cgi.escape(line) + ' '
+            if in_par:
+                html.write(line)
+            else:
+                html.write('<p>')
+                in_par = True
+                html.write(line)
 
-        if in_par:
-            html.write(line)
-        else:
-            html.write('<p>')
-            in_par = True
-            html.write(line)
+            print('Paragrph:', line)
+        # Code
+        elif line[:3] in (r'.B ', r'.I', r'.BI', r'.BR',
+                r'.IB', r'.IR', r'.RB', r'.RI', r'.SB', r'.SM'):
+            line = cgi.escape(line)
+            line = line.replace('"', '')
+            line = ' <code>' + line[3:].strip() + '</code> '
 
-        print('Code    :', line)
+            if in_par:
+                html.write(line)
+            else:
+                html.write('<p>')
+                in_par = True
+                html.write(line)
+
+            print('Code    :', line)
     else:
         print('>>>>!!!!!!!!!!UNKNOWN:', line)
 
