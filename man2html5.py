@@ -60,12 +60,8 @@ print(in_par)
 for line in manpage.read().splitlines():
     print('========================================================')
 
-    # Newline
+    # Empty line
     if line == '':
-        if in_par:
-            html.write("</p>\n")
-            in_par = False
-
         print('Newline')
     # Comment
     elif line[:3] == r'.\"':
