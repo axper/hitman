@@ -55,7 +55,7 @@ def section_name(section):
     else:
         return 'UNKNOWN SECTION'
 
-def matches_command(line, command):
+def matches(line, command):
     ''' Returns True if line starts with command. '''
     logger_matches.debug('Comparing %s and %s', line, command)
     if len(line) - 1 < len(command):
@@ -139,7 +139,7 @@ def escape_paragraph(paragraph):
 
 
 logging.basicConfig(filename='log', level=logging.DEBUG)
-logger_matches = logging.getLogger("matches_command")
+logger_matches = logging.getLogger("matches")
 logger_matches.setLevel(logging.INFO)
 logger_font = logging.getLogger("parse_man_font")
 logger_font.setLevel(logging.INFO)
@@ -165,10 +165,10 @@ for line in manpage.read().splitlines():
     # Command
     elif line[0] in ['\'', '.']:
 
-        if matches_command(line, '\\"'):
+        if matches(line, '\\"'):
             logging.debug('A comment')
 
-        elif matches_command(line, 'TH'):
+        elif matches(line, 'TH'):
             logging.debug('A title line')
 
             title = parse_title(line)
@@ -189,7 +189,7 @@ for line in manpage.read().splitlines():
 
             logging.debug(title)
 
-        elif matches_command(line, 'SH'):
+        elif matches(line, 'SH'):
             logging.debug('A section title')
 
             if par:
@@ -201,7 +201,7 @@ for line in manpage.read().splitlines():
 
             logging.debug(section_title)
         
-        elif matches_command(line, 'SS'):
+        elif matches(line, 'SS'):
             logging.debug('A subsection title')
 
             if par:
@@ -213,43 +213,43 @@ for line in manpage.read().splitlines():
 
             logging.debug(section_title)
 
-        elif matches_command(line, 'BI'):
+        elif matches(line, 'BI'):
             logging.debug('Code (bold - italic)')
             logging.info('STUB')
 
-        elif matches_command(line, 'IB'):
+        elif matches(line, 'IB'):
             logging.debug('Code (italic - bold)')
             logging.info('STUB')
 
-        elif matches_command(line, 'BR'):
+        elif matches(line, 'BR'):
             logging.debug('Code (bold roman)')
             logging.info('STUB')
 
-        elif matches_command(line, 'RB'):
+        elif matches(line, 'RB'):
             logging.debug('Code (roman bold)')
             logging.info('STUB')
 
-        elif matches_command(line, 'IR'):
+        elif matches(line, 'IR'):
             logging.debug('Code (italic roman)')
             logging.info('STUB')
 
-        elif matches_command(line, 'RI'):
+        elif matches(line, 'RI'):
             logging.debug('Code (italic roman)')
             logging.info('STUB')
 
-        elif matches_command(line, 'SM'):
+        elif matches(line, 'SM'):
             logging.debug('Code (small)')
             logging.info('STUB')
 
-        elif matches_command(line, 'SB'):
+        elif matches(line, 'SB'):
             logging.debug('Code (small bold)')
             logging.info('STUB')
 
-        elif matches_command(line, 'I'):
+        elif matches(line, 'I'):
             logging.debug('Code (italic)')
             logging.info('STUB')
 
-        elif matches_command(line, 'B'):
+        elif matches(line, 'B'):
             logging.debug('Code (bold)')
 
             line = cgi.escape(line)
