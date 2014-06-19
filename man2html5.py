@@ -146,6 +146,13 @@ def escape_paragraph(paragraph):
 
     return paragraph
 
+def start_paragraph(html):
+    ''' Writes <p> to html file. '''
+    html.write('<p>')
+
+def end_paragraph(html):
+    ''' Writes </p> and newline to html file. '''
+    html.write('</p>\n')
 
 
 logging.basicConfig(filename='log', level=logging.DEBUG)
@@ -174,7 +181,7 @@ for line in manpage.read().splitlines():
         logging.debug('An empty line')
 
         if par:
-            html.write('</p>\n')
+            end_paragraph(html)
 
         par = False
 
@@ -209,7 +216,7 @@ for line in manpage.read().splitlines():
             logging.debug('A section title')
 
             if par:
-                html.write('</p>\n')
+                end_paragraph(html)
                 par = False
 
             section_title = line[4:].capitalize()
@@ -221,7 +228,7 @@ for line in manpage.read().splitlines():
             logging.debug('A subsection title')
 
             if par:
-                html.write('</p>\n')
+                end_paragraph(html)
                 par = False
 
             section_title = line[4:].capitalize()
@@ -233,18 +240,18 @@ for line in manpage.read().splitlines():
             logging.debug('Begin new paragraph')
 
             if par:
-                html.write('</p>\n')
-                html.write('<p>')
+                end_paragraph(html)
+                start_paragraph(html)
             else:
                 par = True
-                html.write('<p>')
+                start_paragraph(html)
 
         elif matches(line, 'HP') or matches(line, 'IP') or matches(line, 'TP'):
             logging.debug('Begin hanging or indented paragraph')
             logging.debug('(ignoring the rest of command)')
 
             if not par:
-                html.write('<p>')
+                start_paragraph(html)
                 par = True
 
         elif matches(line, 'BI'):
@@ -257,6 +264,11 @@ for line in manpage.read().splitlines():
 
         elif matches(line, 'BR'):
             logging.debug('Code (bold - roman)')
+
+            if not par:
+                start_paragraph(html)
+                par = True
+
             words = parse_paragraph(line)
 
             bold = True
@@ -306,7 +318,7 @@ for line in manpage.read().splitlines():
             if par:
                 html.write(line)
             else:
-                html.write('<p>')
+                start_paragraph(html)
                 par = True
                 html.write(line)
 
@@ -322,14 +334,14 @@ for line in manpage.read().splitlines():
         if par:
             html.write(linenew)
         else:
-            html.write('<p>')
+            start_paragraph(html)
             par = True
             html.write(linenew)
 
         logging.debug(linenew)
 
 if par:
-    html.write('</p>\n')
+    end_paragraph(html)
     par = False
 
 
