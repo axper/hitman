@@ -136,7 +136,10 @@ def sub_inline_font(par):
                 par = par[:i] + bold_end + par[i+3:]
                 logger_font.debug(par)
                 i += len(bold_end) - 1
-
+            else:
+                logger_font.info('deleting non started font command')
+                par = par[:i] + par[i+3:]
+                logger_font.debug(par)
 
         i += 1
 
@@ -213,7 +216,7 @@ def alternating(line, first, second):
     html.write(final)
 
 
-logging.basicConfig(filename='log', level=logging.DEBUG)
+logging.basicConfig(filename='log', level=logging.INFO)
 logger_matches = logging.getLogger("matches")
 logger_matches.setLevel(logging.INFO)
 logger_font = logging.getLogger("sub_inline_font")
@@ -305,8 +308,7 @@ for line in manpage.read().splitlines():
                 start_paragraph(html)
 
         elif matches(line, 'HP') or matches(line, 'IP') or matches(line, 'TP'):
-            logging.debug('Begin hanging or indented paragraph')
-            logging.debug('(ignoring the rest of command)')
+            logging.info('Begin hanging or indented paragraph (ignoring...)')
 
             if not par:
                 start_paragraph(html)
@@ -409,7 +411,7 @@ for line in manpage.read().splitlines():
             logging.debug(final)
             html.write(final)
 
-        elif matches(line, 'br'):
+        elif matches(line, 'br') or matches(line, 'sp'):
             logging.debug('Line break')
 
             if par:
