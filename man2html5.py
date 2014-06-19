@@ -140,6 +140,15 @@ def parse_man_font(par):
 
         i += 1
 
+    if italic:
+        logger_font.debug('ending italic (at the end)')
+        par += italic_end
+        logger_font.debug(par)
+    elif bold:
+        logger_font.debug('ending bold (at the end)')
+        par += bold_end
+        logger_font.debug(par)
+
     return par
 
 def escape_paragraph(paragraph):
