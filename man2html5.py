@@ -231,7 +231,7 @@ for line in manpage.read().splitlines():
                 end_paragraph(html)
                 par = False
 
-            section_title = line[4:].capitalize()
+            section_title = ' '.join(parse_paragraph(line)[1:]).capitalize()
             html.write('<h3>' + section_title + '</h3>\n')
 
             logging.debug(section_title)
