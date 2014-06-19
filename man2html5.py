@@ -165,13 +165,13 @@ def escape_paragraph(paragraph):
 
     return paragraph
 
-def start_paragraph(html):
+def start_paragraph(file_html):
     ''' Writes <p> to html file. '''
-    html.write('<p>')
+    file_html.write('<p>')
 
-def end_paragraph(html):
+def end_paragraph(file_html):
     ''' Writes </p> and newline to html file. '''
-    html.write('</p>\n')
+    file_html.write('</p>\n')
 
 def alternating(line, first, second):
     ''' Writes HTML line alternating between first and second styles. '''
@@ -213,10 +213,10 @@ def alternating(line, first, second):
 
     final += ' '
     logging.debug(final)
-    html.write(final)
+    file_html.write(final)
 
 
-logging.basicConfig(filename='log', level=logging.INFO)
+logging.basicConfig(filename='log', level=logging.DEBUG)
 logger_matches = logging.getLogger("matches")
 logger_matches.setLevel(logging.INFO)
 logger_font = logging.getLogger("sub_inline_font")
@@ -227,13 +227,14 @@ parser.add_argument('file', type=str, help='manpage file to parse')
 args = parser.parse_args()
 
 
-manpage = open_unzip_manpage(args.file)
-html = open('result.html', 'wt')
+file_manpage = open_unzip_manpage(args.file)
+file_html = open('result.html', 'wt')
 
 
 par = False
 
-for line in manpage.read().splitlines():
+iterator_lines = file_manpage.read().splitlines().__iter__()
+for line in iterator_lines:
     logging.debug('-' * 79)
     logging.debug(line)
 
@@ -242,7 +243,7 @@ for line in manpage.read().splitlines():
         logging.debug('An empty line')
 
         if par:
-            end_paragraph(html)
+            end_paragraph(file_html)
 
         par = False
 
@@ -258,18 +259,18 @@ for line in manpage.read().splitlines():
             title = split_title(line)
             title[0] = title[0].lower()
 
-            html.write('<!doctype HTML>\n')
-            html.write('<html>\n')
-            html.write('<head>\n')
-            html.write('<meta charset=\'utf-8\'>\n')
-            html.write('<title>' + title[0] + ' - ' + 
+            file_html.write('<!doctype HTML>\n')
+            file_html.write('<html>\n')
+            file_html.write('<head>\n')
+            file_html.write('<meta charset=\'utf-8\'>\n')
+            file_html.write('<title>' + title[0] + ' - ' + 
                     section_name(title[1]) + ' - ' +
                     'Man page</title>\n')
-            html.write('<link rel=\'stylesheet\' type=\'text/css\' href=\'style.css\'>\n')
-            html.write('</head>\n')
-            html.write('<body>\n')
-            html.write('<div id=\'content\'>\n')
-            html.write('<h1>' + title[0] + '</h1>\n')
+            file_html.write('<link rel=\'stylesheet\' type=\'text/css\''
+                    ' href=\'style.css\'>\n')
+            file_html.write('</head>\n')
+            file_html.write('<body>\n')
+            file_html.write('<h1>' + title[0] + '</h1>\n')
 
             logging.debug(title)
 
@@ -277,11 +278,11 @@ for line in manpage.read().splitlines():
             logging.debug('A section title')
 
             if par:
-                end_paragraph(html)
+                end_paragraph(file_html)
                 par = False
 
             section_title = ' '.join(split_paragraph(line)[1:]).capitalize()
-            html.write('<h2>' + section_title + '</h2>\n')
+            file_html.write('<h2>' + section_title + '</h2>\n')
 
             logging.debug(section_title)
         
@@ -289,11 +290,11 @@ for line in manpage.read().splitlines():
             logging.debug('A subsection title')
 
             if par:
-                end_paragraph(html)
+                end_paragraph(file_html)
                 par = False
 
             section_title = ' '.join(split_paragraph(line)[1:]).capitalize()
-            html.write('<h3>' + section_title + '</h3>\n')
+            file_html.write('<h3>' + section_title + '</h3>\n')
 
             logging.debug(section_title)
 
@@ -301,27 +302,27 @@ for line in manpage.read().splitlines():
             logging.debug('Begin new paragraph')
 
             if par:
-                end_paragraph(html)
-                start_paragraph(html)
+                end_paragraph(file_html)
+                start_paragraph(file_html)
             else:
                 par = True
-                start_paragraph(html)
+                start_paragraph(file_html)
 
         elif matches(line, 'HP') or matches(line, 'IP') or matches(line, 'TP'):
             logging.info('Begin hanging or indented paragraph (ignoring...)')
 
             if not par:
-                start_paragraph(html)
+                start_paragraph(file_html)
                 par = True
             else:
-                end_paragraph(html)
-                start_paragraph(html)
+                end_paragraph(file_html)
+                start_paragraph(file_html)
 
         elif matches(line, 'BI'):
             logging.debug('Code (bold - italic)')
 
             if not par:
-                start_paragraph(html)
+                start_paragraph(file_html)
                 par = True
 
             alternating(line, BOLD, ITALIC)
@@ -330,7 +331,7 @@ for line in manpage.read().splitlines():
             logging.debug('Code (italic - bold)')
 
             if not par:
-                start_paragraph(html)
+                start_paragraph(file_html)
                 par = True
 
             alternating(line, ITALIC, BOLD)
@@ -339,7 +340,7 @@ for line in manpage.read().splitlines():
             logging.debug('Code (bold - normal)')
 
             if not par:
-                start_paragraph(html)
+                start_paragraph(file_html)
                 par = True
 
             alternating(line, BOLD, NORMAL)
@@ -348,7 +349,7 @@ for line in manpage.read().splitlines():
             logging.debug('Code (normal - bold)')
 
             if not par:
-                start_paragraph(html)
+                start_paragraph(file_html)
                 par = True
 
             alternating(line, NORMAL, BOLD)
@@ -357,7 +358,7 @@ for line in manpage.read().splitlines():
             logging.debug('Code (italic - normal)')
 
             if not par:
-                start_paragraph(html)
+                start_paragraph(file_html)
                 par = True
 
             alternating(line, ITALIC, NORMAL)
@@ -366,7 +367,7 @@ for line in manpage.read().splitlines():
             logging.debug('Code (italic - normal)')
 
             if not par:
-                start_paragraph(html)
+                start_paragraph(file_html)
                 par = True
 
             alternating(line, NORMAL, ITALIC)
@@ -383,7 +384,7 @@ for line in manpage.read().splitlines():
             logging.debug('Code (italic)')
 
             if not par:
-                start_paragraph(html)
+                start_paragraph(file_html)
                 par = True
 
             final = ''
@@ -393,13 +394,13 @@ for line in manpage.read().splitlines():
             final += ' '
 
             logging.debug(final)
-            html.write(final)
+            file_html.write(final)
 
         elif matches(line, 'B '):
             logging.debug('Code (bold)')
 
             if not par:
-                start_paragraph(html)
+                start_paragraph(file_html)
                 par = True
 
             final = ''
@@ -409,13 +410,20 @@ for line in manpage.read().splitlines():
             final += ' '
 
             logging.debug(final)
-            html.write(final)
+            file_html.write(final)
+
+        elif matches(line, 'UR'):
+            logging.debug('Start URL')
+
+            #url = ''.join(split_paragraph(escape_paragraph(line))[1:])
+            #logging.debug(url)
+            #logging.debug(next(iterator_lines))
 
         elif matches(line, 'br') or matches(line, 'sp'):
             logging.debug('Line break')
 
             if par:
-                end_paragraph(html)
+                end_paragraph(file_html)
 
             par = False
 
@@ -429,24 +437,23 @@ for line in manpage.read().splitlines():
         linenew += '\n'
 
         if par:
-            html.write(linenew)
+            file_html.write(linenew)
         else:
-            start_paragraph(html)
+            start_paragraph(file_html)
             par = True
-            html.write(linenew)
+            file_html.write(linenew)
 
         logging.debug(linenew)
 
 if par:
-    end_paragraph(html)
+    end_paragraph(file_html)
     par = False
 
 
 
-html.write('</div>\n')
-html.write('</body>\n')
-html.write('</html>\n')
+file_html.write('</body>\n')
+file_html.write('</html>\n')
 
-manpage.close()
-html.close()
+file_manpage.close()
+file_html.close()
 
