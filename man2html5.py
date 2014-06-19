@@ -269,20 +269,21 @@ for line in manpage.read().splitlines():
                 start_paragraph(html)
                 par = True
 
-            words = parse_paragraph(line)
+            words = parse_paragraph(escape_paragraph(line))
+            final = ''
 
             bold = True
             for i in words[1:]:
                 if bold:
-                    html.write(bold_start)
-                    html.write(i)
-                    html.write(bold_end)
+                    final += bold_start + i + bold_end
                     bold = False
                 else:
-                    html.write(i)
+                    final += i
                     bold = True
 
-            html.write(' ')
+            final += ' '
+            logging.debug(final)
+            html.write(final)
 
         elif matches(line, 'RB'):
             logging.debug('Code (roman - bold)')
