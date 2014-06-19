@@ -266,7 +266,7 @@ for line in manpage.read().splitlines():
             logging.info('STUB')
 
         elif matches(line, 'BR'):
-            logging.debug('Code (bold - roman)')
+            logging.debug('Code (bold - normal)')
 
             if not par:
                 start_paragraph(html)
@@ -289,15 +289,15 @@ for line in manpage.read().splitlines():
             html.write(final)
 
         elif matches(line, 'RB'):
-            logging.debug('Code (roman - bold)')
+            logging.debug('Code (normal - bold)')
             logging.info('STUB')
 
         elif matches(line, 'IR'):
-            logging.debug('Code (italic - roman)')
+            logging.debug('Code (italic - normal)')
             logging.info('STUB')
 
         elif matches(line, 'RI'):
-            logging.debug('Code (italic - roman)')
+            logging.debug('Code (italic - normal)')
             logging.info('STUB')
 
         elif matches(line, 'SM'):
