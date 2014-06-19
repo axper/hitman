@@ -153,7 +153,7 @@ manpage = open_unzip_manpage(args.file)
 html = open('result.html', 'wt')
 
 
-in_par = False
+par = False
 
 for line in manpage.read().splitlines():
     logging.debug('-' * 79)
@@ -192,9 +192,9 @@ for line in manpage.read().splitlines():
         elif matches_command(line, 'SH'):
             logging.debug('A section title')
 
-            if in_par:
+            if par:
                 html.write('</p>\n')
-                in_par = False
+                par = False
 
             section_title = line[4:].capitalize()
             html.write('<h2>' + section_title + '</h2>\n')
@@ -204,9 +204,9 @@ for line in manpage.read().splitlines():
         elif matches_command(line, 'SS'):
             logging.debug('A subsection title')
 
-            if in_par:
+            if par:
                 html.write('</p>\n')
-                in_par = False
+                par = False
 
             section_title = line[4:].capitalize()
             html.write('<h3>' + section_title + '</h3>\n')
@@ -215,39 +215,39 @@ for line in manpage.read().splitlines():
 
         elif matches_command(line, 'BI'):
             logging.debug('Code (bold - italic)')
-            logging.debug('STUB')
+            logging.info('STUB')
 
         elif matches_command(line, 'IB'):
             logging.debug('Code (italic - bold)')
-            logging.debug('STUB')
+            logging.info('STUB')
 
         elif matches_command(line, 'BR'):
             logging.debug('Code (bold roman)')
-            logging.debug('STUB')
+            logging.info('STUB')
 
         elif matches_command(line, 'RB'):
             logging.debug('Code (roman bold)')
-            logging.debug('STUB')
+            logging.info('STUB')
 
         elif matches_command(line, 'IR'):
             logging.debug('Code (italic roman)')
-            logging.debug('STUB')
+            logging.info('STUB')
 
         elif matches_command(line, 'RI'):
             logging.debug('Code (italic roman)')
-            logging.debug('STUB')
+            logging.info('STUB')
 
         elif matches_command(line, 'SM'):
             logging.debug('Code (small)')
-            logging.debug('STUB')
+            logging.info('STUB')
 
         elif matches_command(line, 'SB'):
             logging.debug('Code (small bold)')
-            logging.debug('STUB')
+            logging.info('STUB')
 
         elif matches_command(line, 'I'):
             logging.debug('Code (italic)')
-            logging.debug('STUB')
+            logging.info('STUB')
 
         elif matches_command(line, 'B'):
             logging.debug('Code (bold)')
@@ -256,11 +256,11 @@ for line in manpage.read().splitlines():
             line = line.replace('"', '')
             line = ' <code>' + line[3:].strip() + '</code> '
 
-            if in_par:
+            if par:
                 html.write(line)
             else:
                 html.write('<p>')
-                in_par = True
+                par = True
                 html.write(line)
 
         else:
@@ -270,11 +270,13 @@ for line in manpage.read().splitlines():
         logging.debug('A paragraph')
 
         linenew = escape_paragraph(line)
-        if in_par:
+        linenew += '\n'
+
+        if par:
             html.write(linenew)
         else:
             html.write('<p>')
-            in_par = True
+            par = True
             html.write(linenew)
 
         logging.debug(linenew)
