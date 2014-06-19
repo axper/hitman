@@ -35,7 +35,7 @@ def open_unzip_manpage(filename):
     else:
         return open(filename, mode='rt')
 
-def parse_title(string):
+def split_title(string):
     ''' Splits string into 5 parts while taking quotes into account.
     
         Ignores first 3 characters.
@@ -92,7 +92,7 @@ def matches(line, command):
     logger_matches.debug('Comp returns False')
     return False
 
-def parse_man_font(par):
+def sub_inline_font(par):
     ''' Parses man inline font escapes and replaces with HTML. '''
     italic = False
     bold = False
@@ -156,7 +156,7 @@ def escape_paragraph(paragraph):
     paragraph = cgi.escape(paragraph)
 
     paragraph = re.sub(r'\\-', '-', paragraph)
-    paragraph = parse_man_font(paragraph)
+    paragraph = sub_inline_font(paragraph)
 
     return paragraph
 
@@ -214,7 +214,7 @@ def alternating(line, first, second):
 logging.basicConfig(filename='log', level=logging.DEBUG)
 logger_matches = logging.getLogger("matches")
 logger_matches.setLevel(logging.INFO)
-logger_font = logging.getLogger("parse_man_font")
+logger_font = logging.getLogger("sub_inline_font")
 logger_font.setLevel(logging.INFO)
 
 parser = argparse.ArgumentParser(description='Converts Linux manpages to HTML5.')
@@ -250,7 +250,7 @@ for line in manpage.read().splitlines():
         elif matches(line, 'TH'):
             logging.debug('A title line')
 
-            title = parse_title(line)
+            title = split_title(line)
             title[0] = title[0].lower()
 
             html.write('<!doctype HTML>\n')
