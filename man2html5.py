@@ -231,7 +231,7 @@ file_html = open('result.html', 'wt')
 
 par = False
 
-iterator_lines = file_manpage.read().splitlines().__iter__()
+iterator_lines = iter(file_manpage.read().splitlines())
 for line in iterator_lines:
     logging.debug('-' * 79)
     logging.debug(line)
