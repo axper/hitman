@@ -315,16 +315,18 @@ for line in manpage.read().splitlines():
         elif matches(line, 'B '):
             logging.debug('Code (bold)')
 
-            line = cgi.escape(line)
-            line = line.replace('"', '')
-            line = ' <code>' + line[3:].strip() + '</code> '
-
-            if par:
-                html.write(line)
-            else:
+            if not par:
                 start_paragraph(html)
                 par = True
-                html.write(line)
+
+            final = ''
+            final += bold_start
+            final += ' '.join(parse_paragraph(escape_paragraph(line))[1:])
+            final += bold_end
+            final += ' '
+
+            logging.debug(final)
+            html.write(final)
 
         else:
             logging.info('Unknown command: %s', line)
