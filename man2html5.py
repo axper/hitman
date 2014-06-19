@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # This program convets Linux manpages to HTML5 format.
-
-# groff(7), groff_me(7)
-# groff_man(7), man(7) - groff linux man package (an.tmac macro package)
-# groff_mdoc(7), mdoc(7), mdoc.samples(7) - groff bsd man pages
+# Used man file specifications:
+# groff(7), groff_me(7), groff_man(7), man(7)
 
 
 import mimetypes
