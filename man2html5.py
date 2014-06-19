@@ -72,11 +72,67 @@ def matches_command(line, command):
     logger_matches.debug('Comp returns False')
     return False
 
+def parse_man_font(par):
+    ''' Parses man inline font escapes and replaces with HTML. '''
+    italic = False
+    bold = False
+
+    bold_start = '<code>'
+    bold_end = '</code>'
+    italic_start = '<code><i>'
+    italic_end = '</code></i>'
+
+    i = 0
+    while i < len(par) - 2:
+        logger_font.debug(par[i:i+3])
+        if par[i:i+3] == r'\fI':
+            logger_font.debug('starting italic!!!')
+
+            if not italic:
+                italic = True
+                par = par[:i] + italic_start + par[i+3:]
+                logger_font.debug(par)
+                i += len(italic_start) - 1
+            else:
+                logger_font.warning('already italic')
+
+        elif par[i:i+3] == r'\fB':
+            logger_font.debug('starting bold!!!')
+
+            if not bold:
+                bold = True
+                par = par[:i] + bold_start + par[i+3:]
+                logger_font.debug(par)
+                i += len(bold_start) - 1
+            else:
+                logger_font.warning('already bold')
+
+        elif par[i:i+3] in [r'\fR', r'\fP']:
+
+            if italic:
+                italic = False
+                logger_font.debug('ending italic')
+                par = par[:i] + italic_end + par[i+3:]
+                logger_font.debug(par)
+                i += len(italic_end) - 1
+            elif bold:
+                bold = False
+                logger_font.debug('ending bold')
+                par = par[:i] + bold_end + par[i+3:]
+                logger_font.debug(par)
+                i += len(bold_end) - 1
+
+
+        i += 1
+
+    return par
+
 def escape_paragraph(paragraph):
     ''' Escapes HTML and man commands. '''
     paragraph = cgi.escape(paragraph)
 
     paragraph = re.sub(r'\\-', '-', paragraph)
+    paragraph = parse_man_font(paragraph)
 
     return paragraph
 
@@ -85,6 +141,8 @@ def escape_paragraph(paragraph):
 logging.basicConfig(filename='log', level=logging.DEBUG)
 logger_matches = logging.getLogger("matches_command")
 logger_matches.setLevel(logging.INFO)
+logger_font = logging.getLogger("parse_man_font")
+logger_font.setLevel(logging.INFO)
 
 parser = argparse.ArgumentParser(description='Converts Linux manpages to HTML5.')
 parser.add_argument('file', type=str, help='manpage file to parse')
@@ -142,33 +200,54 @@ for line in manpage.read().splitlines():
             html.write('<h2>' + section_title + '</h2>\n')
 
             logging.debug(section_title)
+        
+        elif matches_command(line, 'SS'):
+            logging.debug('A subsection title')
+
+            if in_par:
+                html.write('</p>\n')
+                in_par = False
+
+            section_title = line[4:].capitalize()
+            html.write('<h3>' + section_title + '</h3>\n')
+
+            logging.debug(section_title)
 
         elif matches_command(line, 'BI'):
             logging.debug('Code (bold - italic)')
+            logging.debug('STUB')
 
         elif matches_command(line, 'IB'):
             logging.debug('Code (italic - bold)')
+            logging.debug('STUB')
 
         elif matches_command(line, 'BR'):
             logging.debug('Code (bold roman)')
+            logging.debug('STUB')
 
         elif matches_command(line, 'RB'):
             logging.debug('Code (roman bold)')
+            logging.debug('STUB')
 
         elif matches_command(line, 'IR'):
             logging.debug('Code (italic roman)')
+            logging.debug('STUB')
 
         elif matches_command(line, 'RI'):
             logging.debug('Code (italic roman)')
+            logging.debug('STUB')
 
         elif matches_command(line, 'SM'):
             logging.debug('Code (small)')
+            logging.debug('STUB')
 
         elif matches_command(line, 'SB'):
             logging.debug('Code (small bold)')
+            logging.debug('STUB')
 
         elif matches_command(line, 'I'):
             logging.debug('Code (italic)')
+            logging.debug('STUB')
 
         elif matches_command(line, 'B'):
             logging.debug('Code (bold)')
