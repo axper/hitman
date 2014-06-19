@@ -281,6 +281,11 @@ for line in manpage.read().splitlines():
 
         logging.debug(linenew)
 
+if par:
+    html.write('</p>\n')
+    par = False
+
+
 
 html.write('</div>\n')
 html.write('</body>\n')
