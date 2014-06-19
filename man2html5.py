@@ -253,6 +253,9 @@ for line in manpage.read().splitlines():
             if not par:
                 start_paragraph(html)
                 par = True
+            else:
+                end_paragraph(html)
+                start_paragraph(html)
 
         elif matches(line, 'BI'):
             logging.debug('Code (bold - italic)')
