@@ -213,6 +213,16 @@ for line in manpage.read().splitlines():
 
             logging.debug(section_title)
 
+        elif matches(line, 'PP') or matches(line, 'P ') or matches(line, 'LP'):
+            logging.debug('Begin new paragraph')
+
+            if par:
+                html.write('</p>\n')
+                html.write('<p>')
+            else:
+                par = True
+                html.write('<p>')
+
         elif matches(line, 'BI'):
             logging.debug('Code (bold - italic)')
             logging.info('STUB')
