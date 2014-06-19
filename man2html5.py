@@ -159,6 +159,48 @@ def end_paragraph(html):
     ''' Writes </p> and newline to html file. '''
     html.write('</p>\n')
 
+def alternating(line, first, second):
+    ''' Writes HTML line alternating between first and second styles. '''
+    if first == BOLD:
+        even_start = bold_start
+        even_end = bold_end
+    elif first == ITALIC:
+        even_start = italic_start
+        even_end = italic_end
+    elif first == NORMAL:
+        even_start = ''
+        even_end = ''
+    else:
+        logging.error("Incorrect first argument: %s", first)
+
+    if second == BOLD:
+        odd_start = bold_start
+        odd_end = bold_end
+    elif second == ITALIC:
+        odd_start = italic_start
+        odd_end = italic_end
+    elif second == NORMAL:
+        odd_start = ''
+        odd_end = ''
+    else:
+        logging.error("Incorrect second argument: %s", second)
+
+    words = parse_paragraph(escape_paragraph(line))
+    final = ''
+
+    even = True
+    for i in words[1:]:
+        if even:
+            final += even_start + i + even_end
+            even = False
+        else:
+            final += odd_start + i + odd_end
+            even = True
+
+    final += ' '
+    logging.debug(final)
+    html.write(final)
+
 
 logging.basicConfig(filename='log', level=logging.DEBUG)
 logger_matches = logging.getLogger("matches")
@@ -264,11 +306,21 @@ for line in manpage.read().splitlines():
 
         elif matches(line, 'BI'):
             logging.debug('Code (bold - italic)')
-            logging.info('STUB')
+
+            if not par:
+                start_paragraph(html)
+                par = True
+
+            alternating(line, BOLD, ITALIC)
 
         elif matches(line, 'IB'):
             logging.debug('Code (italic - bold)')
-            logging.info('STUB')
+
+            if not par:
+                start_paragraph(html)
+                par = True
+
+            alternating(line, ITALIC, BOLD)
 
         elif matches(line, 'BR'):
             logging.debug('Code (bold - normal)')
@@ -277,33 +329,34 @@ for line in manpage.read().splitlines():
                 start_paragraph(html)
                 par = True
 
-            words = parse_paragraph(escape_paragraph(line))
-            final = ''
-
-            even = True
-            for i in words[1:]:
-                if even:
-                    final += bold_start + i + bold_end
-                    even = False
-                else:
-                    final += i
-                    even = True
-
-            final += ' '
-            logging.debug(final)
-            html.write(final)
+            alternating(line, BOLD, NORMAL)
 
         elif matches(line, 'RB'):
             logging.debug('Code (normal - bold)')
-            logging.info('STUB')
+
+            if not par:
+                start_paragraph(html)
+                par = True
+
+            alternating(line, NORMAL, BOLD)
 
         elif matches(line, 'IR'):
             logging.debug('Code (italic - normal)')
-            logging.info('STUB')
+
+            if not par:
+                start_paragraph(html)
+                par = True
+
+            alternating(line, ITALIC, NORMAL)
 
         elif matches(line, 'RI'):
             logging.debug('Code (italic - normal)')
-            logging.info('STUB')
+
+            if not par:
+                start_paragraph(html)
+                par = True
+
+            alternating(line, NORMAL, ITALIC)
 
         elif matches(line, 'SM'):
             logging.debug('Code (small)')
@@ -315,7 +368,19 @@ for line in manpage.read().splitlines():
 
         elif matches(line, 'I '):
             logging.debug('Code (italic)')
-            logging.info('STUB')
+
+            if not par:
+                start_paragraph(html)
+                par = True
+
+            final = ''
+            final += italic_start
+            final += ' '.join(parse_paragraph(escape_paragraph(line))[1:])
+            final += italic_end
+            final += ' '
+
+            logging.debug(final)
+            html.write(final)
 
         elif matches(line, 'B '):
             logging.debug('Code (bold)')
