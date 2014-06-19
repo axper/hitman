@@ -48,6 +48,17 @@ pre {
 	padding-top: 12.7px;
 }
 
+dd, dt {
+	color: #000;
+	font-family: sans-serif;
+	font-size: 12.7px;
+	font-size-adjust: none;
+	font-stretch: normal;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+}
+
 p {
 	color: #000;
 	direction: ltr;
