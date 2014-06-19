@@ -44,7 +44,7 @@ def parse_title(string):
     return csv.reader(title_line, quotechar='"', delimiter=' ',
             quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
-def parse_paragraph(string):
+def split_paragraph(string):
     ''' Splits string into words and takes quotes into account. '''
     title_line = string.splitlines()
     return csv.reader(title_line, quotechar='"', delimiter=' ',
@@ -122,7 +122,7 @@ def parse_man_font(par):
             else:
                 logger_font.warning('already bold')
 
-        elif par[i:i+3] in [r'\fR', r'\fP']:
+        elif par[i:i+3] in [r'\fR', r'\fP', r'\f1']:
 
             if italic:
                 italic = False
@@ -194,7 +194,7 @@ def alternating(line, first, second):
     else:
         logging.error("Incorrect second argument: %s", second)
 
-    words = parse_paragraph(escape_paragraph(line))
+    words = split_paragraph(escape_paragraph(line))
     final = ''
 
     even = True
@@ -275,7 +275,7 @@ for line in manpage.read().splitlines():
                 end_paragraph(html)
                 par = False
 
-            section_title = ' '.join(parse_paragraph(line)[1:]).capitalize()
+            section_title = ' '.join(split_paragraph(line)[1:]).capitalize()
             html.write('<h2>' + section_title + '</h2>\n')
 
             logging.debug(section_title)
@@ -287,7 +287,7 @@ for line in manpage.read().splitlines():
                 end_paragraph(html)
                 par = False
 
-            section_title = ' '.join(parse_paragraph(line)[1:]).capitalize()
+            section_title = ' '.join(split_paragraph(line)[1:]).capitalize()
             html.write('<h3>' + section_title + '</h3>\n')
 
             logging.debug(section_title)
@@ -384,7 +384,7 @@ for line in manpage.read().splitlines():
 
             final = ''
             final += italic_start
-            final += ' '.join(parse_paragraph(escape_paragraph(line))[1:])
+            final += ' '.join(split_paragraph(escape_paragraph(line))[1:])
             final += italic_end
             final += ' '
 
@@ -400,7 +400,7 @@ for line in manpage.read().splitlines():
 
             final = ''
             final += bold_start
-            final += ' '.join(parse_paragraph(escape_paragraph(line))[1:])
+            final += ' '.join(split_paragraph(escape_paragraph(line))[1:])
             final += bold_end
             final += ' '
 
