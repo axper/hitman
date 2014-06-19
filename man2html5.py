@@ -229,6 +229,14 @@ for line in manpage.read().splitlines():
                 par = True
                 html.write('<p>')
 
+        elif matches(line, 'HP') or matches(line, 'IP') or matches(line, 'TP'):
+            logging.debug('Begin hanging or indented paragraph')
+            logging.debug('(ignoring the rest of command)')
+
+            if not par:
+                html.write('<p>')
+                par = True
+
         elif matches(line, 'BI'):
             logging.debug('Code (bold - italic)')
             logging.info('STUB')
@@ -238,19 +246,19 @@ for line in manpage.read().splitlines():
             logging.info('STUB')
 
         elif matches(line, 'BR'):
-            logging.debug('Code (bold roman)')
+            logging.debug('Code (bold - roman)')
             logging.info('STUB')
 
         elif matches(line, 'RB'):
-            logging.debug('Code (roman bold)')
+            logging.debug('Code (roman - bold)')
             logging.info('STUB')
 
         elif matches(line, 'IR'):
-            logging.debug('Code (italic roman)')
+            logging.debug('Code (italic - roman)')
             logging.info('STUB')
 
         elif matches(line, 'RI'):
-            logging.debug('Code (italic roman)')
+            logging.debug('Code (italic - roman)')
             logging.info('STUB')
 
         elif matches(line, 'SM'):
