@@ -17,16 +17,31 @@ import logging
 import re
 
 
+bold_start = '<code>'
+bold_end = '</code>'
+italic_start = '<code><i>'
+italic_end = '</code></i>'
+
+
 def open_unzip_manpage(filename):
-    ''' Opens file in text mode and unzips if necessary '''
+    ''' Opens file in text mode and unzips if necessary. '''
     if mimetypes.guess_type(filename)[1] == 'gzip':
         return gzip.open(filename, mode='rt')
     else:
         return open(filename, mode='rt')
 
 def parse_title(string):
-    ''' Splits string into 5 parts while taking quotes into account '''
+    ''' Splits string into 5 parts while taking quotes into account.
+    
+        Ignores first 3 characters.
+    '''
     title_line = string[3:].splitlines()
+    return csv.reader(title_line, quotechar='"', delimiter=' ',
+            quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
+
+def parse_paragraph(string):
+    ''' Splits string into words and takes quotes into account. '''
+    title_line = string.splitlines()
     return csv.reader(title_line, quotechar='"', delimiter=' ',
             quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
@@ -76,11 +91,6 @@ def parse_man_font(par):
     ''' Parses man inline font escapes and replaces with HTML. '''
     italic = False
     bold = False
-
-    bold_start = '<code>'
-    bold_end = '</code>'
-    italic_start = '<code><i>'
-    italic_end = '</code></i>'
 
     i = 0
     while i < len(par) - 2:
@@ -247,7 +257,20 @@ for line in manpage.read().splitlines():
 
         elif matches(line, 'BR'):
             logging.debug('Code (bold - roman)')
-            logging.info('STUB')
+            words = parse_paragraph(line)
+
+            bold = True
+            for i in words[1:]:
+                if bold:
+                    html.write(bold_start)
+                    html.write(i)
+                    html.write(bold_end)
+                    bold = False
+                else:
+                    html.write(i)
+                    bold = True
+
+            html.write(' ')
 
         elif matches(line, 'RB'):
             logging.debug('Code (roman - bold)')
