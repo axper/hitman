@@ -28,7 +28,7 @@ BOLD = 1
 ITALIC = 2
 
 
-def open_unzip_manpage(filename):
+def open_manpage(filename):
     ''' Opens file in text mode and unzips if necessary. '''
     if mimetypes.guess_type(filename)[1] == 'gzip':
         return gzip.open(filename, mode='rt')
@@ -227,7 +227,7 @@ parser.add_argument('file', type=str, help='manpage file to parse')
 args = parser.parse_args()
 
 
-file_manpage = open_unzip_manpage(args.file)
+file_manpage = open_manpage(args.file)
 file_html = open('result.html', 'wt')
 
 
