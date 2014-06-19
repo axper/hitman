@@ -153,9 +153,11 @@ def sub_inline_font(par):
 
 def escape_paragraph(paragraph):
     ''' Escapes HTML and man commands. '''
+    # Escape HTML chars
     paragraph = cgi.escape(paragraph)
-
+    # Replace \-
     paragraph = re.sub(r'\\-', '-', paragraph)
+    # Replace inline fonts
     paragraph = sub_inline_font(paragraph)
 
     return paragraph
