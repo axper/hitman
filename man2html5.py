@@ -407,6 +407,14 @@ for line in manpage.read().splitlines():
             logging.debug(final)
             html.write(final)
 
+        elif matches(line, 'br'):
+            logging.debug('Line break')
+
+            if par:
+                end_paragraph(html)
+
+            par = False
+
         else:
             logging.info('Unknown command: %s', line)
 

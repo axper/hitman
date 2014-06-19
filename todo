@@ -7,8 +7,6 @@ unixcmd(1), idevicename(1)
 	add .TP handling via dl/dt/dd
 ipcontroller(1)
 	slash escape handling
-ipcluster(1), sndfile-metadata-set()
-	.br handling
 ppmtouil(1)
 	do not rely on .TH being first command
 psfgettable(1)
