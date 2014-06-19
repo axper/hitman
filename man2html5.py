@@ -14,6 +14,7 @@ import csv
 import cgi
 import argparse
 import logging
+import re
 
 
 def open_unzip_manpage(filename):
@@ -73,8 +74,11 @@ def matches_command(line, command):
 
 def escape_paragraph(paragraph):
     ''' Escapes HTML and man commands. '''
-    parnew = cgi.escape(paragraph)
-    return parnew
+    paragraph = cgi.escape(paragraph)
+
+    paragraph = re.sub(r'\\-', '-', paragraph)
+
+    return paragraph
 
 
 
@@ -193,6 +197,8 @@ for line in manpage.read().splitlines():
             html.write('<p>')
             in_par = True
             html.write(linenew)
+
+        logging.debug(linenew)
 
 
 html.write('</div>\n')
