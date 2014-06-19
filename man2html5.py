@@ -23,6 +23,11 @@ italic_start = '<code><i>'
 italic_end = '</code></i>'
 
 
+NORMAL = 0
+BOLD = 1
+ITALIC = 2
+
+
 def open_unzip_manpage(filename):
     ''' Opens file in text mode and unzips if necessary. '''
     if mimetypes.guess_type(filename)[1] == 'gzip':
@@ -275,14 +280,14 @@ for line in manpage.read().splitlines():
             words = parse_paragraph(escape_paragraph(line))
             final = ''
 
-            bold = True
+            even = True
             for i in words[1:]:
-                if bold:
+                if even:
                     final += bold_start + i + bold_end
-                    bold = False
+                    even = False
                 else:
                     final += i
-                    bold = True
+                    even = True
 
             final += ' '
             logging.debug(final)
