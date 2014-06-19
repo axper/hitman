@@ -261,11 +261,11 @@ for line in manpage.read().splitlines():
             logging.debug('Code (small bold)')
             logging.info('STUB')
 
-        elif matches(line, 'I'):
+        elif matches(line, 'I '):
             logging.debug('Code (italic)')
             logging.info('STUB')
 
-        elif matches(line, 'B'):
+        elif matches(line, 'B '):
             logging.debug('Code (bold)')
 
             line = cgi.escape(line)
