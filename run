@@ -1,7 +1,5 @@
 #!/bin/sh
 
-echo $#
-
 if [[ $# -ne 1 ]]; then
 	echo 'give me something'
 	exit
