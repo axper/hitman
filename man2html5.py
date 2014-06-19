@@ -54,9 +54,34 @@ def section_name(section):
     else:
         return 'UNKNOWN SECTION'
 
+def matches_command(line, command):
+    ''' Returns True if line starts with command. '''
+    logger_matches.debug('Comparing %s and %s', line, command)
+    if len(line) - 1 < len(command):
+        logger_matches.debug('Comp returns False (length)')
+        return False
+
+    for i in range(len(command)):
+        logger_matches.debug('Comp<%s><%s>', line[1 + i], command[i])
+        if line[1 + i] != command[i]:
+            break
+    else:
+        logger_matches.debug('Comp returns True')
+        return True
+    logger_matches.debug('Comp returns False')
+    return False
+
+def escape_paragraph(paragraph):
+    ''' Escapes HTML and man commands. '''
+    parnew = cgi.escape(paragraph)
+    return parnew
+
 
 
 logging.basicConfig(filename='log', level=logging.DEBUG)
+logger_matches = logging.getLogger("matches_command")
+logger_matches.setLevel(logging.INFO)
+
 parser = argparse.ArgumentParser(description='Converts Linux manpages to HTML5.')
 parser.add_argument('file', type=str, help='manpage file to parse')
 args = parser.parse_args()
@@ -70,19 +95,20 @@ in_par = False
 
 for line in manpage.read().splitlines():
     logging.debug('-' * 79)
+    logging.debug(line)
 
     # Empty line
     if line == '':
-        logging.debug('Empty line')
+        logging.debug('An empty line')
     # Command
     elif line[0] in ['\'', '.']:
-        logging.debug('Is Command')
 
-        # Comment
-        if line[:3] == r'.\"':
-            continue
-        # The title line
-        elif line[:3] == r'.TH':
+        if matches_command(line, '\\"'):
+            logging.debug('A comment')
+
+        elif matches_command(line, 'TH'):
+            logging.debug('A title line')
+
             title = parse_title(line)
             title[0] = title[0].lower()
 
@@ -98,29 +124,51 @@ for line in manpage.read().splitlines():
             html.write('<body>\n')
             html.write('<div id=\'content\'>\n')
             html.write('<h1>' + title[0] + '</h1>\n')
-        # Section
-        elif line[:3] == r'.SH':
+
+            logging.debug(title)
+
+        elif matches_command(line, 'SH'):
+            logging.debug('A section title')
+
             if in_par:
                 html.write('</p>\n')
                 in_par = False
 
             section_title = line[4:].capitalize()
             html.write('<h2>' + section_title + '</h2>\n')
-            logging.debug('Sec     : %s', section_title)
-        # Paragraph (sentence)
-        elif line[:1] != r'.':
-            line = ' ' + cgi.escape(line) + ' '
-            if in_par:
-                html.write(line)
-            else:
-                html.write('<p>')
-                in_par = True
-                html.write(line)
 
-            logging.debug('Paragrph: %s', line)
-        # Code
-        elif line[:3] in (r'.B ', r'.I', r'.BI', r'.BR',
-                r'.IB', r'.IR', r'.RB', r'.RI', r'.SB', r'.SM'):
+            logging.debug(section_title)
+
+        elif matches_command(line, 'BI'):
+            logging.debug('Code (bold - italic)')
+
+        elif matches_command(line, 'IB'):
+            logging.debug('Code (italic - bold)')
+
+        elif matches_command(line, 'BR'):
+            logging.debug('Code (bold roman)')
+
+        elif matches_command(line, 'RB'):
+            logging.debug('Code (roman bold)')
+
+        elif matches_command(line, 'IR'):
+            logging.debug('Code (italic roman)')
+
+        elif matches_command(line, 'RI'):
+            logging.debug('Code (italic roman)')
+
+        elif matches_command(line, 'SM'):
+            logging.debug('Code (small)')
+
+        elif matches_command(line, 'SB'):
+            logging.debug('Code (small bold)')
+
+        elif matches_command(line, 'I'):
+            logging.debug('Code (italic)')
+
+        elif matches_command(line, 'B'):
+            logging.debug('Code (bold)')
+
             line = cgi.escape(line)
             line = line.replace('"', '')
             line = ' <code>' + line[3:].strip() + '</code> '
@@ -132,9 +180,20 @@ for line in manpage.read().splitlines():
                 in_par = True
                 html.write(line)
 
-            logging.debug('Code    : %s', line)
+        else:
+            logging.info('Unknown command: %s', line)
+
     else:
-        logging.info('>>>>!!!!!!!!!!UNKNOWN: %s', line)
+        logging.debug('A paragraph')
+
+        linenew = escape_paragraph(line)
+        if in_par:
+            html.write(linenew)
+        else:
+            html.write('<p>')
+            in_par = True
+            html.write(linenew)
+
 
 html.write('</div>\n')
 html.write('</body>\n')
