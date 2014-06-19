@@ -162,6 +162,12 @@ for line in manpage.read().splitlines():
     # Empty line
     if line == '':
         logging.debug('An empty line')
+
+        if par:
+            html.write('</p>\n')
+
+        par = False
+
     # Command
     elif line[0] in ['\'', '.']:
 
