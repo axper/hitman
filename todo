@@ -1,4 +1,4 @@
-synopsis section via pre
+synopsis section via pre, especially disdvi()
 rdx(1)
 	_main rainbow
 chvt(1)
@@ -11,3 +11,7 @@ ppmtouil(1)
 	do not rely on .TH being first command
 psfgettable(1)
 	wtf is .IX
+gnome-calculator(1)
+	.PD
+gnome-calculator(1)
+	.sp
