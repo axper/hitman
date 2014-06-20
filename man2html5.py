@@ -431,7 +431,7 @@ class Request:
             st.par = False
 
 
-man_requests = {
+requests = {
     #'' : ('empty line', ),
     '\\"' : ('comment', Request.comment),
 
@@ -745,7 +745,7 @@ man_requests = {
     'do' : ('switch compatability mode 2', ),
 }
 
-sub_inline = {
+escape_sequences = {
     #('\\*' : ('change font size'),
     #('\\*(HF' : ('section header font'),
 
@@ -803,7 +803,7 @@ for line in st.file_manpage.read().splitlines():
         continue
 
     request = line[1:].split()[0]
-    command_info = man_requests[request]
+    command_info = requests[request]
     d('Type: %s', command_info[0])
 
     if len(command_info) >= 2:
