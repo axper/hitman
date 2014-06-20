@@ -250,6 +250,7 @@ class State:
     control_char = '.'
     control_char_nobreak = '\''
     escape_char = '\\'
+    no_break = False
 
 st = State()
 
