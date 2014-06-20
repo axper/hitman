@@ -32,7 +32,7 @@ def open_man_file(filename):
             exit(1)
     else:
         try:
-            return open(filename, mode='t')
+            return open(filename)
         except FileNotFoundError as err:
             print(err)
             exit(1)
