@@ -35,15 +35,6 @@ def open_manpage(filename):
     else:
         return open(filename, mode='rt')
 
-def split_title(string):
-    ''' Splits string into 5 parts while taking quotes into account.
-    
-        Ignores first 3 characters.
-    '''
-    title_line = string[3:].splitlines()
-    return csv.reader(title_line, quotechar='"', delimiter=' ',
-            quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
-
 def split_paragraph(string):
     ''' Splits string into words and takes quotes into account. '''
     title_line = string.splitlines()
@@ -256,7 +247,7 @@ for line in iterator_lines:
         elif matches(line, 'TH'):
             logging.debug('A title line')
 
-            title = split_title(line)
+            title = split_paragraph(line)[1:]
             title[0] = title[0].lower()
 
             file_html.write('<!doctype HTML>\n')
