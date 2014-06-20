@@ -260,13 +260,33 @@ class CommandHandlers:
     def comment(st, line):
         pass
 
+    def title(st, line):
+        title = split_with_quotes(line)[1:]
+        title[0] = title[0].lower()
+
+        st.file_html.write('<!doctype HTML>\n')
+        st.file_html.write('<html>\n')
+        st.file_html.write('<head>\n')
+        st.file_html.write('<meta charset=\'utf-8\'>\n')
+        st.file_html.write('<title>' + title[0] + ' - ' + 
+                section_name(title[1]) + ' - ' +
+                'Man page</title>\n')
+        st.file_html.write('<link rel=\'stylesheet\' type=\'text/css\''
+                ' href=\'style.css\'>\n')
+        st.file_html.write('</head>\n')
+        st.file_html.write('<body>\n')
+        st.file_html.write('<h1>' + title[0] + '</h1>\n')
+
+        logging.debug(title)
+
+
 man_commands_start = {
     #'' : ('empty line', ),
     '\\"' : ('comment', CommandHandlers.comment),
 
     ## Man macro package
     # Usage
-    'TH' : ('title line', ),
+    'TH' : ('title line', CommandHandlers.title),
     'SH' : ('section title', ),
     'SS' : ('subsection title', ),
     'TP' : ('new paragraph hanging 1', ),
@@ -648,28 +668,7 @@ for line in st.file_manpage.read().splitlines():
         logging.info('Stub: %s', command_info[0])
     
 
-    if matches(line, 'TH'):
-        logging.debug('A title line')
-
-        title = split_with_quotes(line)[1:]
-        title[0] = title[0].lower()
-
-        st.file_html.write('<!doctype HTML>\n')
-        st.file_html.write('<html>\n')
-        st.file_html.write('<head>\n')
-        st.file_html.write('<meta charset=\'utf-8\'>\n')
-        st.file_html.write('<title>' + title[0] + ' - ' + 
-                section_name(title[1]) + ' - ' +
-                'Man page</title>\n')
-        st.file_html.write('<link rel=\'stylesheet\' type=\'text/css\''
-                ' href=\'style.css\'>\n')
-        st.file_html.write('</head>\n')
-        st.file_html.write('<body>\n')
-        st.file_html.write('<h1>' + title[0] + '</h1>\n')
-
-        logging.debug(title)
-
-    elif matches(line, 'SH'):
+    if matches(line, 'SH'):
         logging.debug('A section title')
 
         if st.par:
