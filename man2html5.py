@@ -287,6 +287,7 @@ for line in st.file_manpage.read().splitlines():
         st.no_break = False
     else:
         CommandHandlers.sentence(st, line)
+        continue
 
     # Definitely a command now
     if matches(line, '\\"'):
