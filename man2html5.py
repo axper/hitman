@@ -3,7 +3,7 @@
 
 # This program convets Linux manpages to HTML5 format.
 # Used man file specifications:
-# groff(7), groff_me(7), groff_man(7), man(7)
+# groff(7), groff_me(7), groff_man(7), man(7), info groff
 
 
 import mimetypes
