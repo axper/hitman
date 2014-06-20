@@ -826,6 +826,7 @@ for line in st.file_manpage.read().splitlines():
         request = line[1:].split()[0]
     except IndexError:
         logging.info('Stub: single character control sequence on the line')
+        continue
 
     command_info = requests[request]
     d('Type: %s', command_info[0])
