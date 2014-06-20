@@ -1,5 +1,5 @@
 man_commands_start = {
-    '' : ('empty line', ),
+    #'' : ('empty line', ),
     '\\"' : ('comment', ),
 
     ## Man macro package
