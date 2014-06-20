@@ -5,7 +5,7 @@ rdx(1)
 chvt(1)
 	italic right after bold shouldn't close <code>
 unixcmd(1), idevicename(1)
-	add .TP handling via dl/dt/dd
+	add .TP handling via dl/dt/dd; dd css
 ipcontroller(1)
 	slash escape handling
 ppmtouil(1)
