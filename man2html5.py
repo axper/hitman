@@ -289,6 +289,16 @@ class CommandHandlers:
 
         logging.debug(section_title)
 
+    def subsection_title(st, line):
+        if st.par:
+            end_paragraph(st.file_html)
+            st.par = False
+
+        section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
+        st.file_html.write('<h3>' + section_title + '</h3>\n')
+
+        logging.debug(section_title)
+
 
 man_commands_start = {
     #'' : ('empty line', ),
@@ -298,7 +308,7 @@ man_commands_start = {
     # Usage
     'TH' : ('title line', CommandHandlers.title),
     'SH' : ('section title', CommandHandlers.section_title),
-    'SS' : ('subsection title', ),
+    'SS' : ('subsection title', CommandHandlers.subsection_title),
     'TP' : ('new paragraph hanging 1', ),
     'LP' : ('new paragraph 1', ),
     'PP' : ('new paragraph 2', ),
@@ -678,19 +688,7 @@ for line in st.file_manpage.read().splitlines():
         logging.info('Stub: %s', command_info[0])
     
 
-    if matches(line, 'SS'):
-        logging.debug('A subsection title')
-
-        if st.par:
-            end_paragraph(st.file_html)
-            st.par = False
-
-        section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
-        st.file_html.write('<h3>' + section_title + '</h3>\n')
-
-        logging.debug(section_title)
-
-    elif matches(line, 'PP') or matches(line, 'P ') or matches(line, 'LP'):
+    if matches(line, 'PP') or matches(line, 'P ') or matches(line, 'LP'):
         logging.debug('Begin new state paragraph')
 
         if st.par:
