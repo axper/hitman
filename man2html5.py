@@ -33,7 +33,7 @@ def split_with_quotes(string):
     ''' Splits string into words and takes quotes into account. '''
     title_line = string.splitlines()
     return csv.reader(title_line, quotechar='"', delimiter=' ',
-            quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
+                      quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
 def section_name(section):
     ''' Returns name of manpage section number. '''
@@ -201,7 +201,7 @@ def initialize_logging():
 
 def initialize_get_args():
     ''' Returns command line arguments. '''
-    parser = argparse.ArgumentParser(description='Converts Linux manpages to HTML5.')
+    parser = argparse.ArgumentParser(description='Manpage to HTML5 converter.')
     parser.add_argument('file', type=str, help='manpage file to parse')
     return parser.parse_args()
 
@@ -510,7 +510,6 @@ requests = {
 
     ## Requests from gtroff info page
     # Registers
-    # \nXXXXX - get register
     'nr' : ('define register', ),
     'rr' : ('remove register', ),
     'rnn' : ('rename register', ),
@@ -752,7 +751,7 @@ requests = {
 # \* - interpolate string (change font size???)
 
 # \(XX - escape sequence name of exactly 2 characters
-# \[XXXXX] - long escape sequence name
+# \[X] - long escape sequence name
 
 # dq - "
 # cq - '
