@@ -285,7 +285,7 @@ class HtmlActions:
 
 
 
-class RequestHandlers:
+class Request:
     ''' Functions to handle requests at beginning of lines. '''
     def empty_line(st, line):
         d('empty line')
@@ -437,33 +437,33 @@ class RequestHandlers:
 
 man_requests = {
     #'' : ('empty line', ),
-    '\\"' : ('comment', RequestHandlers.comment),
+    '\\"' : ('comment', Request.comment),
 
     ## Man macro package
     # Usage
-    'TH' : ('title line', RequestHandlers.title),
-    'SH' : ('section title', RequestHandlers.section_title),
-    'SS' : ('subsection title', RequestHandlers.subsection_title),
-    'LP' : ('new paragraph 1', RequestHandlers.new_paragraph),
-    'PP' : ('new paragraph 2', RequestHandlers.new_paragraph),
-    'P' : ('new paragraph 3', RequestHandlers.new_paragraph),
-    'TP' : ('new paragraph hanging 1', RequestHandlers.hanging_indented_paragraph),
-    'IP' : ('new paragraph hanging 2', RequestHandlers.hanging_indented_paragraph),
-    'HP' : ('new paragraph hanging 3', RequestHandlers.hanging_indented_paragraph),
+    'TH' : ('title line', Request.title),
+    'SH' : ('section title', Request.section_title),
+    'SS' : ('subsection title', Request.subsection_title),
+    'LP' : ('new paragraph 1', Request.new_paragraph),
+    'PP' : ('new paragraph 2', Request.new_paragraph),
+    'P' : ('new paragraph 3', Request.new_paragraph),
+    'TP' : ('new paragraph hanging 1', Request.hanging_indented_paragraph),
+    'IP' : ('new paragraph hanging 2', Request.hanging_indented_paragraph),
+    'HP' : ('new paragraph hanging 3', Request.hanging_indented_paragraph),
     'RS' : ('start indent', ),
     'RE' : ('end indent', ),
 
     # Font
     'SM' : ('font small', ),
     'SB' : ('font small alt bold', ),
-    'BI' : ('font bold alt italic', RequestHandlers.alt_bold_italic),
-    'IB' : ('font italic alt bold', RequestHandlers.alt_italic_bold),
-    'RI' : ('font normal alt italic', RequestHandlers.alt_normal_italic),
-    'IR' : ('font italic alt normal', RequestHandlers.alt_italic_normal),
-    'BR' : ('font bold alt normal', RequestHandlers.alt_bold_normal),
-    'RB' : ('font normal alt bold', RequestHandlers.alt_normal_bold),
-    'B' : ('font bold', RequestHandlers.font_bold),
-    'I' : ('font italic', RequestHandlers.font_italic),
+    'BI' : ('font bold alt italic', Request.alt_bold_italic),
+    'IB' : ('font italic alt bold', Request.alt_italic_bold),
+    'RI' : ('font normal alt italic', Request.alt_normal_italic),
+    'IR' : ('font italic alt normal', Request.alt_italic_normal),
+    'BR' : ('font bold alt normal', Request.alt_bold_normal),
+    'RB' : ('font normal alt bold', Request.alt_normal_bold),
+    'B' : ('font bold', Request.font_bold),
+    'I' : ('font italic', Request.font_italic),
     #('R' : ('font normal', ),
 
     # Misc
@@ -522,7 +522,7 @@ man_requests = {
     'af' : ('change register output format', ),
 
     # Filling and adjusting
-    'br' : ('line break', RequestHandlers.line_break),
+    'br' : ('line break', Request.line_break),
     'fi' : ('enable fill mode', ),
     'nf' : ('disable fill mode', ),
     'ad' : ('set adjusting mode', ),
@@ -548,7 +548,7 @@ man_requests = {
     'hla' : ('set hypenation language', ),
 
     # Spacing
-    'sp' : ('space downwards', RequestHandlers.line_break),
+    'sp' : ('space downwards', Request.line_break),
     'ls' : ('print blank lines', ),
     'ns' : ('disable line spacing', ),
 
@@ -793,7 +793,7 @@ for line in st.file_manpage.read().splitlines():
     d(line)
 
     if line == '':
-        RequestHandlers.empty_line(st, line)
+        Request.empty_line(st, line)
         continue
 
     if line[0] == st.control_char_nobreak:
@@ -801,7 +801,7 @@ for line in st.file_manpage.read().splitlines():
     elif line[0] == st.control_char:
         st.no_break = False
     else:
-        RequestHandlers.text_line(st, line)
+        Request.text_line(st, line)
         continue
 
     request = line.split()[0][1:]
@@ -813,7 +813,7 @@ for line in st.file_manpage.read().splitlines():
     else:
         logging.info('Stub: %s', command_info[0])
     
-RequestHandlers.finalize(st)
+Request.finalize(st)
 
 html_actions.write_html_footer()
 deinitialize(st)
