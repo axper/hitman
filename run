@@ -7,6 +7,11 @@ fi
 
 rm --force log
 ./man2html5.py "/usr/share/man/man1/${1}.1.gz"
+
+if [[ $? -ne 0 ]]; then
+	exit
+fi
+
 gvim log
 gvim "/usr/share/man/man1/${1}.1.gz"
 gvim ./result.html
