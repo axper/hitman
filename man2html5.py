@@ -233,7 +233,7 @@ def initialize(st):
 
 
 class State:
-    ''' The global program state variables. '''
+    ''' The global state variables. '''
     file_manpage = None
     file_html = None
     par = False
@@ -242,8 +242,8 @@ st = State()
 
 initialize(st)
 
-iterator_lines = iter(st.file_manpage.read().splitlines())
-for line in iterator_lines:
+
+for line in st.file_manpage.read().splitlines():
     logging.debug('-' * 79)
     logging.debug(line)
 
@@ -423,10 +423,6 @@ for line in iterator_lines:
 
         elif matches(line, 'UR'):
             logging.debug('Start URL')
-
-            #url = ''.join(split_with_quotes(escape_paragraph(line))[1:])
-            #logging.debug(url)
-            #logging.debug(next(iterator_lines))
 
         elif matches(line, 'br') or matches(line, 'sp'):
             logging.debug('Line break')
