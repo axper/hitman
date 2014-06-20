@@ -218,6 +218,15 @@ def deinitialize(st):
     st.file_manpage.close()
 
 
+class State:
+    ''' The global state variables. '''
+    file_manpage = None
+    file_html = None
+    par = False
+    control_char = '.'
+    control_char_nobreak = '\''
+    escape_char = '\\'
+    no_break = False
 
 class HtmlActions:
     paragraph_start = '<p>\n'
@@ -766,20 +775,8 @@ man_sub_inline = {
     '\\c' : (''), # continue current line
 }
 
-class State:
-    ''' The global state variables. '''
-    file_manpage = None
-    file_html = None
-    par = False
-    control_char = '.'
-    control_char_nobreak = '\''
-    escape_char = '\\'
-    no_break = False
-
 st = State()
-
 initialize(st)
-
 html_actions = HtmlActions(st.file_html)
 
 
@@ -808,12 +805,9 @@ for line in st.file_manpage.read().splitlines():
     else:
         logging.info('Stub: %s', command_info[0])
     
-
 if st.par:
     html_actions.end_paragraph()
     st.par = False
 
-
 html_actions.write_html_footer()
-
 deinitialize(st)
