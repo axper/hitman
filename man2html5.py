@@ -15,10 +15,6 @@ import logging
 import re
 
 
-bold_start = '<code>'
-bold_end = '</code>'
-italic_start = '<code><i>'
-italic_end = '</i></code>'
 
 
 NORMAL = 0
@@ -40,7 +36,7 @@ def split_with_quotes(string):
             quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
 def section_name(section):
-    ''' Returns name of manpage section number '''
+    ''' Returns name of manpage section number. '''
     if section == '0':
         return 'POSIX headers'
     if section == '1':
@@ -155,14 +151,6 @@ def escape_paragraph(paragraph):
 
     return paragraph
 
-def start_paragraph(file_html):
-    ''' Writes <p> to html file. '''
-    file_html.write('<p>')
-
-def end_paragraph(file_html):
-    ''' Writes </p> and newline to html file. '''
-    file_html.write('</p>\n')
-
 def alternating(st, line, first, second):
     ''' Writes HTML line alternating between first and second styles. '''
     if first == BOLD:
@@ -230,13 +218,62 @@ def initialize(st):
     st.file_html = open('result.html', 'wt')
 
 
+
+# temporary
+bold_start = '<code><b>'
+bold_end = '</b></code>'
+
+italic_start = '<code><i>'
+italic_end = '</i></code>'
+
+class HtmlActions:
+    paragraph_start = '<p>\n'
+    paragraph_end = '</p>\n'
+
+    bold_start = '<code><b>'
+    bold_end = '</b></code>'
+
+    italic_start = '<code><i>'
+    italic_end = '</i></code>'
+
+    # title[0]
+    # title[1]
+    # title[0]
+    header = '<!doctype HTML>\n' \
+            '<html>\n' \
+            '<head>\n' \
+            '<meta charset=\'utf-8\'>\n' \
+            '<title>{0} - {1} - Man page</title>\n' \
+            '<link rel=\'stylesheet\' type=\'text/css\' href=\'style.css\'>\n' \
+            '</head>\n' \
+            '<body>\n' \
+            '<h1>{0}</h1>\n'
+    footer = '</body>\n' \
+            '</html>\n'
+
+    def __init__(self, html_file):
+        self.html_file = html_file
+
+    def write_html_header(self, title):
+        self.html_file.write(self.header.format(title[0], section_name(title[1])))
+
+    def write_html_footer(self):
+        self.html_file.write(self.footer)
+
+    def start_paragraph(self):
+        self.html_file.write(self.paragraph_start)
+
+    def end_paragraph(self):
+        self.html_file.write(self.paragraph_end)
+
+
 class CommandHandlers:
     ''' Functions to handle requests at beginning of lines. '''
     def empty_line(st, line):
         logging.debug('empty line')
 
         if st.par:
-            end_paragraph(st.file_html)
+            html_actions.end_paragraph()
 
         st.par = False
 
@@ -251,7 +288,7 @@ class CommandHandlers:
             st.file_html.write(linenew)
         else:
             logging.debug('starting paragraph')
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
             st.par = True
             st.file_html.write(linenew)
 
@@ -264,24 +301,13 @@ class CommandHandlers:
         title = split_with_quotes(line)[1:]
         title[0] = title[0].lower()
 
-        st.file_html.write('<!doctype HTML>\n')
-        st.file_html.write('<html>\n')
-        st.file_html.write('<head>\n')
-        st.file_html.write('<meta charset=\'utf-8\'>\n')
-        st.file_html.write('<title>' + title[0] + ' - ' + 
-                section_name(title[1]) + ' - ' +
-                'Man page</title>\n')
-        st.file_html.write('<link rel=\'stylesheet\' type=\'text/css\''
-                ' href=\'style.css\'>\n')
-        st.file_html.write('</head>\n')
-        st.file_html.write('<body>\n')
-        st.file_html.write('<h1>' + title[0] + '</h1>\n')
+        html_actions.write_html_header(title)
 
         logging.debug(title)
 
     def section_title(st, line):
         if st.par:
-            end_paragraph(st.file_html)
+            html_actions.end_paragraph()
             st.par = False
 
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
@@ -291,7 +317,7 @@ class CommandHandlers:
 
     def subsection_title(st, line):
         if st.par:
-            end_paragraph(st.file_html)
+            html_actions.end_paragraph()
             st.par = False
 
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
@@ -301,67 +327,67 @@ class CommandHandlers:
 
     def new_paragraph(st, line):
         if st.par:
-            end_paragraph(st.file_html)
-            start_paragraph(st.file_html)
+            html_actions.end_paragraph()
+            html_actions.start_paragraph()
         else:
             st.par = True
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
 
     def hanging_indented_paragraph(st, line):
         logging.info('hanging or indented paragraph (ignoring...)')
 
         if not st.par:
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
             st.par = True
         else:
-            end_paragraph(st.file_html)
-            start_paragraph(st.file_html)
+            html_actions.end_paragraph()
+            html_actions.start_paragraph()
 
     def alt_bold_italic(st, line):
         if not st.par:
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
             st.par = True
 
         alternating(st, line, BOLD, ITALIC)
 
     def alt_italic_bold(st, line):
         if not st.par:
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
             st.par = True
 
         alternating(st, line, ITALIC, BOLD)
 
     def alt_bold_normal(st, line):
         if not st.par:
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
             st.par = True
 
         alternating(st, line, BOLD, NORMAL)
 
     def alt_normal_bold(st, line):
         if not st.par:
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
             st.par = True
 
         alternating(st, line, NORMAL, BOLD)
 
     def alt_italic_normal(st, line):
         if not st.par:
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
             st.par = True
 
         alternating(st, line, ITALIC, NORMAL)
 
     def alt_normal_italic(st, line):
         if not st.par:
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
             st.par = True
 
         alternating(st, line, NORMAL, ITALIC)
     
     def font_italic(st, line):
         if not st.par:
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
             st.par = True
 
         final = ''
@@ -375,7 +401,7 @@ class CommandHandlers:
 
     def font_bold(st, line):
         if not st.par:
-            start_paragraph(st.file_html)
+            html_actions.start_paragraph()
             st.par = True
 
         final = ''
@@ -389,7 +415,7 @@ class CommandHandlers:
 
     def line_break(st, line):
         if st.par:
-            end_paragraph(st.file_html)
+            html_actions.end_paragraph()
 
         st.par = False
 
@@ -756,6 +782,8 @@ st = State()
 
 initialize(st)
 
+html_actions = HtmlActions(st.file_html)
+
 
 for line in st.file_manpage.read().splitlines():
     logging.debug('-' * 79)
@@ -784,13 +812,11 @@ for line in st.file_manpage.read().splitlines():
     
 
 if st.par:
-    end_paragraph(st.file_html)
+    html_actions.end_paragraph()
     st.par = False
 
 
-
-st.file_html.write('</body>\n')
-st.file_html.write('</html>\n')
+html_actions.write_html_footer()
 
 st.file_manpage.close()
 st.file_html.close()
