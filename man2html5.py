@@ -769,7 +769,7 @@ sub_inline = {
 
     # Current escape character (ususally backslash)
     '\\\\' : ('\\'),
-    '\\e' : ('\\'),
+    '\\e' : ('\\'), # Current escape character
     '\\E' : ('\\'),
     '\\.' : ('.'), # wrong if escape char is not backslash
 
