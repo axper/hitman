@@ -428,7 +428,7 @@ class RequestHandlers:
 
 
 
-man_commands_start = {
+man_requests = {
     #'' : ('empty line', ),
     '\\"' : ('comment', RequestHandlers.comment),
 
@@ -798,7 +798,7 @@ for line in st.file_manpage.read().splitlines():
         continue
 
     request = line.split()[0][1:]
-    command_info = man_commands_start[request]
+    command_info = man_requests[request]
     d('Type: %s', command_info[0])
 
     if len(command_info) >= 2:
