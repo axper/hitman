@@ -788,7 +788,7 @@ for line in st.file_manpage.read().splitlines():
     d('-' * 79)
     d(line)
 
-    if line == '':
+    if not line:
         d('empty line')
         Request.empty_line(st, line)
         continue
