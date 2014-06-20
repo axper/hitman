@@ -187,7 +187,7 @@ def alternating(st, line, first, second):
             even = True
 
     final += ' '
-    logging.debug(final)
+    d(final)
     st.file_html.write(final)
 
 def initialize_logging():
@@ -285,7 +285,7 @@ class HtmlActions:
 class CommandHandlers:
     ''' Functions to handle requests at beginning of lines. '''
     def empty_line(st, line):
-        logging.debug('empty line')
+        d('empty line')
 
         if st.par:
             html_actions.end_paragraph()
@@ -293,21 +293,21 @@ class CommandHandlers:
         st.par = False
 
     def sentence(st, line):
-        logging.debug('sentence')
+        d('sentence')
 
         linenew = escape_paragraph(line)
         linenew += '\n'
 
         if st.par:
-            logging.debug('already in paragraph')
+            d('already in paragraph')
             st.file_html.write(linenew)
         else:
-            logging.debug('starting paragraph')
+            d('starting paragraph')
             html_actions.start_paragraph()
             st.par = True
             st.file_html.write(linenew)
 
-        logging.debug(linenew)
+        d(linenew)
 
     def comment(st, line):
         pass
@@ -318,7 +318,7 @@ class CommandHandlers:
 
         html_actions.write_html_header(title)
 
-        logging.debug(title)
+        d(title)
 
     def section_title(st, line):
         if st.par:
@@ -328,7 +328,7 @@ class CommandHandlers:
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
         st.file_html.write('<h2>' + section_title + '</h2>\n')
 
-        logging.debug(section_title)
+        d(section_title)
 
     def subsection_title(st, line):
         if st.par:
@@ -338,7 +338,7 @@ class CommandHandlers:
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
         st.file_html.write('<h3>' + section_title + '</h3>\n')
 
-        logging.debug(section_title)
+        d(section_title)
 
     def new_paragraph(st, line):
         if st.par:
@@ -778,11 +778,12 @@ man_sub_inline = {
 st = State()
 initialize(st)
 html_actions = HtmlActions(st.file_html)
+d = logging.debug
 
 
 for line in st.file_manpage.read().splitlines():
-    logging.debug('-' * 79)
-    logging.debug(line)
+    d('-' * 79)
+    d(line)
 
     if line == '':
         CommandHandlers.empty_line(st, line)
@@ -798,7 +799,7 @@ for line in st.file_manpage.read().splitlines():
 
     line_command = line.split()[0][1:]
     command_info = man_commands_start[line_command]
-    logging.debug('Type: %s', command_info[0])
+    d('Type: %s', command_info[0])
 
     if len(command_info) >= 2:
         command_info[1](st, line)
