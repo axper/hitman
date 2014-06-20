@@ -299,6 +299,14 @@ class CommandHandlers:
 
         logging.debug(section_title)
 
+    def new_paragraph(st, line):
+        if st.par:
+            end_paragraph(st.file_html)
+            start_paragraph(st.file_html)
+        else:
+            st.par = True
+            start_paragraph(st.file_html)
+
 
 man_commands_start = {
     #'' : ('empty line', ),
@@ -309,10 +317,10 @@ man_commands_start = {
     'TH' : ('title line', CommandHandlers.title),
     'SH' : ('section title', CommandHandlers.section_title),
     'SS' : ('subsection title', CommandHandlers.subsection_title),
+    'LP' : ('new paragraph 1', CommandHandlers.new_paragraph),
+    'PP' : ('new paragraph 2', CommandHandlers.new_paragraph),
+    'P' : ('new paragraph 3', CommandHandlers.new_paragraph),
     'TP' : ('new paragraph hanging 1', ),
-    'LP' : ('new paragraph 1', ),
-    'PP' : ('new paragraph 2', ),
-    'P' : ('new paragraph 3', ),
     'IP' : ('new paragraph hanging 2', ),
     'HP' : ('new paragraph hanging 3', ),
     'RS' : ('start indent', ),
@@ -688,17 +696,7 @@ for line in st.file_manpage.read().splitlines():
         logging.info('Stub: %s', command_info[0])
     
 
-    if matches(line, 'PP') or matches(line, 'P ') or matches(line, 'LP'):
-        logging.debug('Begin new state paragraph')
-
-        if st.par:
-            end_paragraph(st.file_html)
-            start_paragraph(st.file_html)
-        else:
-            st.par = True
-            start_paragraph(st.file_html)
-
-    elif matches(line, 'HP') or matches(line, 'IP') or matches(line, 'TP'):
+    if matches(line, 'HP') or matches(line, 'IP') or matches(line, 'TP'):
         logging.info('Begin hanging or indented paragraph (ignoring...)')
 
         if not st.par:
