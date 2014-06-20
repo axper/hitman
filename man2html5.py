@@ -1,5 +1,6 @@
 #! /usr/bin/env python3.4
 # -*- coding: utf-8 -*-
+''' This program converts Manpages to HTML5. '''
 
 # This program convets Linux manpages to HTML5 format.
 # Used man file specifications:
