@@ -334,7 +334,7 @@ for line in iterator_lines:
                 start_paragraph(state['file_html'])
                 state['par'] = True
 
-            alternating(line, BOLD, ITALIC)
+            alternating(state, line, BOLD, ITALIC)
 
         elif matches(line, 'IB'):
             logging.debug('Code (italic - bold)')
@@ -343,7 +343,7 @@ for line in iterator_lines:
                 start_paragraph(state['file_html'])
                 state['par'] = True
 
-            alternating(line, ITALIC, BOLD)
+            alternating(state, line, ITALIC, BOLD)
 
         elif matches(line, 'BR'):
             logging.debug('Code (bold - normal)')
@@ -352,7 +352,7 @@ for line in iterator_lines:
                 start_paragraph(state['file_html'])
                 state['par'] = True
 
-            alternating(line, BOLD, NORMAL)
+            alternating(state, line, BOLD, NORMAL)
 
         elif matches(line, 'RB'):
             logging.debug('Code (normal - bold)')
@@ -361,7 +361,7 @@ for line in iterator_lines:
                 start_paragraph(state['file_html'])
                 state['par'] = True
 
-            alternating(line, NORMAL, BOLD)
+            alternating(state, line, NORMAL, BOLD)
 
         elif matches(line, 'IR'):
             logging.debug('Code (italic - normal)')
@@ -379,7 +379,7 @@ for line in iterator_lines:
                 start_paragraph(state['file_html'])
                 state['par'] = True
 
-            alternating(line, NORMAL, ITALIC)
+            alternating(state, line, NORMAL, ITALIC)
 
         elif matches(line, 'SM'):
             logging.debug('Code (small)')
