@@ -212,6 +212,11 @@ def initialize(st):
     st.file_manpage = open_man_file(initialize_get_args().file)
     st.file_html = open('result.html', 'wt')
 
+def deinitialize(st):
+    ''' Closes opened files. '''
+    st.file_html.close()
+    st.file_manpage.close()
+
 
 
 class HtmlActions:
@@ -811,6 +816,4 @@ if st.par:
 
 html_actions.write_html_footer()
 
-st.file_manpage.close()
-st.file_html.close()
-
+deinitialize(st)
