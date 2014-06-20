@@ -802,7 +802,7 @@ for line in st.file_manpage.read().splitlines():
         Request.text_line(st, line)
         continue
 
-    request = line.split()[0][1:]
+    request = line[1:].split()[0]
     command_info = man_requests[request]
     d('Type: %s', command_info[0])
 
