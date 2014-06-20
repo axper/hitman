@@ -749,7 +749,7 @@ man_requests = {
     'do' : ('switch compatability mode 2', ),
 }
 
-man_sub_inline = {
+sub_inline = {
     #('\\*' : ('change font size'),
     #('\\*(HF' : ('section header font'),
 
