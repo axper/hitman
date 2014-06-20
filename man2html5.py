@@ -188,7 +188,7 @@ def alternating(st, line, first, second):
 
     final += ' '
     d(final)
-    st.file_html.write(final)
+    html_actions.write_string(final)
 
 def initialize_logging():
     ''' Initializes logging library for the program. '''
@@ -255,6 +255,9 @@ class HtmlActions:
 
     def __init__(self, html_file):
         self.html_file = html_file
+
+    def write_string(self, s):
+        self.html_file.write(s)
 
     def write_html_header(self, title):
         self.html_file.write(self.header.format(title[0], section_name(title[1])))
