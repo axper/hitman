@@ -286,7 +286,6 @@ for line in st.file_manpage.read().splitlines():
     elif line[0] == st.control_char:
         st.no_break = False
     else:
-        logging.debug('Probably sentence as first char is not ctrl or ctrlnobreak')
         CommandHandlers.sentence(st, line)
 
     # Definitely a command now
