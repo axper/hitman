@@ -231,6 +231,16 @@ def initialize(st):
     st.file_manpage = open_man_file(initialize_get_args().file)
     st.file_html = open('result.html', 'wt')
 
+class CommandHandlers:
+    ''' Functions to handle requests at beginning of lines. '''
+    def empty_line(st, line):
+        logging.debug('An empty line')
+
+        if st.par:
+            end_paragraph(st.file_html)
+
+        st.par = False
+
 
 class State:
     ''' The global state variables. '''
@@ -250,14 +260,8 @@ for line in st.file_manpage.read().splitlines():
     logging.debug('-' * 79)
     logging.debug(line)
 
-    # Empty line
     if line == '':
-        logging.debug('An empty line')
-
-        if st.par:
-            end_paragraph(st.file_html)
-
-        st.par = False
+        CommandHandlers.empty_line(st, line)
 
     # Command
     elif line[0] in ['\'', '.']:
