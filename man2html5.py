@@ -237,6 +237,9 @@ class State:
     file_manpage = None
     file_html = None
     par = False
+    control_char = '.'
+    control_char_nobreak = '\''
+    escape_char = '\\'
 
 st = State()
 
