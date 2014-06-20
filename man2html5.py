@@ -797,8 +797,8 @@ for line in st.file_manpage.read().splitlines():
         RequestHandlers.sentence(st, line)
         continue
 
-    line_command = line.split()[0][1:]
-    command_info = man_commands_start[line_command]
+    request = line.split()[0][1:]
+    command_info = man_commands_start[request]
     d('Type: %s', command_info[0])
 
     if len(command_info) >= 2:
