@@ -295,8 +295,8 @@ class RequestHandlers:
 
         st.par = False
 
-    def sentence(st, line):
-        d('sentence')
+    def text_line(st, line):
+        d('text line')
 
         linenew = escape_paragraph(line)
         linenew += '\n'
@@ -801,7 +801,7 @@ for line in st.file_manpage.read().splitlines():
     elif line[0] == st.control_char:
         st.no_break = False
     else:
-        RequestHandlers.sentence(st, line)
+        RequestHandlers.text_line(st, line)
         continue
 
     request = line.split()[0][1:]
