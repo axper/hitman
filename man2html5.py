@@ -26,13 +26,13 @@ def open_man_file(filename):
     ''' Opens file in text mode and unzips if necessary. '''
     if mimetypes.guess_type(filename)[1] == 'gzip':
         try:
-            return gzip.open(filename, mode='rt')
+            return gzip.open(filename)
         except FileNotFoundError as err:
             print(err)
             exit(1)
     else:
         try:
-            return open(filename, mode='rt')
+            return open(filename)
         except FileNotFoundError as err:
             print(err)
             exit(1)
