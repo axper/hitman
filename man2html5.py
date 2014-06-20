@@ -232,13 +232,13 @@ def initialize(st):
     st.file_html = open('result.html', 'wt')
 
 
-class state:
+class State:
     ''' The global program state variables. '''
     file_manpage = None
     file_html = None
     par = False
 
-st = state()
+st = State()
 
 initialize(st)
 
