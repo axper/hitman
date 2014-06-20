@@ -648,10 +648,7 @@ for line in st.file_manpage.read().splitlines():
         logging.info('Stub: %s', command_info[0])
     
 
-    if matches(line, '\\"'):
-        logging.debug('A comment')
-
-    elif matches(line, 'TH'):
+    if matches(line, 'TH'):
         logging.debug('A title line')
 
         title = split_with_quotes(line)[1:]
