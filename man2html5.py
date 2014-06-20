@@ -426,6 +426,10 @@ class RequestHandlers:
 
         st.par = False
 
+    def finalize(st):
+        if st.par:
+            html_actions.end_paragraph()
+            st.par = False
 
 
 man_requests = {
@@ -806,9 +810,7 @@ for line in st.file_manpage.read().splitlines():
     else:
         logging.info('Stub: %s', command_info[0])
     
-if st.par:
-    html_actions.end_paragraph()
-    st.par = False
+RequestHandlers.finalize(st)
 
 html_actions.write_html_footer()
 deinitialize(st)
