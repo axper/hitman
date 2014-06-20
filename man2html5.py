@@ -14,6 +14,8 @@ import argparse
 import logging
 import re
 
+import mancommands
+
 
 bold_start = '<code>'
 bold_end = '</code>'
