@@ -26,13 +26,13 @@ def open_man_file(filename):
     ''' Opens file in text mode and unzips if necessary. '''
     if mimetypes.guess_type(filename)[1] == 'gzip':
         try:
-            return gzip.open(filename)
+            return gzip.open(filename, mode='rt')
         except FileNotFoundError as err:
             print(err)
             exit(1)
     else:
         try:
-            return open(filename)
+            return open(filename, mode='t')
         except FileNotFoundError as err:
             print(err)
             exit(1)
@@ -43,31 +43,18 @@ def split_with_quotes(string):
     return csv.reader(title_line, quotechar='"', delimiter=' ',
                       quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
-def section_name(section):
-    ''' Returns name of manpage section number. '''
-    if section == '0':
-        return 'POSIX headers'
-    if section == '1':
-        return 'Programs'
-    elif section == '2':
-        return 'System calls'
-    elif section == '3':
-        return 'Library calls'
-    elif section == '4':
-        return 'Special files'
-    elif section == '5':
-        return 'File formats'
-    elif section == '6':
-        return 'Games'
-    elif section == '7':
-        return 'Misc'
-    elif section == '8':
-        return 'System administration'
-    elif section == '9':
-        return 'Kernel routines'
-    else:
-        logging.warning('Unknown manpage section number: %s', section)
-        return 'UNKNOWN SECTION'
+section_name = {
+    '0' : 'POSIX headers',
+    '1' : 'Programs',
+    '2' : 'System calls',
+    '3' : 'Library calls',
+    '4' : 'Special files',
+    '5' : 'File formats',
+    '6' : 'Games',
+    '7' : 'Misc',
+    '8' : 'System administration',
+    '9' : 'Kernel routines',
+}
 
 def sub_inline_font(par):
     ''' Parses man inline font escapes and replaces with HTML. '''
@@ -273,7 +260,7 @@ class HtmlActions:
 
     def write_html_header(self, title):
         self.html_file.write(self.header.format(title[0],
-                                                section_name(title[1])))
+                                                section_name[title[1]]))
 
     def write_html_footer(self):
         self.html_file.write(self.footer)
@@ -448,6 +435,7 @@ class Request:
 
 requests = {
     #'' : ('empty line', ),
+    '.' : ('just a single dot', ),
     '\\"' : ('comment', Request.comment),
 
     ## Man macro package
@@ -521,6 +509,8 @@ requests = {
     'NE' : ('end note', ),
     # Paragraph indent
     'TQ' : ('new paragraph hanging 4', ),
+    # Unknown
+    'UN' : ('Unknown!!!', ),
 
 
     ## Requests from gtroff info page
@@ -832,7 +822,11 @@ for line in st.file_manpage.read().splitlines():
         Request.text_line(st, line)
         continue
 
-    request = line[1:].split()[0]
+    try:
+        request = line[1:].split()[0]
+    except IndexError:
+        logging.info('Stub: single character control sequence on the line')
+
     command_info = requests[request]
     d('Type: %s', command_info[0])
 
