@@ -14,7 +14,7 @@ import cgi
 import argparse
 import logging
 import re
-
+from sys import exit
 
 
 
@@ -26,9 +26,17 @@ ITALIC = 2
 def open_man_file(filename):
     ''' Opens file in text mode and unzips if necessary. '''
     if mimetypes.guess_type(filename)[1] == 'gzip':
-        return gzip.open(filename, mode='rt')
+        try:
+            return gzip.open(filename, mode='rt')
+        except FileNotFoundError as err:
+            print(err)
+            exit(1)
     else:
-        return open(filename, mode='rt')
+        try:
+            return open(filename, mode='rt')
+        except FileNotFoundError as err:
+            print(err)
+            exit(1)
 
 def split_with_quotes(string):
     ''' Splits string into words and takes quotes into account. '''
@@ -211,7 +219,11 @@ def initialize(st):
     initialize_logging()
 
     st.file_manpage = open_man_file(initialize_get_args().file)
-    st.file_html = open('result.html', 'wt')
+    try:
+        st.file_html = open('result.html', 'wt')
+    except FileNotFoundError as err:
+        print(err)
+        exit(1)
 
 def deinitialize(st):
     ''' Closes opened files. '''
