@@ -14,7 +14,6 @@ import cgi
 import argparse
 import logging
 import re
-from sys import exit
 
 
 
