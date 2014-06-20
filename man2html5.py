@@ -165,7 +165,7 @@ def end_paragraph(file_html):
     ''' Writes </p> and newline to html file. '''
     file_html.write('</p>\n')
 
-def alternating(state, line, first, second):
+def alternating(st, line, first, second):
     ''' Writes HTML line alternating between first and second styles. '''
     if first == BOLD:
         even_start = bold_start
@@ -224,7 +224,7 @@ def initialize_get_args():
     parser.add_argument('file', type=str, help='manpage file to parse')
     return parser.parse_args()
 
-def initialize(state):
+def initialize(st):
     ''' Initializes program: sets up logging and opens files. '''
     initialize_logging()
 
@@ -240,7 +240,7 @@ class state:
 
 st = state()
 
-initialize(state)
+initialize(st)
 
 iterator_lines = iter(st.file_manpage.read().splitlines())
 for line in iterator_lines:
@@ -334,7 +334,7 @@ for line in iterator_lines:
                 start_paragraph(st.file_html)
                 st.par = True
 
-            alternating(state, line, BOLD, ITALIC)
+            alternating(st, line, BOLD, ITALIC)
 
         elif matches(line, 'IB'):
             logging.debug('Code (italic - bold)')
@@ -343,7 +343,7 @@ for line in iterator_lines:
                 start_paragraph(st.file_html)
                 st.par = True
 
-            alternating(state, line, ITALIC, BOLD)
+            alternating(st, line, ITALIC, BOLD)
 
         elif matches(line, 'BR'):
             logging.debug('Code (bold - normal)')
@@ -352,7 +352,7 @@ for line in iterator_lines:
                 start_paragraph(st.file_html)
                 st.par = True
 
-            alternating(state, line, BOLD, NORMAL)
+            alternating(st, line, BOLD, NORMAL)
 
         elif matches(line, 'RB'):
             logging.debug('Code (normal - bold)')
@@ -361,7 +361,7 @@ for line in iterator_lines:
                 start_paragraph(st.file_html)
                 st.par = True
 
-            alternating(state, line, NORMAL, BOLD)
+            alternating(st, line, NORMAL, BOLD)
 
         elif matches(line, 'IR'):
             logging.debug('Code (italic - normal)')
@@ -370,7 +370,7 @@ for line in iterator_lines:
                 start_paragraph(st.file_html)
                 st.par = True
 
-            alternating(state, line, ITALIC, NORMAL)
+            alternating(st, line, ITALIC, NORMAL)
 
         elif matches(line, 'RI'):
             logging.debug('Code (italic - normal)')
@@ -379,7 +379,7 @@ for line in iterator_lines:
                 start_paragraph(st.file_html)
                 st.par = True
 
-            alternating(state, line, NORMAL, ITALIC)
+            alternating(st, line, NORMAL, ITALIC)
 
         elif matches(line, 'SM'):
             logging.debug('Code (small)')
