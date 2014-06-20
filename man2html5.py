@@ -359,6 +359,39 @@ class CommandHandlers:
 
         alternating(st, line, NORMAL, ITALIC)
     
+    def font_small(st, line):
+        logging.info('STUB')
+
+    def font_small_bold(st, line):
+        logging.info('STUB')
+
+    def font_italic(st, line):
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        final = ''
+        final += italic_start
+        final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
+        final += italic_end
+        final += ' '
+
+        logging.debug(final)
+        st.file_html.write(final)
+
+    def font_bold(st, line):
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        final = ''
+        final += bold_start
+        final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
+        final += bold_end
+        final += ' '
+
+        logging.debug(final)
+        st.file_html.write(final)
 
 
 man_commands_start = {
@@ -380,16 +413,16 @@ man_commands_start = {
     'RE' : ('end indent', ),
 
     # Font
-    'SM' : ('font small', ),
-    'SB' : ('font small alt bold', ),
+    'SM' : ('font small', CommandHandlers.font_small),
+    'SB' : ('font small alt bold', CommandHandlers.font_small_bold),
     'BI' : ('font bold alt italic', CommandHandlers.alt_bold_italic),
     'IB' : ('font italic alt bold', CommandHandlers.alt_italic_bold),
     'RI' : ('font normal alt italic', CommandHandlers.alt_normal_italic),
     'IR' : ('font italic alt normal', CommandHandlers.alt_italic_normal),
     'BR' : ('font bold alt normal', CommandHandlers.alt_bold_normal),
     'RB' : ('font normal alt bold', CommandHandlers.alt_normal_bold),
-    'B' : ('font bold', ),
-    'I' : ('font italic', ),
+    'B' : ('font bold', CommandHandlers.font_bold),
+    'I' : ('font italic', CommandHandlers.font_italic),
     #('R' : ('font normal', ),
 
     # Misc
@@ -749,47 +782,7 @@ for line in st.file_manpage.read().splitlines():
         logging.info('Stub: %s', command_info[0])
     
 
-    if matches(line, 'SM'):
-        logging.debug('Code (small)')
-        logging.info('STUB')
-
-    elif matches(line, 'SB'):
-        logging.debug('Code (small bold)')
-        logging.info('STUB')
-
-    elif matches(line, 'I '):
-        logging.debug('Code (italic)')
-
-        if not st.par:
-            start_paragraph(st.file_html)
-            st.par = True
-
-        final = ''
-        final += italic_start
-        final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
-        final += italic_end
-        final += ' '
-
-        logging.debug(final)
-        st.file_html.write(final)
-
-    elif matches(line, 'B '):
-        logging.debug('Code (bold)')
-
-        if not st.par:
-            start_paragraph(st.file_html)
-            st.par = True
-
-        final = ''
-        final += bold_start
-        final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
-        final += bold_end
-        final += ' '
-
-        logging.debug(final)
-        st.file_html.write(final)
-
-    elif matches(line, 'UR'):
+    if matches(line, 'UR'):
         logging.debug('Start URL')
 
     elif matches(line, 'br') or matches(line, 'sp'):
