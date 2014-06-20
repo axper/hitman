@@ -1,5 +1,6 @@
 synopsis section via pre, especially disdvi()
 handle '\ ' - shouldn't split if space space is escaped
+example section
 rdx(1)
 	_main rainbow
 chvt(1)
