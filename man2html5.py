@@ -14,8 +14,6 @@ import argparse
 import logging
 import re
 
-import mancommands
-
 
 bold_start = '<code>'
 bold_end = '</code>'
@@ -231,6 +229,7 @@ def initialize(st):
     st.file_manpage = open_man_file(initialize_get_args().file)
     st.file_html = open('result.html', 'wt')
 
+
 class CommandHandlers:
     ''' Functions to handle requests at beginning of lines. '''
     def empty_line(st, line):
@@ -258,6 +257,9 @@ class CommandHandlers:
 
         logging.debug(linenew)
 
+    def comment(st, line):
+        pass
+
 class State:
     ''' The global state variables. '''
     file_manpage = None
@@ -267,6 +269,8 @@ class State:
     control_char_nobreak = '\''
     escape_char = '\\'
     no_break = False
+
+from mancommands import *
 
 st = State()
 
@@ -289,7 +293,16 @@ for line in st.file_manpage.read().splitlines():
         CommandHandlers.sentence(st, line)
         continue
 
-    # Definitely a command now
+    line_command = line.split()[0][1:]
+    command_info = man_commands_start[line_command]
+    logging.debug('Type: %s', command_info[0])
+
+    if len(command_info) >= 2:
+        command_info[1](st, line)
+    else:
+        logging.info('Stub: %s', command_info[0])
+    
+
     if matches(line, '\\"'):
         logging.debug('A comment')
 
