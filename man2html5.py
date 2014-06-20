@@ -234,7 +234,7 @@ def initialize(st):
 class CommandHandlers:
     ''' Functions to handle requests at beginning of lines. '''
     def empty_line(st, line):
-        logging.debug('An empty line')
+        logging.debug('empty line')
 
         if st.par:
             end_paragraph(st.file_html)
@@ -242,7 +242,7 @@ class CommandHandlers:
         st.par = False
 
     def sentence(st, line):
-        logging.debug('A paragraph')
+        logging.debug('sentence')
 
         linenew = escape_paragraph(line)
         linenew += '\n'
