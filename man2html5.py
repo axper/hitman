@@ -260,7 +260,8 @@ class HtmlActions:
         self.html_file.write(s)
 
     def write_html_header(self, title):
-        self.html_file.write(self.header.format(title[0], section_name(title[1])))
+        self.html_file.write(self.header.format(title[0],
+                                                section_name(title[1])))
 
     def write_html_footer(self):
         self.html_file.write(self.footer)
@@ -398,14 +399,15 @@ class Request:
             st.par = True
 
         alternating(st, line, NORMAL, ITALIC)
-    
+
     def font_italic(st, line):
         if not st.par:
             html_actions.start_paragraph()
             st.par = True
 
         html_actions.start_italic()
-        st.file_html.write(' '.join(split_with_quotes(escape_paragraph(line))[1:]))
+        parsed = ' '.join(split_with_quotes(escape_paragraph(line))[1:])
+        st.file_html.write(parsed)
         html_actions.end_italic()
         st.file_html.write(' ')
 
@@ -415,7 +417,8 @@ class Request:
             st.par = True
 
         html_actions.start_bold()
-        st.file_html.write(' '.join(split_with_quotes(escape_paragraph(line))[1:]))
+        parsed = ' '.join(split_with_quotes(escape_paragraph(line))[1:])
+        st.file_html.write(parsed)
         html_actions.end_bold()
         st.file_html.write(' ')
 
@@ -769,7 +772,7 @@ escape_sequences = {
     '\\*(Tm' : ('™'),
     '\\*[R]' : ('®'),
     '\\*[Tm]' : ('™'),
-    
+
     # Quotes
     '\\*(lq' : ('“'),
     '\\*(rq' : ('”'),
@@ -825,7 +828,7 @@ for line in st.file_manpage.read().splitlines():
         command_info[1](st, line)
     else:
         logging.info('Stub: %s', command_info[0])
-    
+
 Request.finalize(st)
 
 html_actions.write_html_footer()
