@@ -359,12 +359,6 @@ class CommandHandlers:
 
         alternating(st, line, NORMAL, ITALIC)
     
-    def font_small(st, line):
-        logging.info('STUB')
-
-    def font_small_bold(st, line):
-        logging.info('STUB')
-
     def font_italic(st, line):
         if not st.par:
             start_paragraph(st.file_html)
@@ -393,6 +387,13 @@ class CommandHandlers:
         logging.debug(final)
         st.file_html.write(final)
 
+    def line_break(st, line):
+        if st.par:
+            end_paragraph(st.file_html)
+
+        st.par = False
+
+
 
 man_commands_start = {
     #'' : ('empty line', ),
@@ -413,8 +414,8 @@ man_commands_start = {
     'RE' : ('end indent', ),
 
     # Font
-    'SM' : ('font small', CommandHandlers.font_small),
-    'SB' : ('font small alt bold', CommandHandlers.font_small_bold),
+    'SM' : ('font small', ),
+    'SB' : ('font small alt bold', ),
     'BI' : ('font bold alt italic', CommandHandlers.alt_bold_italic),
     'IB' : ('font italic alt bold', CommandHandlers.alt_italic_bold),
     'RI' : ('font normal alt italic', CommandHandlers.alt_normal_italic),
@@ -481,7 +482,7 @@ man_commands_start = {
     'af' : ('change register output format', ),
 
     # Filling and adjusting
-    'br' : ('line break', ),
+    'br' : ('line break', CommandHandlers.line_break),
     'fi' : ('enable fill mode', ),
     'nf' : ('disable fill mode', ),
     'ad' : ('set adjusting mode', ),
@@ -507,7 +508,7 @@ man_commands_start = {
     'hla' : ('set hypenation language', ),
 
     # Spacing
-    'sp' : ('space downwards', ),
+    'sp' : ('space downwards', CommandHandlers.line_break),
     'ls' : ('print blank lines', ),
     'ns' : ('disable line spacing', ),
 
@@ -781,21 +782,6 @@ for line in st.file_manpage.read().splitlines():
     else:
         logging.info('Stub: %s', command_info[0])
     
-
-    if matches(line, 'UR'):
-        logging.debug('Start URL')
-
-    elif matches(line, 'br') or matches(line, 'sp'):
-        logging.debug('Line break')
-
-        if st.par:
-            end_paragraph(st.file_html)
-
-        st.par = False
-
-    else:
-        logging.info('Unknown command: %s', line)
-
 
 if st.par:
     end_paragraph(st.file_html)
