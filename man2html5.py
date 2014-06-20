@@ -282,7 +282,7 @@ class HtmlActions:
 
 
 
-class CommandHandlers:
+class RequestHandlers:
     ''' Functions to handle requests at beginning of lines. '''
     def empty_line(st, line):
         d('empty line')
@@ -430,33 +430,33 @@ class CommandHandlers:
 
 man_commands_start = {
     #'' : ('empty line', ),
-    '\\"' : ('comment', CommandHandlers.comment),
+    '\\"' : ('comment', RequestHandlers.comment),
 
     ## Man macro package
     # Usage
-    'TH' : ('title line', CommandHandlers.title),
-    'SH' : ('section title', CommandHandlers.section_title),
-    'SS' : ('subsection title', CommandHandlers.subsection_title),
-    'LP' : ('new paragraph 1', CommandHandlers.new_paragraph),
-    'PP' : ('new paragraph 2', CommandHandlers.new_paragraph),
-    'P' : ('new paragraph 3', CommandHandlers.new_paragraph),
-    'TP' : ('new paragraph hanging 1', CommandHandlers.hanging_indented_paragraph),
-    'IP' : ('new paragraph hanging 2', CommandHandlers.hanging_indented_paragraph),
-    'HP' : ('new paragraph hanging 3', CommandHandlers.hanging_indented_paragraph),
+    'TH' : ('title line', RequestHandlers.title),
+    'SH' : ('section title', RequestHandlers.section_title),
+    'SS' : ('subsection title', RequestHandlers.subsection_title),
+    'LP' : ('new paragraph 1', RequestHandlers.new_paragraph),
+    'PP' : ('new paragraph 2', RequestHandlers.new_paragraph),
+    'P' : ('new paragraph 3', RequestHandlers.new_paragraph),
+    'TP' : ('new paragraph hanging 1', RequestHandlers.hanging_indented_paragraph),
+    'IP' : ('new paragraph hanging 2', RequestHandlers.hanging_indented_paragraph),
+    'HP' : ('new paragraph hanging 3', RequestHandlers.hanging_indented_paragraph),
     'RS' : ('start indent', ),
     'RE' : ('end indent', ),
 
     # Font
     'SM' : ('font small', ),
     'SB' : ('font small alt bold', ),
-    'BI' : ('font bold alt italic', CommandHandlers.alt_bold_italic),
-    'IB' : ('font italic alt bold', CommandHandlers.alt_italic_bold),
-    'RI' : ('font normal alt italic', CommandHandlers.alt_normal_italic),
-    'IR' : ('font italic alt normal', CommandHandlers.alt_italic_normal),
-    'BR' : ('font bold alt normal', CommandHandlers.alt_bold_normal),
-    'RB' : ('font normal alt bold', CommandHandlers.alt_normal_bold),
-    'B' : ('font bold', CommandHandlers.font_bold),
-    'I' : ('font italic', CommandHandlers.font_italic),
+    'BI' : ('font bold alt italic', RequestHandlers.alt_bold_italic),
+    'IB' : ('font italic alt bold', RequestHandlers.alt_italic_bold),
+    'RI' : ('font normal alt italic', RequestHandlers.alt_normal_italic),
+    'IR' : ('font italic alt normal', RequestHandlers.alt_italic_normal),
+    'BR' : ('font bold alt normal', RequestHandlers.alt_bold_normal),
+    'RB' : ('font normal alt bold', RequestHandlers.alt_normal_bold),
+    'B' : ('font bold', RequestHandlers.font_bold),
+    'I' : ('font italic', RequestHandlers.font_italic),
     #('R' : ('font normal', ),
 
     # Misc
@@ -515,7 +515,7 @@ man_commands_start = {
     'af' : ('change register output format', ),
 
     # Filling and adjusting
-    'br' : ('line break', CommandHandlers.line_break),
+    'br' : ('line break', RequestHandlers.line_break),
     'fi' : ('enable fill mode', ),
     'nf' : ('disable fill mode', ),
     'ad' : ('set adjusting mode', ),
@@ -541,7 +541,7 @@ man_commands_start = {
     'hla' : ('set hypenation language', ),
 
     # Spacing
-    'sp' : ('space downwards', CommandHandlers.line_break),
+    'sp' : ('space downwards', RequestHandlers.line_break),
     'ls' : ('print blank lines', ),
     'ns' : ('disable line spacing', ),
 
@@ -786,7 +786,7 @@ for line in st.file_manpage.read().splitlines():
     d(line)
 
     if line == '':
-        CommandHandlers.empty_line(st, line)
+        RequestHandlers.empty_line(st, line)
         continue
 
     if line[0] == st.control_char_nobreak:
@@ -794,7 +794,7 @@ for line in st.file_manpage.read().splitlines():
     elif line[0] == st.control_char:
         st.no_break = False
     else:
-        CommandHandlers.sentence(st, line)
+        RequestHandlers.sentence(st, line)
         continue
 
     line_command = line.split()[0][1:]
