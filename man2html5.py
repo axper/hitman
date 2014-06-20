@@ -279,6 +279,16 @@ class CommandHandlers:
 
         logging.debug(title)
 
+    def section_title(st, line):
+        if st.par:
+            end_paragraph(st.file_html)
+            st.par = False
+
+        section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
+        st.file_html.write('<h2>' + section_title + '</h2>\n')
+
+        logging.debug(section_title)
+
 
 man_commands_start = {
     #'' : ('empty line', ),
@@ -287,7 +297,7 @@ man_commands_start = {
     ## Man macro package
     # Usage
     'TH' : ('title line', CommandHandlers.title),
-    'SH' : ('section title', ),
+    'SH' : ('section title', CommandHandlers.section_title),
     'SS' : ('subsection title', ),
     'TP' : ('new paragraph hanging 1', ),
     'LP' : ('new paragraph 1', ),
@@ -668,19 +678,7 @@ for line in st.file_manpage.read().splitlines():
         logging.info('Stub: %s', command_info[0])
     
 
-    if matches(line, 'SH'):
-        logging.debug('A section title')
-
-        if st.par:
-            end_paragraph(st.file_html)
-            st.par = False
-
-        section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
-        st.file_html.write('<h2>' + section_title + '</h2>\n')
-
-        logging.debug(section_title)
-    
-    elif matches(line, 'SS'):
+    if matches(line, 'SS'):
         logging.debug('A subsection title')
 
         if st.par:
