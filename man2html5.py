@@ -603,7 +603,7 @@ requests = {
     'sty' : ('set style for font position', ),
     #positions
     'fp' : ('mount font to position', ),
-    'ft' : ('change font position', ),
+    #'ft' : ('change font position', ), # only when argument is a number
     #symbols
     'composite' : ('map glyph name', ),
     'cflags' : ('set char properties', ),
