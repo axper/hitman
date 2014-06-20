@@ -287,7 +287,7 @@ class HtmlActions:
 
 class Request:
     ''' Functions to handle requests at beginning of lines. '''
-    def empty_line(st, line):
+    def empty_line(st):
         if st.par:
             html_actions.end_paragraph()
 
@@ -790,7 +790,7 @@ for line in st.file_manpage.read().splitlines():
 
     if not line:
         d('empty line')
-        Request.empty_line(st, line)
+        Request.empty_line(st)
         continue
 
     if line[0] == st.control_char_nobreak:
