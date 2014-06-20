@@ -205,7 +205,7 @@ def alternating(state, line, first, second):
 
     final += ' '
     logging.debug(final)
-    state['file_html'].write(final)
+    st.file_html.write(final)
 
 def initialize_logging():
     ''' Initializes logging library for the program. '''
@@ -228,21 +228,21 @@ def initialize(state):
     ''' Initializes program: sets up logging and opens files. '''
     initialize_logging()
 
-    state['file_manpage'] = open_man_file(initialize_get_args().file)
-    state['file_html'] = open('result.html', 'wt')
+    st.file_manpage = open_man_file(initialize_get_args().file)
+    st.file_html = open('result.html', 'wt')
 
 
-state = {
-    'file_manpage': None,
-    'file_html': None,
+class state:
+    ''' The global program state variables. '''
+    file_manpage = None
+    file_html = None
+    par = False
 
-    'par': False,
-}
+st = state()
 
 initialize(state)
 
-
-iterator_lines = iter(state['file_manpage'].read().splitlines())
+iterator_lines = iter(st.file_manpage.read().splitlines())
 for line in iterator_lines:
     logging.debug('-' * 79)
     logging.debug(line)
@@ -251,10 +251,10 @@ for line in iterator_lines:
     if line == '':
         logging.debug('An empty line')
 
-        if state['par']:
-            end_paragraph(state['file_html'])
+        if st.par:
+            end_paragraph(st.file_html)
 
-        state['par'] = False
+        st.par = False
 
     # Command
     elif line[0] in ['\'', '.']:
@@ -268,116 +268,116 @@ for line in iterator_lines:
             title = split_with_quotes(line)[1:]
             title[0] = title[0].lower()
 
-            state['file_html'].write('<!doctype HTML>\n')
-            state['file_html'].write('<html>\n')
-            state['file_html'].write('<head>\n')
-            state['file_html'].write('<meta charset=\'utf-8\'>\n')
-            state['file_html'].write('<title>' + title[0] + ' - ' + 
+            st.file_html.write('<!doctype HTML>\n')
+            st.file_html.write('<html>\n')
+            st.file_html.write('<head>\n')
+            st.file_html.write('<meta charset=\'utf-8\'>\n')
+            st.file_html.write('<title>' + title[0] + ' - ' + 
                     section_name(title[1]) + ' - ' +
                     'Man page</title>\n')
-            state['file_html'].write('<link rel=\'stylesheet\' type=\'text/css\''
+            st.file_html.write('<link rel=\'stylesheet\' type=\'text/css\''
                     ' href=\'style.css\'>\n')
-            state['file_html'].write('</head>\n')
-            state['file_html'].write('<body>\n')
-            state['file_html'].write('<h1>' + title[0] + '</h1>\n')
+            st.file_html.write('</head>\n')
+            st.file_html.write('<body>\n')
+            st.file_html.write('<h1>' + title[0] + '</h1>\n')
 
             logging.debug(title)
 
         elif matches(line, 'SH'):
             logging.debug('A section title')
 
-            if state['par']:
-                end_paragraph(state['file_html'])
-                state['par'] = False
+            if st.par:
+                end_paragraph(st.file_html)
+                st.par = False
 
             section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
-            state['file_html'].write('<h2>' + section_title + '</h2>\n')
+            st.file_html.write('<h2>' + section_title + '</h2>\n')
 
             logging.debug(section_title)
         
         elif matches(line, 'SS'):
             logging.debug('A subsection title')
 
-            if state['par']:
-                end_paragraph(state['file_html'])
-                state['par'] = False
+            if st.par:
+                end_paragraph(st.file_html)
+                st.par = False
 
             section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
-            state['file_html'].write('<h3>' + section_title + '</h3>\n')
+            st.file_html.write('<h3>' + section_title + '</h3>\n')
 
             logging.debug(section_title)
 
         elif matches(line, 'PP') or matches(line, 'P ') or matches(line, 'LP'):
             logging.debug('Begin new state paragraph')
 
-            if state['par']:
-                end_paragraph(state['file_html'])
-                start_paragraph(state['file_html'])
+            if st.par:
+                end_paragraph(st.file_html)
+                start_paragraph(st.file_html)
             else:
-                state['par'] = True
-                start_paragraph(state['file_html'])
+                st.par = True
+                start_paragraph(st.file_html)
 
         elif matches(line, 'HP') or matches(line, 'IP') or matches(line, 'TP'):
             logging.info('Begin hanging or indented paragraph (ignoring...)')
 
-            if not state['par']:
-                start_paragraph(state['file_html'])
-                state['par'] = True
+            if not st.par:
+                start_paragraph(st.file_html)
+                st.par = True
             else:
-                end_paragraph(state['file_html'])
-                start_paragraph(state['file_html'])
+                end_paragraph(st.file_html)
+                start_paragraph(st.file_html)
 
         elif matches(line, 'BI'):
             logging.debug('Code (bold - italic)')
 
-            if not state['par']:
-                start_paragraph(state['file_html'])
-                state['par'] = True
+            if not st.par:
+                start_paragraph(st.file_html)
+                st.par = True
 
             alternating(state, line, BOLD, ITALIC)
 
         elif matches(line, 'IB'):
             logging.debug('Code (italic - bold)')
 
-            if not state['par']:
-                start_paragraph(state['file_html'])
-                state['par'] = True
+            if not st.par:
+                start_paragraph(st.file_html)
+                st.par = True
 
             alternating(state, line, ITALIC, BOLD)
 
         elif matches(line, 'BR'):
             logging.debug('Code (bold - normal)')
 
-            if not state['par']:
-                start_paragraph(state['file_html'])
-                state['par'] = True
+            if not st.par:
+                start_paragraph(st.file_html)
+                st.par = True
 
             alternating(state, line, BOLD, NORMAL)
 
         elif matches(line, 'RB'):
             logging.debug('Code (normal - bold)')
 
-            if not state['par']:
-                start_paragraph(state['file_html'])
-                state['par'] = True
+            if not st.par:
+                start_paragraph(st.file_html)
+                st.par = True
 
             alternating(state, line, NORMAL, BOLD)
 
         elif matches(line, 'IR'):
             logging.debug('Code (italic - normal)')
 
-            if not state['par']:
-                start_paragraph(state['file_html'])
-                state['par'] = True
+            if not st.par:
+                start_paragraph(st.file_html)
+                st.par = True
 
             alternating(state, line, ITALIC, NORMAL)
 
         elif matches(line, 'RI'):
             logging.debug('Code (italic - normal)')
 
-            if not state['par']:
-                start_paragraph(state['file_html'])
-                state['par'] = True
+            if not st.par:
+                start_paragraph(st.file_html)
+                st.par = True
 
             alternating(state, line, NORMAL, ITALIC)
 
@@ -392,9 +392,9 @@ for line in iterator_lines:
         elif matches(line, 'I '):
             logging.debug('Code (italic)')
 
-            if not state['par']:
-                start_paragraph(state['file_html'])
-                state['par'] = True
+            if not st.par:
+                start_paragraph(st.file_html)
+                st.par = True
 
             final = ''
             final += italic_start
@@ -403,14 +403,14 @@ for line in iterator_lines:
             final += ' '
 
             logging.debug(final)
-            state['file_html'].write(final)
+            st.file_html.write(final)
 
         elif matches(line, 'B '):
             logging.debug('Code (bold)')
 
-            if not state['par']:
-                start_paragraph(state['file_html'])
-                state['par'] = True
+            if not st.par:
+                start_paragraph(st.file_html)
+                st.par = True
 
             final = ''
             final += bold_start
@@ -419,7 +419,7 @@ for line in iterator_lines:
             final += ' '
 
             logging.debug(final)
-            state['file_html'].write(final)
+            st.file_html.write(final)
 
         elif matches(line, 'UR'):
             logging.debug('Start URL')
@@ -431,10 +431,10 @@ for line in iterator_lines:
         elif matches(line, 'br') or matches(line, 'sp'):
             logging.debug('Line break')
 
-            if state['par']:
-                end_paragraph(state['file_html'])
+            if st.par:
+                end_paragraph(st.file_html)
 
-            state['par'] = False
+            st.par = False
 
         else:
             logging.info('Unknown command: %s', line)
@@ -445,26 +445,26 @@ for line in iterator_lines:
         linenew = escape_paragraph(line)
         linenew += '\n'
 
-        if state['par']:
+        if st.par:
             logging.debug('already in paragraph')
-            state['file_html'].write(linenew)
+            st.file_html.write(linenew)
         else:
             logging.debug('starting paragraph')
-            start_paragraph(state['file_html'])
-            state['par'] = True
-            state['file_html'].write(linenew)
+            start_paragraph(st.file_html)
+            st.par = True
+            st.file_html.write(linenew)
 
         logging.debug(linenew)
 
-if state['par']:
-    end_paragraph(state['file_html'])
-    state['par'] = False
+if st.par:
+    end_paragraph(st.file_html)
+    st.par = False
 
 
 
-state['file_html'].write('</body>\n')
-state['file_html'].write('</html>\n')
+st.file_html.write('</body>\n')
+st.file_html.write('</html>\n')
 
-state['file_manpage'].close()
-state['file_html'].close()
+st.file_manpage.close()
+st.file_html.close()
 
