@@ -511,7 +511,7 @@ requests = {
     ## Requests from gtroff info page
     # Registers
     # \nXXXXX - get register
-    'nr' : ('set register', ),
+    'nr' : ('define register', ),
     'rr' : ('remove register', ),
     'rnn' : ('rename register', ),
     'aln' : ('create alias for register', ),
@@ -745,10 +745,26 @@ requests = {
     'do' : ('switch compatability mode 2', ),
 }
 
-escape_sequences = {
-    #('\\*' : ('change font size'),
-    #('\\*(HF' : ('section header font'),
+# \* - retrive string var
+# \n - retrive number var
+# \f - set font
+# \*(HF - section header font
+# \* - interpolate string (change font size???)
 
+# \(XX - escape sequence name of exactly 2 characters
+# \[XXXXX] - long escape sequence name
+
+# dq - "
+# cq - '
+# rs - \
+#   - <space 1>
+# | - <space 2>
+# ^ - <space 3>
+# h - <space 4>
+
+# backslash (\) at the end - continue line
+
+escape_sequences = {
     # Copyrights
     '\\*R' : ('®'),
     '\\*(Tm' : ('™'),
