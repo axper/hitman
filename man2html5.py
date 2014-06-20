@@ -80,6 +80,13 @@ def matches(line, command):
 
 def sub_inline_font(par):
     ''' Parses man inline font escapes and replaces with HTML. '''
+
+    bold_start = '<code><b>'
+    bold_end = '</b></code>'
+
+    italic_start = '<code><i>'
+    italic_end = '</i></code>'
+
     italic = False
     bold = False
 
@@ -153,6 +160,13 @@ def escape_paragraph(paragraph):
 
 def alternating(st, line, first, second):
     ''' Writes HTML line alternating between first and second styles. '''
+
+    bold_start = '<code><b>'
+    bold_end = '</b></code>'
+
+    italic_start = '<code><i>'
+    italic_end = '</i></code>'
+
     if first == BOLD:
         even_start = bold_start
         even_end = bold_end
@@ -219,13 +233,6 @@ def initialize(st):
 
 
 
-# temporary
-bold_start = '<code><b>'
-bold_end = '</b></code>'
-
-italic_start = '<code><i>'
-italic_end = '</i></code>'
-
 class HtmlActions:
     paragraph_start = '<p>\n'
     paragraph_end = '</p>\n'
@@ -265,6 +272,19 @@ class HtmlActions:
 
     def end_paragraph(self):
         self.html_file.write(self.paragraph_end)
+
+    def start_bold(self):
+        self.html_file.write(self.bold_start)
+
+    def end_bold(self):
+        self.html_file.write(self.bold_end)
+
+    def start_italic(self):
+        self.html_file.write(self.italic_start)
+
+    def end_italic(self):
+        self.html_file.write(self.italic_end)
+
 
 
 class CommandHandlers:
@@ -390,28 +410,20 @@ class CommandHandlers:
             html_actions.start_paragraph()
             st.par = True
 
-        final = ''
-        final += italic_start
-        final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
-        final += italic_end
-        final += ' '
-
-        logging.debug(final)
-        st.file_html.write(final)
+        html_actions.start_italic()
+        st.file_html.write(' '.join(split_with_quotes(escape_paragraph(line))[1:]))
+        html_actions.end_italic()
+        st.file_html.write(' ')
 
     def font_bold(st, line):
         if not st.par:
             html_actions.start_paragraph()
             st.par = True
 
-        final = ''
-        final += bold_start
-        final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
-        final += bold_end
-        final += ' '
-
-        logging.debug(final)
-        st.file_html.write(final)
+        html_actions.start_bold()
+        st.file_html.write(' '.join(split_with_quotes(escape_paragraph(line))[1:]))
+        html_actions.end_bold()
+        st.file_html.write(' ')
 
     def line_break(st, line):
         if st.par:
