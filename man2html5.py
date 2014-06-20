@@ -43,19 +43,6 @@ def split_with_quotes(string):
     return csv.reader(title_line, quotechar='"', delimiter=' ',
                       quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
-section_name = {
-    '0' : 'POSIX headers',
-    '1' : 'Programs',
-    '2' : 'System calls',
-    '3' : 'Library calls',
-    '4' : 'Special files',
-    '5' : 'File formats',
-    '6' : 'Games',
-    '7' : 'Misc',
-    '8' : 'System administration',
-    '9' : 'Kernel routines',
-}
-
 def sub_inline_font(par):
     ''' Parses man inline font escapes and replaces with HTML. '''
 
@@ -432,6 +419,19 @@ class Request:
             html_actions.end_paragraph()
             st.par = False
 
+
+section_name = {
+    '0' : 'POSIX headers',
+    '1' : 'Programs',
+    '2' : 'System calls',
+    '3' : 'Library calls',
+    '4' : 'Special files',
+    '5' : 'File formats',
+    '6' : 'Games',
+    '7' : 'Misc',
+    '8' : 'System administration',
+    '9' : 'Kernel routines',
+}
 
 requests = {
     #'' : ('empty line', ),
