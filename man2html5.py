@@ -35,7 +35,7 @@ def open_manpage(filename):
     else:
         return open(filename, mode='rt')
 
-def split_paragraph(string):
+def split_with_quotes(string):
     ''' Splits string into words and takes quotes into account. '''
     title_line = string.splitlines()
     return csv.reader(title_line, quotechar='"', delimiter=' ',
@@ -190,7 +190,7 @@ def alternating(line, first, second):
     else:
         logging.error("Incorrect second argument: %s", second)
 
-    words = split_paragraph(escape_paragraph(line))
+    words = split_with_quotes(escape_paragraph(line))
     final = ''
 
     even = True
@@ -247,7 +247,7 @@ for line in iterator_lines:
         elif matches(line, 'TH'):
             logging.debug('A title line')
 
-            title = split_paragraph(line)[1:]
+            title = split_with_quotes(line)[1:]
             title[0] = title[0].lower()
 
             file_html.write('<!doctype HTML>\n')
@@ -272,7 +272,7 @@ for line in iterator_lines:
                 end_paragraph(file_html)
                 par = False
 
-            section_title = ' '.join(split_paragraph(line)[1:]).capitalize()
+            section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
             file_html.write('<h2>' + section_title + '</h2>\n')
 
             logging.debug(section_title)
@@ -284,7 +284,7 @@ for line in iterator_lines:
                 end_paragraph(file_html)
                 par = False
 
-            section_title = ' '.join(split_paragraph(line)[1:]).capitalize()
+            section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
             file_html.write('<h3>' + section_title + '</h3>\n')
 
             logging.debug(section_title)
@@ -380,7 +380,7 @@ for line in iterator_lines:
 
             final = ''
             final += italic_start
-            final += ' '.join(split_paragraph(escape_paragraph(line))[1:])
+            final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
             final += italic_end
             final += ' '
 
@@ -396,7 +396,7 @@ for line in iterator_lines:
 
             final = ''
             final += bold_start
-            final += ' '.join(split_paragraph(escape_paragraph(line))[1:])
+            final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
             final += bold_end
             final += ' '
 
@@ -406,7 +406,7 @@ for line in iterator_lines:
         elif matches(line, 'UR'):
             logging.debug('Start URL')
 
-            #url = ''.join(split_paragraph(escape_paragraph(line))[1:])
+            #url = ''.join(split_with_quotes(escape_paragraph(line))[1:])
             #logging.debug(url)
             #logging.debug(next(iterator_lines))
 
