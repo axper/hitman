@@ -64,6 +64,7 @@ def section_name(section):
     elif section == '9':
         return 'Kernel routines'
     else:
+        logging.warning('Unknown manpage section number: %s', section)
         return 'UNKNOWN SECTION'
 
 def matches(line, command):
