@@ -61,23 +61,6 @@ def section_name(section):
         logging.warning('Unknown manpage section number: %s', section)
         return 'UNKNOWN SECTION'
 
-def matches(line, command):
-    ''' Returns True if line starts with command. '''
-    logger_matches.debug('Comparing %s and %s', line, command)
-    if len(line) - 1 < len(command):
-        logger_matches.debug('Comp returns False (length)')
-        return False
-
-    for i in range(len(command)):
-        logger_matches.debug('Comp<%s><%s>', line[1 + i], command[i])
-        if line[1 + i] != command[i]:
-            break
-    else:
-        logger_matches.debug('Comp returns True')
-        return True
-    logger_matches.debug('Comp returns False')
-    return False
-
 def sub_inline_font(par):
     ''' Parses man inline font escapes and replaces with HTML. '''
 
@@ -213,8 +196,6 @@ def initialize_logging():
     global logger_font
 
     logging.basicConfig(filename='log', level=logging.DEBUG)
-    logger_matches = logging.getLogger("matches")
-    logger_matches.setLevel(logging.INFO)
     logger_font = logging.getLogger("sub_inline_font")
     logger_font.setLevel(logging.INFO)
 
