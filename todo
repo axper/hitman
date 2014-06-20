@@ -17,3 +17,5 @@ gnome-calculator(1)
 	.PD
 gnome-calculator(1)
 	.sp
+
+move debug logs from CommandHelpers down
