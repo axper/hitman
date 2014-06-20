@@ -307,6 +307,24 @@ class CommandHandlers:
             st.par = True
             start_paragraph(st.file_html)
 
+    def hanging_indented_paragraph(st, line):
+        logging.info('hanging or indented paragraph (ignoring...)')
+
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+        else:
+            end_paragraph(st.file_html)
+            start_paragraph(st.file_html)
+
+    def alt_bold_italic(st, line):
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        alternating(st, line, BOLD, ITALIC)
+
+
 
 man_commands_start = {
     #'' : ('empty line', ),
@@ -320,16 +338,16 @@ man_commands_start = {
     'LP' : ('new paragraph 1', CommandHandlers.new_paragraph),
     'PP' : ('new paragraph 2', CommandHandlers.new_paragraph),
     'P' : ('new paragraph 3', CommandHandlers.new_paragraph),
-    'TP' : ('new paragraph hanging 1', ),
-    'IP' : ('new paragraph hanging 2', ),
-    'HP' : ('new paragraph hanging 3', ),
+    'TP' : ('new paragraph hanging 1', CommandHandlers.hanging_indented_paragraph),
+    'IP' : ('new paragraph hanging 2', CommandHandlers.hanging_indented_paragraph),
+    'HP' : ('new paragraph hanging 3', CommandHandlers.hanging_indented_paragraph),
     'RS' : ('start indent', ),
     'RE' : ('end indent', ),
 
     # Font
     'SM' : ('font small', ),
     'SB' : ('font small alt bold', ),
-    'BI' : ('font bold alt italic', ),
+    'BI' : ('font bold alt italic', CommandHandlers.alt_bold_italic),
     'IB' : ('font italic alt bold', ),
     'RI' : ('font normal alt italic', ),
     'IR' : ('font italic alt normal', ),
@@ -696,26 +714,7 @@ for line in st.file_manpage.read().splitlines():
         logging.info('Stub: %s', command_info[0])
     
 
-    if matches(line, 'HP') or matches(line, 'IP') or matches(line, 'TP'):
-        logging.info('Begin hanging or indented paragraph (ignoring...)')
-
-        if not st.par:
-            start_paragraph(st.file_html)
-            st.par = True
-        else:
-            end_paragraph(st.file_html)
-            start_paragraph(st.file_html)
-
-    elif matches(line, 'BI'):
-        logging.debug('Code (bold - italic)')
-
-        if not st.par:
-            start_paragraph(st.file_html)
-            st.par = True
-
-        alternating(st, line, BOLD, ITALIC)
-
-    elif matches(line, 'IB'):
+    if matches(line, 'IB'):
         logging.debug('Code (italic - bold)')
 
         if not st.par:
