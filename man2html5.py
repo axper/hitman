@@ -241,6 +241,22 @@ class CommandHandlers:
 
         st.par = False
 
+    def sentence(st, line):
+        logging.debug('A paragraph')
+
+        linenew = escape_paragraph(line)
+        linenew += '\n'
+
+        if st.par:
+            logging.debug('already in paragraph')
+            st.file_html.write(linenew)
+        else:
+            logging.debug('starting paragraph')
+            start_paragraph(st.file_html)
+            st.par = True
+            st.file_html.write(linenew)
+
+        logging.debug(linenew)
 
 class State:
     ''' The global state variables. '''
@@ -263,202 +279,193 @@ for line in st.file_manpage.read().splitlines():
 
     if line == '':
         CommandHandlers.empty_line(st, line)
+        continue
 
-    # Command
-    elif line[0] in ['\'', '.']:
-
-        if matches(line, '\\"'):
-            logging.debug('A comment')
-
-        elif matches(line, 'TH'):
-            logging.debug('A title line')
-
-            title = split_with_quotes(line)[1:]
-            title[0] = title[0].lower()
-
-            st.file_html.write('<!doctype HTML>\n')
-            st.file_html.write('<html>\n')
-            st.file_html.write('<head>\n')
-            st.file_html.write('<meta charset=\'utf-8\'>\n')
-            st.file_html.write('<title>' + title[0] + ' - ' + 
-                    section_name(title[1]) + ' - ' +
-                    'Man page</title>\n')
-            st.file_html.write('<link rel=\'stylesheet\' type=\'text/css\''
-                    ' href=\'style.css\'>\n')
-            st.file_html.write('</head>\n')
-            st.file_html.write('<body>\n')
-            st.file_html.write('<h1>' + title[0] + '</h1>\n')
-
-            logging.debug(title)
-
-        elif matches(line, 'SH'):
-            logging.debug('A section title')
-
-            if st.par:
-                end_paragraph(st.file_html)
-                st.par = False
-
-            section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
-            st.file_html.write('<h2>' + section_title + '</h2>\n')
-
-            logging.debug(section_title)
-        
-        elif matches(line, 'SS'):
-            logging.debug('A subsection title')
-
-            if st.par:
-                end_paragraph(st.file_html)
-                st.par = False
-
-            section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
-            st.file_html.write('<h3>' + section_title + '</h3>\n')
-
-            logging.debug(section_title)
-
-        elif matches(line, 'PP') or matches(line, 'P ') or matches(line, 'LP'):
-            logging.debug('Begin new state paragraph')
-
-            if st.par:
-                end_paragraph(st.file_html)
-                start_paragraph(st.file_html)
-            else:
-                st.par = True
-                start_paragraph(st.file_html)
-
-        elif matches(line, 'HP') or matches(line, 'IP') or matches(line, 'TP'):
-            logging.info('Begin hanging or indented paragraph (ignoring...)')
-
-            if not st.par:
-                start_paragraph(st.file_html)
-                st.par = True
-            else:
-                end_paragraph(st.file_html)
-                start_paragraph(st.file_html)
-
-        elif matches(line, 'BI'):
-            logging.debug('Code (bold - italic)')
-
-            if not st.par:
-                start_paragraph(st.file_html)
-                st.par = True
-
-            alternating(st, line, BOLD, ITALIC)
-
-        elif matches(line, 'IB'):
-            logging.debug('Code (italic - bold)')
-
-            if not st.par:
-                start_paragraph(st.file_html)
-                st.par = True
-
-            alternating(st, line, ITALIC, BOLD)
-
-        elif matches(line, 'BR'):
-            logging.debug('Code (bold - normal)')
-
-            if not st.par:
-                start_paragraph(st.file_html)
-                st.par = True
-
-            alternating(st, line, BOLD, NORMAL)
-
-        elif matches(line, 'RB'):
-            logging.debug('Code (normal - bold)')
-
-            if not st.par:
-                start_paragraph(st.file_html)
-                st.par = True
-
-            alternating(st, line, NORMAL, BOLD)
-
-        elif matches(line, 'IR'):
-            logging.debug('Code (italic - normal)')
-
-            if not st.par:
-                start_paragraph(st.file_html)
-                st.par = True
-
-            alternating(st, line, ITALIC, NORMAL)
-
-        elif matches(line, 'RI'):
-            logging.debug('Code (italic - normal)')
-
-            if not st.par:
-                start_paragraph(st.file_html)
-                st.par = True
-
-            alternating(st, line, NORMAL, ITALIC)
-
-        elif matches(line, 'SM'):
-            logging.debug('Code (small)')
-            logging.info('STUB')
-
-        elif matches(line, 'SB'):
-            logging.debug('Code (small bold)')
-            logging.info('STUB')
-
-        elif matches(line, 'I '):
-            logging.debug('Code (italic)')
-
-            if not st.par:
-                start_paragraph(st.file_html)
-                st.par = True
-
-            final = ''
-            final += italic_start
-            final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
-            final += italic_end
-            final += ' '
-
-            logging.debug(final)
-            st.file_html.write(final)
-
-        elif matches(line, 'B '):
-            logging.debug('Code (bold)')
-
-            if not st.par:
-                start_paragraph(st.file_html)
-                st.par = True
-
-            final = ''
-            final += bold_start
-            final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
-            final += bold_end
-            final += ' '
-
-            logging.debug(final)
-            st.file_html.write(final)
-
-        elif matches(line, 'UR'):
-            logging.debug('Start URL')
-
-        elif matches(line, 'br') or matches(line, 'sp'):
-            logging.debug('Line break')
-
-            if st.par:
-                end_paragraph(st.file_html)
-
-            st.par = False
-
-        else:
-            logging.info('Unknown command: %s', line)
-
+    if line[0] == st.control_char_nobreak:
+        st.no_break = True
+    elif line[0] == st.control_char:
+        st.no_break = False
     else:
-        logging.debug('A paragraph')
+        logging.debug('Probably sentence as first char is not ctrl or ctrlnobreak')
+        CommandHandlers.sentence(st, line)
 
-        linenew = escape_paragraph(line)
-        linenew += '\n'
+    # Definitely a command now
+    if matches(line, '\\"'):
+        logging.debug('A comment')
+
+    elif matches(line, 'TH'):
+        logging.debug('A title line')
+
+        title = split_with_quotes(line)[1:]
+        title[0] = title[0].lower()
+
+        st.file_html.write('<!doctype HTML>\n')
+        st.file_html.write('<html>\n')
+        st.file_html.write('<head>\n')
+        st.file_html.write('<meta charset=\'utf-8\'>\n')
+        st.file_html.write('<title>' + title[0] + ' - ' + 
+                section_name(title[1]) + ' - ' +
+                'Man page</title>\n')
+        st.file_html.write('<link rel=\'stylesheet\' type=\'text/css\''
+                ' href=\'style.css\'>\n')
+        st.file_html.write('</head>\n')
+        st.file_html.write('<body>\n')
+        st.file_html.write('<h1>' + title[0] + '</h1>\n')
+
+        logging.debug(title)
+
+    elif matches(line, 'SH'):
+        logging.debug('A section title')
 
         if st.par:
-            logging.debug('already in paragraph')
-            st.file_html.write(linenew)
+            end_paragraph(st.file_html)
+            st.par = False
+
+        section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
+        st.file_html.write('<h2>' + section_title + '</h2>\n')
+
+        logging.debug(section_title)
+    
+    elif matches(line, 'SS'):
+        logging.debug('A subsection title')
+
+        if st.par:
+            end_paragraph(st.file_html)
+            st.par = False
+
+        section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
+        st.file_html.write('<h3>' + section_title + '</h3>\n')
+
+        logging.debug(section_title)
+
+    elif matches(line, 'PP') or matches(line, 'P ') or matches(line, 'LP'):
+        logging.debug('Begin new state paragraph')
+
+        if st.par:
+            end_paragraph(st.file_html)
+            start_paragraph(st.file_html)
         else:
-            logging.debug('starting paragraph')
+            st.par = True
+            start_paragraph(st.file_html)
+
+    elif matches(line, 'HP') or matches(line, 'IP') or matches(line, 'TP'):
+        logging.info('Begin hanging or indented paragraph (ignoring...)')
+
+        if not st.par:
             start_paragraph(st.file_html)
             st.par = True
-            st.file_html.write(linenew)
+        else:
+            end_paragraph(st.file_html)
+            start_paragraph(st.file_html)
 
-        logging.debug(linenew)
+    elif matches(line, 'BI'):
+        logging.debug('Code (bold - italic)')
+
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        alternating(st, line, BOLD, ITALIC)
+
+    elif matches(line, 'IB'):
+        logging.debug('Code (italic - bold)')
+
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        alternating(st, line, ITALIC, BOLD)
+
+    elif matches(line, 'BR'):
+        logging.debug('Code (bold - normal)')
+
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        alternating(st, line, BOLD, NORMAL)
+
+    elif matches(line, 'RB'):
+        logging.debug('Code (normal - bold)')
+
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        alternating(st, line, NORMAL, BOLD)
+
+    elif matches(line, 'IR'):
+        logging.debug('Code (italic - normal)')
+
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        alternating(st, line, ITALIC, NORMAL)
+
+    elif matches(line, 'RI'):
+        logging.debug('Code (italic - normal)')
+
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        alternating(st, line, NORMAL, ITALIC)
+
+    elif matches(line, 'SM'):
+        logging.debug('Code (small)')
+        logging.info('STUB')
+
+    elif matches(line, 'SB'):
+        logging.debug('Code (small bold)')
+        logging.info('STUB')
+
+    elif matches(line, 'I '):
+        logging.debug('Code (italic)')
+
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        final = ''
+        final += italic_start
+        final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
+        final += italic_end
+        final += ' '
+
+        logging.debug(final)
+        st.file_html.write(final)
+
+    elif matches(line, 'B '):
+        logging.debug('Code (bold)')
+
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        final = ''
+        final += bold_start
+        final += ' '.join(split_with_quotes(escape_paragraph(line))[1:])
+        final += bold_end
+        final += ' '
+
+        logging.debug(final)
+        st.file_html.write(final)
+
+    elif matches(line, 'UR'):
+        logging.debug('Start URL')
+
+    elif matches(line, 'br') or matches(line, 'sp'):
+        logging.debug('Line break')
+
+        if st.par:
+            end_paragraph(st.file_html)
+
+        st.par = False
+
+    else:
+        logging.info('Unknown command: %s', line)
+
 
 if st.par:
     end_paragraph(st.file_html)
