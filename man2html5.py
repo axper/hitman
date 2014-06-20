@@ -789,7 +789,7 @@ for line in st.file_manpage.read().splitlines():
     d(line)
 
     if not line:
-        d('empty line')
+        d('Type: empty line')
         Request.empty_line(st)
         continue
 
@@ -798,7 +798,7 @@ for line in st.file_manpage.read().splitlines():
     elif line[0] == st.control_char:
         st.no_break = False
     else:
-        d('text line')
+        d('Type: text line')
         Request.text_line(st, line)
         continue
 
