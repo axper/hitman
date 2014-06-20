@@ -338,6 +338,13 @@ class CommandHandlers:
 
         alternating(st, line, BOLD, NORMAL)
 
+    def alt_normal_bold(st, line):
+        if not st.par:
+            start_paragraph(st.file_html)
+            st.par = True
+
+        alternating(st, line, NORMAL, BOLD)
+
 
 
 man_commands_start = {
@@ -366,7 +373,7 @@ man_commands_start = {
     'RI' : ('font normal alt italic', ),
     'IR' : ('font italic alt normal', ),
     'BR' : ('font bold alt normal', CommandHandlers.alt_bold_normal),
-    'RB' : ('font normal alt bold', ),
+    'RB' : ('font normal alt bold', CommandHandlers.alt_normal_bold),
     'B' : ('font bold', ),
     'I' : ('font italic', ),
     #('R' : ('font normal', ),
@@ -728,16 +735,7 @@ for line in st.file_manpage.read().splitlines():
         logging.info('Stub: %s', command_info[0])
     
 
-    if matches(line, 'RB'):
-        logging.debug('Code (normal - bold)')
-
-        if not st.par:
-            start_paragraph(st.file_html)
-            st.par = True
-
-        alternating(st, line, NORMAL, BOLD)
-
-    elif matches(line, 'IR'):
+    if matches(line, 'IR'):
         logging.debug('Code (italic - normal)')
 
         if not st.par:
