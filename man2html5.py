@@ -753,7 +753,34 @@ requests = {
     # Implementation differences
     'cp' : ('switch compatability mode', ),
     'do' : ('switch compatability mode for some name', ),
+
+
+    ## Preprocessor macros (see groff(7))
+    'EQ' : ('start eqn preprocessor', ),
+    'EN' : ('end eqn preprocessor', ),
+    'G1' : ('start grap preprocessor', ),
+    'G2' : ('end grap preprocessor', ),
+    'GS' : ('start grn preprocessor', ),
+    'GE' : ('end grn preprocessor', ),
+    'PS' : ('start pic preprocessor', ),
+    'PE' : ('end pic preprocessor', ),
+    'R1' : ('start refer preprocessor', ),
+    'R2' : ('end refer preprocessor', ),
+    'TS' : ('start tbl preprocessor', ),
+    'TS' : ('end tbl preprocessor', ),
 }
+
+
+# Escapes begin with slash
+# Followed by:
+#     [xyz] for vairables and escape names
+#     'xyz' for constants
+# 1-character escape names (except '[' and '('):
+#     \x
+# 2-character escape names:
+#     \(xy
+# or
+#     \*(xy
 
 # \* - retrive string var
 # \n - retrive number var
