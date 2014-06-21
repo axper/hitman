@@ -445,7 +445,7 @@ requests = {
     '\\"' : ('comment', Request.comment),
 
     ## Man macro package
-    # Usage
+    # 2. Usage
     'TH' : ('title line', Request.title),
     'SH' : ('section title', Request.section_title),
     'SS' : ('subsection title', Request.subsection_title),
@@ -458,7 +458,7 @@ requests = {
     'RS' : ('start indent', ),
     'RE' : ('end indent', ),
 
-    # Font
+    # 3. Font
     'SM' : ('font small', ),
     'SB' : ('font small alt bold', ),
     'BI' : ('font bold alt italic', Request.alt_bold_italic),
@@ -471,13 +471,13 @@ requests = {
     'I' : ('font italic', Request.font_italic),
     #('R' : ('font normal', ),
 
-    # Misc
+    # 4. Misc
     'DT' : ('reset tabs to default', ),
     'PD' : ('set distance between paragraphs', ),
     'AT' : ('set at&t unix version (dont use)', ),
     'UC' : ('set bsd version (dont use)', ),
 
-    # Optional extensions
+    # 7. Optional extensions
     'PT' : ('print header string', ),
     'BT' : ('print footer string', ),
     'CT' : ('print ctrl key', ),
@@ -495,7 +495,7 @@ requests = {
     'VS' : ('start change bar', ),
     'VE' : ('end change bar', ),
 
-    # Other (not described in groff info page)
+    # Other (not described in groff info page for man)
     # Example
     'EX' : ('start example', ),
     'EE' : ('end example', ),
@@ -520,17 +520,17 @@ requests = {
 
 
     ## Requests from gtroff info page
-    # Comments
+    # 5. Comments
     'ig' : ('ignore until .. or macro encounters', ),
 
-    # Registers
+    # 6. Registers
     'nr' : ('define register', ),
     'rr' : ('remove register', ),
     'rnn' : ('rename register', ),
     'aln' : ('create alias name for register', ),
     'af' : ('set register output format', ),
 
-    # Filling and adjusting
+    # 7. Manipulating filling and adjusting
     'br' : ('line break', Request.line_break),
     'fi' : ('enable output fill mode', ),
     'nf' : ('disable output fill mode', ),
@@ -541,7 +541,7 @@ requests = {
     'ce' : ('center next line', ),
     'rj' : ('right justify text', ),
 
-    # Hypenation (-)
+    # 8. Manipulating hypenation
     'hy' : ('enable hypenation', ),
     'nh' : ('disable hypenation', ),
     'hlm' : ('set max hypenated lines', ),
@@ -556,20 +556,20 @@ requests = {
     'shc' : ('set soft hypen char', ),
     'hla' : ('set hypenation language', ),
 
-    # Spacing
+    # 9. Manipulating spacing
     'sp' : ('skip lines up or down', Request.line_break),
     'ls' : ('print blank lines after each output', ),
     'ns' : ('disable line spacing mode', ),
     'rs' : ('enable line spacing mode', ),
 
-    # Tabs and fields
+    # 10. Tabs and fields
     'ta' : ('set tab stop positions', ),
     'tc' : ('set tab fill char (space)', ),
     'linetabs' : ('switch relative tab distance computing mode', ),
     'lc' : ('switch leader repetition char', ),
     'fc' : ('define delimiting and padding char for fields', ),
 
-    # Character translations
+    # 11. Character translations
     'cc' : ('set control character (dot)', ),
     'c2' : ('set no break control character (singlequote)', ),
     'eo' : ('disable character esacaping', ),
@@ -580,40 +580,40 @@ requests = {
     'trin' : ('translate char to glyph 2', ),
     'trnt' : ('translate char to glyph 3', ),
 
-    # Troff and Nroff modes
+    # 12. Troff and Nroff modes
     'nroff' : ('enable condition n and disable condition t', ),
     'troff' : ('enable condition t and disable condition n', ),
 
-    # Line layout
+    # 13. Line layout
     'po' : ('set horizontal page offset', ),
     'in' : ('set indentation', ),
     'ti' : ('temporary indent next line', ),
     'll' : ('set line length', ),
 
-    # Page layout
+    # 15. Page layout
     'pl' : ('set page length', ),
     'tl' : ('print title line', ),
     'lt' : ('set length of title', ),
     'pn' : ('set page number', ),
     'pc' : ('set page number character', ),
 
-    # Page control
+    # 16. Page control
     'bp' : ('new page', ),
     'ne' : ('reserve vertical space 1', ),
     'sv' : ('reserve vertical space 2', ),
     'os' : ('reserve vertical space 3', ),
 
-    # Font
-    #change
+    # 17. Fonts and symbols
+    # Changing fonts
     'ft' : ('set font or font position', ),
     'ftr' : ('alias font', ),
     'fzoom' : ('set font zoom', ),
-    #family
+    # Font Families
     'fam' : ('set font family', ),
     'sty' : ('set style for font position', ),
-    #positions
+    # Font positions
     'fp' : ('mount font to position', ),
-    #symbols
+    # Using symbols
     'composite' : ('map glyph name', ),
     'cflags' : ('set char properties', ),
     'char' : ('print string instead of char 1', ),
@@ -622,29 +622,29 @@ requests = {
     'schar' : ('print string instead of char 4', ),
     'rchar' : ('remove char definition', ),
     'rfschar' : ('remove char definition for font', ),
-    #char class
+    # Characater classes
     'class' : ('define class of characters', ),
-    #special font
+    # Special fonts
     'special' : ('set special font 1', ),
     'fspecial' : ('set special font 2', ),
-    #artificial font
+    # Artificial fonts
     'ul' : ('underline next n input lines', ),
     'cu' : ('underline font and space', ),
     'uf' : ('set underline font', ),
     'bd' : ('create bold font by printing twice', ),
     'cs' : ('set constant glyph width mode for font', ),
-    #ligatures and kerning
+    # Ligatures and kerning
     'lg' : ('switch ligature mode', ),
     'kern' : ('switch kerning', ),
     'tkf' : ('enable track kerning for font', ),
 
-    # Font size
+    # 18. Sizes
     'ps' : ('set font size', ),
     'sizes' : ('change allowed font sizes', ),
     'vs' : ('change vertical font size', ),
     'pvs' : ('change post vertical line spacing', ),
 
-    # String variables
+    # 19. Strings
     'ds' : ('define string var', ),
     'ds1' : ('define string var nocompat', ),
     'as' : ('append to string var', ),
@@ -656,7 +656,7 @@ requests = {
     'als' : ('create alias name for something', ),
     'chop' : ('remove last character from thing', ),
 
-    # Loops
+    # 20. Conditionals and loops
     'if' : ('if condition', ),
     'nop' : ('execute nothing', ),
     'ie' : ('else if', ),
@@ -665,7 +665,7 @@ requests = {
     'break' : ('break out of loop', ),
     'continue' : ('continue loop', ),
 
-    # Macros
+    # 21. Writing macros
     'de' : ('define macro 1', ),
     'de1' : ('define macro nocompat', ),
     'dei' : ('define macro 2', ),
@@ -677,11 +677,11 @@ requests = {
     'return' : ('return from macro', ),
     'shift' : ('shift macro arguments', ),
 
-    # Page motions
+    # 22. Page motions
     'mk' : ('put current line number into register', ),
     'rt' : ('return to marked line number', ),
 
-    # Traps (macro calls)
+    # 24. Traps (macro calls)
     'vpt' : ('switch vertical position traps', ),
     'wh' : ('set line number trap', ),
     'ch' : ('change trap location', ),
@@ -692,7 +692,7 @@ requests = {
     'lsm' : ('set leading space trap', ),
     'em' : ('set end of input trap (run macro after end of input)', ),
 
-    # Diversions
+    # 25. Diversions
     'di' : ('begin diversion 1', ),
     'da' : ('begin diversion 2', ),
     'box' : ('begin diversion 3', ),
@@ -701,17 +701,17 @@ requests = {
     'asciify' : ('unformat diversion', ),
     'unformat' : ('unformat spaces and tabs in diversion', ),
 
-    # Environments
+    # 26. Environments
     'ev' : ('switch environment', ),
     'evc' : ('copy environment to current', ),
 
-    # Colors
+    # 28. Colors
     'color' : ('switch colors', ),
     'defcolor' : ('define color', ),
     'gcolor' : ('set glyph color', ),
     'fcolor' : ('set background color', ),
 
-    # Input output
+    # 29. I/O
     'so' : ('include file', ),
     #'pso' : ('include command output', ), # Unsafe
     'mso' : ('include file search in tmac macro dirs', ),
@@ -728,17 +728,17 @@ requests = {
     'writem' : ('write macro to file', ),
     'close' : ('close file', ),
 
-    # Postprocessor
+    # 30. Postprocessor
     'device' : ('write control string into output device', ),
     'devicem' : ('write control string into output device uninterpreted', ),
 
-    # Misc
+    # 31. Misc
     'nm' : ('switch line number mode', ),
     'nn' : ('disable line numbering', ),
     'mc' : ('print glyph with distance from right margin', ),
     'psbb' : ('read postscript image', ),
 
-    # Debugging
+    # 33. Debugging
     'lf' : ('set input line number and filename', ),
     'tm' : ('print debug message', ),
     'tm1' : ('print debug message with whitespace at front', ),
@@ -755,7 +755,7 @@ requests = {
     'spreadwarn' : ('switch warning about unnecessary spaces', ),
     'warn' : ('change warning levels', ),
 
-    # Implementation differences
+    # 34. Implementation differences
     'cp' : ('switch compatability mode', ),
     'do' : ('switch compatability mode for some name', ),
 
