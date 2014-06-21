@@ -713,16 +713,16 @@ requests = {
 
     # Input output
     'so' : ('include file', ),
-    'pso' : ('include command output', ),
+    #'pso' : ('include command output', ), # Unsafe
     'mso' : ('include file search in tmac macro dirs', ),
     'trf' : ('transparently print file contents 1', ),
     'cf' : ('transparently print file contents 2', ),
     'nx' : ('force processing the file', ),
     'rd' : ('read from standard output (input?)', ),
-    'pi' : ('pipe output to shell command', ),
-    'sy' : ('execute shell script', ),
-    'open' : ('open file for writing', ),
-    'opena' : ('open file for writing and appending', ),
+    #'pi' : ('pipe output to shell command', ), # Unsafe
+    #'sy' : ('execute shell script', ), # Unsafe
+    #'open' : ('open file for writing', ), # Unsafe
+    #'opena' : ('open file for writing and appending', ), # Unsafe
     'write' : ('write to file', ),
     'writec' : ('write to file without newline', ),
     'writem' : ('write macro to file', ),
