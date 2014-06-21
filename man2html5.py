@@ -20,10 +20,10 @@
 import mimetypes
 import gzip
 import csv
-import cgi
 import argparse
 import logging
 import re
+import html
 
 
 
@@ -56,7 +56,7 @@ def split_with_quotes(string):
 def escape_text_line(paragraph):
     ''' Escapes HTML and man commands. '''
     # Escape HTML chars
-    paragraph = cgi.escape(paragraph)
+    paragraph = html.escape(paragraph)
 
     bold_start = '<code><b>'
     bold_end = '</b></code>'
