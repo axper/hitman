@@ -773,11 +773,11 @@ requests = {
 
 # Escapes begin with slash
 # Followed by:
-#     [xyz] for vairables and escape names
+#     [xyz] for vairables and escape
 #     'xyz' for constants
-# 1-character escape names (except '[' and '('):
+# 1-character escape (except '[' and '('):
 #     \x
-# 2-character escape names:
+# 2-character escape (usually special characters):
 #     \(xy
 # or
 #     \*(xy
