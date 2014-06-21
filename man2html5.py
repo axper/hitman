@@ -605,7 +605,7 @@ requests = {
 
     # Font
     #change
-    'ft' : ('set font', ),
+    'ft' : ('set font or font position', ),
     'ftr' : ('alias font', ),
     'fzoom' : ('set font zoom', ),
     #family
@@ -613,7 +613,6 @@ requests = {
     'sty' : ('set style for font position', ),
     #positions
     'fp' : ('mount font to position', ),
-    #'ft' : ('change font position', ), # only when argument is a number
     #symbols
     'composite' : ('map glyph name', ),
     'cflags' : ('set char properties', ),
@@ -787,8 +786,9 @@ requests = {
 #     \(xy
 # or
 #     \*(xy
-#
-# backslash (\) at the end - continue line
+# Arguments are enclosed in single quotes
+# Backslash (\) at the end - continue line
+# Three single-quotes at beginning of line is a comment
 
 # dq - "
 # cq - '
@@ -801,6 +801,113 @@ requests = {
 
 
 escapes = {
+    # 4. Identifiers
+    'A' : ('check if valid identifier', ),
+
+    # 5.3.1 Comments
+    '"' : ('start comment until end of line', ),
+    '#' : ('start comment until end of line nobreak', ),
+
+    # 6. Registers
+    'R' : ('define register', ),
+    'n' : ('get register value', ),
+    'g' : ('get format stored in register', ),
+
+    # 7. Filling and adjusting
+    'p' : ('break and adjust (spread) current line', ),
+
+    # 8. Manipulating hypenation
+    '%' : ('insert hypenation char (dash)', ),
+    ':' : ('break word but dont pring hypenation char', ),
+
+    # 9. Manipulating spacing
+    'x' : ('extra vertical line space', ),
+
+    # 10. Tabs and fields
+    't' : ('tab char (ignored)', ),
+
+    # 11. Character translations
+    '\\' : ('if escape char is backslash, print it', ),
+    'e' : ('print current escape char', ),
+    'E' : ('print current escape char but not in copy mode', ),
+    '.' : ('dot char', ),
+
+    # 14. Line control
+    #'<newline>' : ('ignore the newline and continue current line', ),
+    'c' : ('ignore everything on current line after this nobreak current', ),
+
+    # 17. Fonts and symbols
+    'f' : ('set font or font position', ),
+    'F' : ('set font family', ),
+    '(' : ('insert char with 2 char name', ),
+    '[' : ('insert char with name of any lenght 1', ),
+    'C' : ('insert char with name of any lenght 2', ),
+    'N' : ('insert char specified with its code', ),
+    '\'' : ('quote (apostrophe) character', ),
+    '`' : ('grave character', ),
+    '-' : ('minus sign', ),
+    '_' : ('underline', ),
+    'H' : ('set height of current font', ),
+    'S' : ('slant current font', ),
+    '\\' : ('increasee width of previous glyph (italic correction)', ),
+    ',' : ('increasee width of next glyph (italic correction)', ),
+    '&' : ('insert zero-width char (ignored) 1', ),
+    ')' : ('insert zero-width char (ignored) 2', ),
+
+    # 18. Sizes
+    's' : ('set font size', ),
+
+    # 19. Strings
+    '*' : ('get string value', ),
+
+    # 20. Loops
+    '{' : ('loop: begin block', ),
+    '}' : ('loop: end block', ),
+    '' : ('', ),
+
+    # 21. Writing macros
+    '$' : ('get macro argument by its number (like bash)', ),
+
+    # 22. Page motions
+    'v' : ('move up or down in page', ),
+    'r' : ('move (reserve) up 1v', ),
+    'u' : ('move (reserve) up 0.5v', ),
+    'd' : ('move (reserve) down 0.5v', ),
+    'h' : ('move left or right', ),
+    ' ' : ('unpaddable space char nobreak', ),
+    '~' : ('unbreakable stretching space char', ),
+    '|' : ('small space (1/6)', ),
+    '^' : ('small space (1/12)', ),
+    '0' : ('space of size of a number', ),
+    'w' : ('get width of string', ),
+    'k' : ('store current column position in register', ),
+    'o' : ('overstrike chars', ),
+    'z' : ('print char with zero width (without spacing)', ),
+    'Z' : ('print string and restore previous position', ),
+
+    # 23. Drawing requests
+    'l' : ('draw line to left or right from current position', ),
+    'L' : ('draw line to top or down from current position', ),
+    'D' : ('draw variety of stuff', ),
+    'b' : ('bracket building by centering vertically', ),
+
+    # 25. Diversions
+    '!' : ('transparent line until end of line', ),
+    '?' : ('transparently embed into diversion until next question mark', ),
+
+    # 27. Suppressing output
+    'O' : ('switch output', ),
+
+    # 28. Colors
+    'm' : ('set font color', ),
+    'M' : ('set font background color', ),
+
+    # 29. I/O
+    'V' : ('get content of environment variable', ),
+
+    # 30. Postprocessor access
+    'X' : ('write control string into output device', ),
+    'Y' : ('write control string into output device uninterpreted', ),
 }
 
 st = State()
