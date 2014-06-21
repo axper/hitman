@@ -53,8 +53,10 @@ def split_with_quotes(string):
     return csv.reader(title_line, quotechar='"', delimiter=' ',
                       quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
-def sub_inline_font(par):
-    ''' Parses man inline font escapes and replaces with HTML. '''
+def escape_text_line(paragraph):
+    ''' Escapes HTML and man commands. '''
+    # Escape HTML chars
+    paragraph = cgi.escape(paragraph)
 
     bold_start = '<code><b>'
     bold_end = '</b></code>'
@@ -66,68 +68,59 @@ def sub_inline_font(par):
     bold = False
 
     i = 0
-    while i < len(par) - 2:
-        logger_font.debug(par[i:i+3])
-        if par[i:i+3] == r'\fI':
+    while i < len(paragraph) - 2:
+        logger_font.debug(paragraph[i:i+3])
+        if paragraph[i:i+3] == r'\fI':
             logger_font.debug('starting italic!!!')
 
             if not italic:
                 italic = True
-                par = par[:i] + italic_start + par[i+3:]
-                logger_font.debug(par)
+                paragraph = paragraph[:i] + italic_start + paragraph[i+3:]
+                logger_font.debug(paragraph)
                 i += len(italic_start) - 1
             else:
                 logger_font.warning('already italic')
 
-        elif par[i:i+3] == r'\fB':
+        elif paragraph[i:i+3] == r'\fB':
             logger_font.debug('starting bold!!!')
 
             if not bold:
                 bold = True
-                par = par[:i] + bold_start + par[i+3:]
-                logger_font.debug(par)
+                paragraph = paragraph[:i] + bold_start + paragraph[i+3:]
+                logger_font.debug(paragraph)
                 i += len(bold_start) - 1
             else:
                 logger_font.warning('already bold')
 
-        elif par[i:i+3] in [r'\fR', r'\fP', r'\f1']:
+        elif paragraph[i:i+3] in [r'\fR', r'\fP', r'\f1']:
 
             if italic:
                 italic = False
                 logger_font.debug('ending italic')
-                par = par[:i] + italic_end + par[i+3:]
-                logger_font.debug(par)
+                paragraph = paragraph[:i] + italic_end + paragraph[i+3:]
+                logger_font.debug(paragraph)
                 i += len(italic_end) - 1
             elif bold:
                 bold = False
                 logger_font.debug('ending bold')
-                par = par[:i] + bold_end + par[i+3:]
-                logger_font.debug(par)
+                paragraph = paragraph[:i] + bold_end + paragraph[i+3:]
+                logger_font.debug(paragraph)
                 i += len(bold_end) - 1
             else:
                 logger_font.info('deleting non started font command')
-                par = par[:i] + par[i+3:]
-                logger_font.debug(par)
+                paragraph = paragraph[:i] + paragraph[i+3:]
+                logger_font.debug(paragraph)
 
         i += 1
 
     if italic:
         logger_font.debug('ending italic (at the end)')
-        par += italic_end
-        logger_font.debug(par)
+        paragraph += italic_end
+        logger_font.debug(paragraph)
     elif bold:
         logger_font.debug('ending bold (at the end)')
-        par += bold_end
-        logger_font.debug(par)
-
-    return par
-
-def escape_text_line(paragraph):
-    ''' Escapes HTML and man commands. '''
-    # Escape HTML chars
-    paragraph = cgi.escape(paragraph)
-    # Replace inline fonts
-    paragraph = sub_inline_font(paragraph)
+        paragraph += bold_end
+        logger_font.debug(paragraph)
 
     return paragraph
 
