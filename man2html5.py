@@ -800,34 +800,7 @@ requests = {
 # \*(HF - section header font
 
 
-escape_sequences = {
-    # Copyrights
-    '\\*R' : ('®'),
-    '\\*(Tm' : ('™'),
-    '\\*[R]' : ('®'),
-    '\\*[Tm]' : ('™'),
-
-    # Quotes
-    '\\*(lq' : ('“'),
-    '\\*(rq' : ('”'),
-    '\\*[lq]' : ('“'),
-    '\\*[rq]' : ('”'),
-    '\\(lq' : ('“'),
-    '\\(rq' : ('”'),
-
-    # Hypenation
-    '\\%' : (''),
-    '\\:' : (''),
-
-    # Current escape character (ususally backslash)
-    '\\\\' : ('\\'),
-    '\\e' : ('\\'), # Current escape character
-    '\\E' : ('\\'),
-    '\\.' : ('.'), # wrong if escape char is not backslash
-
-    # Line control
-    '\\\n' : (''), # continue current line
-    '\\c' : (''), # continue current line
+escapes = {
 }
 
 st = State()
