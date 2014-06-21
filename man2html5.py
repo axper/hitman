@@ -439,8 +439,8 @@ section_name = {
     '9' : 'Kernel routines',
 }
 
+# Just the control char by itself on the line is ignored
 requests = {
-    #'' : ('empty line', ),
     '.' : ('just a single dot', ),
     '\\"' : ('comment', Request.comment),
 
@@ -788,6 +788,9 @@ requests = {
 # Arguments are enclosed in single quotes
 # Backslash (\) at the end - continue line
 # Three single-quotes at beginning of line is a comment
+# Escape followed by newline:
+#     ignore the newline and continue current line
+
 escapes = {
     # 4. Identifiers
     'A' : ('check if valid identifier', ),
@@ -821,7 +824,6 @@ escapes = {
     '.' : ('dot char', ),
 
     # 14. Line control
-    #'<newline>' : ('ignore the newline and continue current line', ),
     'c' : ('ignore everything on current line after this nobreak current', ),
 
     # 17. Fonts and symbols
