@@ -780,9 +780,9 @@ requests = {
 # Followed by:
 #     [xyz] for vairables and escape
 #     'xyz' for constants
-# 1-character escape (except '[' and '('):
+# 1-character escape, except '[' and '(':
 #     \x
-# 2-character escape (usually special characters):
+# 2-character escape, usually special characters:
 #     \(xy
 # or
 #     \*(xy
@@ -793,10 +793,6 @@ requests = {
 # dq - "
 # cq - '
 # rs - \
-#   - <space 1>
-# | - <space 2>
-# ^ - <space 3>
-# h - <space 4>
 # \*(HF - section header font
 
 
@@ -863,7 +859,6 @@ escapes = {
     # 20. Loops
     '{' : ('loop: begin block', ),
     '}' : ('loop: end block', ),
-    '' : ('', ),
 
     # 21. Writing macros
     '$' : ('get macro argument by its number (like bash)', ),
