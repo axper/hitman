@@ -122,7 +122,7 @@ def sub_inline_font(par):
 
     return par
 
-def escape_paragraph(paragraph):
+def escape_text_line(paragraph):
     ''' Escapes HTML and man commands. '''
     # Escape HTML chars
     paragraph = cgi.escape(paragraph)
@@ -164,7 +164,7 @@ def alternating(st, line, first, second):
     else:
         logging.error("Incorrect second argument: %s", second)
 
-    words = split_with_quotes(escape_paragraph(line))
+    words = split_with_quotes(escape_text_line(line))
     final = ''
 
     even = True
@@ -290,7 +290,7 @@ class Request:
         st.par = False
 
     def text_line(st, line):
-        linenew = escape_paragraph(line)
+        linenew = escape_text_line(line)
         linenew += '\n'
 
         if st.par:
@@ -401,7 +401,7 @@ class Request:
             st.par = True
 
         html_writer.start_italic()
-        parsed = ' '.join(split_with_quotes(escape_paragraph(line))[1:])
+        parsed = ' '.join(split_with_quotes(escape_text_line(line))[1:])
         st.file_html.write(parsed)
         html_writer.end_italic()
         st.file_html.write(' ')
@@ -412,7 +412,7 @@ class Request:
             st.par = True
 
         html_writer.start_bold()
-        parsed = ' '.join(split_with_quotes(escape_paragraph(line))[1:])
+        parsed = ' '.join(split_with_quotes(escape_text_line(line))[1:])
         st.file_html.write(parsed)
         html_writer.end_bold()
         st.file_html.write(' ')
@@ -1250,8 +1250,6 @@ chars = {
     'u2662' : '♢',
 }
 
-def parse_text_line(l):
-    pass
 
 st = State()
 initialize(st)
