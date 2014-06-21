@@ -787,12 +787,8 @@ requests = {
 #     \(xy
 # or
 #     \*(xy
-
-# \* - retrive string var
-# \n - retrive number var
-# \f - set font
-# \*(HF - section header font
-# \* - interpolate string (change font size???)
+#
+# backslash (\) at the end - continue line
 
 # dq - "
 # cq - '
@@ -801,8 +797,8 @@ requests = {
 # | - <space 2>
 # ^ - <space 3>
 # h - <space 4>
+# \*(HF - section header font
 
-# backslash (\) at the end - continue line
 
 escape_sequences = {
     # Copyrights
