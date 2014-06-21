@@ -845,7 +845,7 @@ escapes = {
     '_' : ('underline', ),
     'H' : ('set height of current font', ),
     'S' : ('slant current font', ),
-    '\\' : ('increasee width of previous glyph (italic correction)', ),
+    '/' : ('increasee width of previous glyph (italic correction)', ),
     ',' : ('increasee width of next glyph (italic correction)', ),
     '&' : ('insert zero-width char (ignored) 1', ),
     ')' : ('insert zero-width char (ignored) 2', ),
