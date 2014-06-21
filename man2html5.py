@@ -514,33 +514,36 @@ requests = {
 
 
     ## Requests from gtroff info page
+    # Comments
+    'ig' : ('ignore until .. or macro encounters', ),
+
     # Registers
     'nr' : ('define register', ),
     'rr' : ('remove register', ),
     'rnn' : ('rename register', ),
-    'aln' : ('create alias for register', ),
-    'af' : ('change register output format', ),
+    'aln' : ('create alias name for register', ),
+    'af' : ('set register output format', ),
 
     # Filling and adjusting
     'br' : ('line break', Request.line_break),
-    'fi' : ('enable fill mode', ),
-    'nf' : ('disable fill mode', ),
-    'ad' : ('set adjusting mode', ),
-    'na' : ('disable adjusting', ),
-    'brp' : ('adjust current line and break', ),
+    'fi' : ('enable output fill mode', ),
+    'nf' : ('disable output fill mode', ),
+    'ad' : ('set line adjusting mode', ),
+    'na' : ('disable output line adjusting', ),
+    'brp' : ('break and adjust (spread) current line', ),
     'ss' : ('change space size between words', ),
-    'ce' : ('center text', ),
+    'ce' : ('center next line', ),
     'rj' : ('right justify text', ),
 
     # Hypenation (-)
     'hy' : ('enable hypenation', ),
     'nh' : ('disable hypenation', ),
     'hlm' : ('set max hypenated lines', ),
-    'hw' : ('define hypenation for words', ),
-    'hc' : ('change hypenation char', ),
-    'hpf' : ('read hypenation patterns from file 1', ),
-    'hpfa' : ('read hypenation patterns from file 1', ),
-    'hpfcode' : ('read hypenation patterns from file 1', ),
+    'hw' : ('define exceptional hypenation for words', ),
+    'hc' : ('switch additional hypenation indicator char', ),
+    'hpf' : ('read hypenation patterns from file', ),
+    'hpfa' : ('append hypenation patterns from file', ),
+    'hpfcode' : ('set input mapping for hpf', ),
     'hcode' : ('set hypenation code of char', ),
     'hym' : ('set right hypenation margin', ),
     'hys' : ('set hypenation space', ),
@@ -548,50 +551,51 @@ requests = {
     'hla' : ('set hypenation language', ),
 
     # Spacing
-    'sp' : ('space downwards', Request.line_break),
-    'ls' : ('print blank lines', ),
-    'ns' : ('disable line spacing', ),
+    'sp' : ('skip lines up or down', Request.line_break),
+    'ls' : ('print blank lines after each output', ),
+    'ns' : ('disable line spacing mode', ),
+    'rs' : ('enable line spacing mode', ),
 
     # Tabs and fields
-    'ta' : ('change tab stop positions', ),
-    'tc' : ('do not fill tab with space', ),
-    'linetabs' : ('set relative tab distance computing mode', ),
-    'lc' : ('declare leader repetition char', ),
+    'ta' : ('set tab stop positions', ),
+    'tc' : ('set tab fill char (space)', ),
+    'linetabs' : ('switch relative tab distance computing mode', ),
+    'lc' : ('switch leader repetition char', ),
     'fc' : ('define delimiting and padding char for fields', ),
 
     # Character translations
-    'cc' : ('set control character (dot and singlequote)', ),
-    'c2' : ('set no break character', ),
+    'cc' : ('set control character (dot)', ),
+    'c2' : ('set no break control character (singlequote)', ),
     'eo' : ('disable character esacaping', ),
-    'ec' : ('set escape char', ),
-    'ecs' : ('save current escape char', ),
-    'ecr' : ('restore saved escape char', ),
+    'ec' : ('set escape char (backslash)', ),
+    'ecs' : ('save current escape char (backslash)', ),
+    'ecr' : ('restore saved escape char (backslash)', ),
     'tr' : ('translate char to glyph 1', ),
     'trin' : ('translate char to glyph 2', ),
     'trnt' : ('translate char to glyph 3', ),
 
     # Troff and Nroff modes
-    'nroff' : ('enable tty output', ),
-    'troff' : ('enable non-tty output', ),
+    'nroff' : ('enable condition n and disable condition t', ),
+    'troff' : ('enable condition t and disable condition n', ),
 
     # Line layout
     'po' : ('set horizontal page offset', ),
     'in' : ('set indentation', ),
-    'ti' : ('temporary indent', ),
+    'ti' : ('temporary indent next line', ),
     'll' : ('set line length', ),
 
     # Page layout
     'pl' : ('set page length', ),
-    'tl' : ('print title line 1', ),
-    'lt' : ('print title line 2', ),
+    'tl' : ('print title line', ),
+    'lt' : ('set length of title', ),
     'pn' : ('set page number', ),
     'pc' : ('set page number character', ),
 
     # Page control
     'bp' : ('new page', ),
-    'ne' : ('reserver vertical space 1', ),
-    'sv' : ('reserver vertical space 2', ),
-    'os' : ('reserver vertical space 3', ),
+    'ne' : ('reserve vertical space 1', ),
+    'sv' : ('reserve vertical space 2', ),
+    'os' : ('reserve vertical space 3', ),
 
     # Font
     #change
@@ -611,75 +615,77 @@ requests = {
     'fchar' : ('print string instead of char 2', ),
     'fschar' : ('print string instead of char 3', ),
     'schar' : ('print string instead of char 4', ),
-    'rchar' : ('remove char definition 1', ),
-    'rfschar' : ('remove char definition 2', ),
+    'rchar' : ('remove char definition', ),
+    'rfschar' : ('remove char definition for font', ),
     #char class
-    'class' : ('define char class', ),
+    'class' : ('define class of characters', ),
     #special font
     'special' : ('set special font 1', ),
     'fspecial' : ('set special font 2', ),
     #artificial font
-    'ul' : ('underline font', ),
+    'ul' : ('underline next n input lines', ),
     'cu' : ('underline font and space', ),
     'uf' : ('set underline font', ),
     'bd' : ('create bold font by printing twice', ),
-    'cs' : ('switch constant glyph space mode', ),
+    'cs' : ('set constant glyph width mode for font', ),
     #ligatures and kerning
-    'lg' : ('switch ligature', ),
+    'lg' : ('switch ligature mode', ),
     'kern' : ('switch kerning', ),
-    'tkf' : ('enable track kerning', ),
+    'tkf' : ('enable track kerning for font', ),
 
     # Font size
-    'ps' : ('change font size', ),
+    'ps' : ('set font size', ),
     'sizes' : ('change allowed font sizes', ),
     'vs' : ('change vertical font size', ),
-    'pvs' : ('change post vertical font size', ),
+    'pvs' : ('change post vertical line spacing', ),
 
     # String variables
-    'ds' : ('define string var 1', ),
-    'ds1' : ('define string var 2', ),
-    'as' : ('assign string var 1', ),
-    'as1' : ('assign string var 2', ),
-    'substring' : ('substitue strings', ),
+    'ds' : ('define string var', ),
+    'ds1' : ('define string var nocompat', ),
+    'as' : ('append to string var', ),
+    'as1' : ('append to string var nocompat', ),
+    'substring' : ('substitue in string', ),
     'length' : ('get string length', ),
     'rn' : ('rename something', ),
-    'als' : ('create alias to something', ),
-    'chop' : ('remove last character from string', ),
+    'rm' : ('remove something', ),
+    'als' : ('create alias name for something', ),
+    'chop' : ('remove last character from thing', ),
 
     # Loops
     'if' : ('if condition', ),
     'nop' : ('execute nothing', ),
-    'ie' : ('else 1', ),
-    'el' : ('else 2', ),
+    'ie' : ('else if', ),
+    'el' : ('else', ),
     'while' : ('while loop', ),
     'break' : ('break out of loop', ),
     'continue' : ('continue loop', ),
 
     # Macros
     'de' : ('define macro 1', ),
-    'de1' : ('define macro 2', ),
-    'dei' : ('define macro 3', ),
-    'dei1' : ('define macro 4', ),
-    'am' : ('define append macro 1', ),
-    'am1' : ('define append macro 2', ),
-    'ami' : ('define append macro 3', ),
-    'ami1' : ('define append macro 4', ),
+    'de1' : ('define macro nocompat', ),
+    'dei' : ('define macro 2', ),
+    'dei1' : ('define macro 2 nocompat', ),
+    'am' : ('append to macro', ),
+    'am1' : ('append to macro nocompat', ),
+    'ami' : ('append to macro whose name is stored in', ),
+    'ami1' : ('append to macro whose name is stored in nocompat', ),
     'return' : ('return from macro', ),
+    'shift' : ('shift macro arguments', ),
 
     # Page motions
-    'mk' : ('mark page location', ),
-    'rt' : ('return marked page location', ),
+    'mk' : ('put current line number into register', ),
+    'rt' : ('return to marked line number', ),
 
     # Traps (macro calls)
-    'vpt' : ('change vertical position traps', ),
-    'wh' : ('set page location trap', ),
+    'vpt' : ('switch vertical position traps', ),
+    'wh' : ('set line number trap', ),
     'ch' : ('change trap location', ),
     'dt' : ('set trap in diversion', ),
     'it' : ('set input line trap 1', ),
     'itc' : ('set input line trap 2', ),
-    'blm' : ('set blank line trap', ),
+    'blm' : ('switch blank line trap', ),
     'lsm' : ('set leading space trap', ),
-    'em' : ('set end of input trap', ),
+    'em' : ('set end of input trap (run macro after end of input)', ),
 
     # Diversions
     'di' : ('begin diversion 1', ),
@@ -703,50 +709,50 @@ requests = {
     # Input output
     'so' : ('include file', ),
     'pso' : ('include command output', ),
-    'mso' : ('include file search in macro dirs', ),
+    'mso' : ('include file search in tmac macro dirs', ),
     'trf' : ('transparently print file contents 1', ),
     'cf' : ('transparently print file contents 2', ),
     'nx' : ('force processing the file', ),
-    'rd' : ('read from standard output', ),
-    'pi' : ('pipe output to shell commands', ),
+    'rd' : ('read from standard output (input?)', ),
+    'pi' : ('pipe output to shell command', ),
     'sy' : ('execute shell script', ),
     'open' : ('open file for writing', ),
     'opena' : ('open file for writing and appending', ),
     'write' : ('write to file', ),
-    'writec' : ('write to file without newlines', ),
+    'writec' : ('write to file without newline', ),
     'writem' : ('write macro to file', ),
     'close' : ('close file', ),
 
     # Postprocessor
-    'device' : ('embed string into output 1', ),
-    'devicem' : ('embed string into output 2', ),
+    'device' : ('write control string into output device', ),
+    'devicem' : ('write control string into output device uninterpreted', ),
 
     # Misc
-    'nm' : ('print line numbers', ),
+    'nm' : ('switch line number mode', ),
     'nn' : ('disable line numbering', ),
     'mc' : ('print glyph with distance from right margin', ),
     'psbb' : ('read postscript image', ),
 
     # Debugging
-    'lf' : ('change line number', ),
-    'tm' : ('print debug message 1', ),
-    'tm1' : ('print debug message 2', ),
-    'tmc' : ('print debug message 3', ),
-    'ab' : ('print debug message 4', ),
-    'ex' : ('print debug message 5', ),
+    'lf' : ('set input line number and filename', ),
+    'tm' : ('print debug message', ),
+    'tm1' : ('print debug message with whitespace at front', ),
+    'tmc' : ('print debug message with whitespace and no newline at end', ),
+    'ab' : ('print debug message 4 and exit', ),
+    'ex' : ('print debug message 5 (exit from roff processing)', ),
     'pev' : ('print current environment to stderr', ),
-    'pm' : ('print symbol table to stderr', ),
-    'pnr' : ('print all numbers to stderr', ),
+    'pm' : ('print macro names and sizes stderr', ),
+    'pnr' : ('print registers to stderr', ),
     'ptr' : ('print traps to stderr', ),
     'fl' : ('flush output', ),
-    'bactrace' : ('print backtrace of input stack', ),
+    'backtrace' : ('print backtrace of input stack', ),
     'warnscale' : ('set warning scale indicator', ),
-    'spreadwarn' : ('enable warning about unnecessary spaces', ),
+    'spreadwarn' : ('switch warning about unnecessary spaces', ),
     'warn' : ('change warning levels', ),
 
     # Implementation differences
-    'cp' : ('switch compatability mode 1', ),
-    'do' : ('switch compatability mode 2', ),
+    'cp' : ('switch compatability mode', ),
+    'do' : ('switch compatability mode for some name', ),
 }
 
 # \* - retrive string var
@@ -822,11 +828,11 @@ for line in st.file_manpage.read().splitlines():
         Request.text_line(st, line)
         continue
 
-    try:
-        request = line[1:].split()[0]
-    except IndexError:
-        logging.info('Stub: single character control sequence on the line')
+    if len(line) == 1:
+        d('Type: single ctrl char, is ignored')
         continue
+
+    request = line[1:].split()[0]
 
     command_info = requests[request]
     d('Type: %s', command_info[0])
