@@ -1,4 +1,4 @@
-code {
+code, dt {
 	background-color: #EBF1F5;
 	display: inline-block;
 	color: #222;
@@ -48,6 +48,7 @@ pre {
 	padding-top: 12.7px;
 }
 
+/*
 dd, dt {
 	color: #000;
 	font-family: sans-serif;
@@ -58,8 +59,9 @@ dd, dt {
 	font-variant: normal;
 	font-weight: 400;
 }
+*/
 
-p {
+p, dd {
 	color: #000;
 	direction: ltr;
 	font-family: sans-serif;
@@ -71,7 +73,6 @@ p {
 	font-weight: 400;
 	line-height: 19.05px;
 	margin-bottom: 6.35px;
-	margin-left: 0px;
 	margin-right: 0px;
 	margin-top: 5.08333px;
 }
