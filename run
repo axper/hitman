@@ -6,14 +6,14 @@ if [[ $# -ne 1 ]]; then
 fi
 
 rm --force log
-./man2html5.py "/usr/share/man/man1/${1}.1.gz"
+./man2html5.py "./pages/${1}"
 
 if [[ $? -ne 0 ]]; then
 	exit
 fi
 
 gvim log
-gvim "/usr/share/man/man1/${1}.1.gz"
-gvim ./result.html
-urxvt -e zsh -c "source ~/.zshrc && man ${1}" &
+gvim "./pages/${1}"
+#gvim ./result.html
+urxvt -e zsh -c "source ~/.zshrc && man ./pages/${1}" &
 firefox -new-window ./result.html &>/dev/null
