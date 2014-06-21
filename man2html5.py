@@ -775,7 +775,6 @@ requests = {
     'TS' : ('end tbl preprocessor', ),
 }
 
-
 # Escapes begin with slash
 # Followed by:
 #     [xyz] for vairables and escape
@@ -789,13 +788,6 @@ requests = {
 # Arguments are enclosed in single quotes
 # Backslash (\) at the end - continue line
 # Three single-quotes at beginning of line is a comment
-
-# dq - "
-# cq - '
-# rs - \
-# \*(HF - section header font
-
-
 escapes = {
     # 4. Identifiers
     'A' : ('check if valid identifier', ),
@@ -1074,7 +1066,7 @@ chars = {
     'ru' : '_',
     'bb' : '¦',
     'sl' : '/',
-    'rs' : '\'',
+    'rs' : '\\',
     'ci' : '○',
     'bu' : '·',
     'dd' : '‡',
@@ -1252,6 +1244,9 @@ chars = {
     'DI' : '♦',
     'u2662' : '♢',
 }
+
+def parse_text_line(l):
+    pass
 
 st = State()
 initialize(st)
