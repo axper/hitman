@@ -126,8 +126,6 @@ def escape_paragraph(paragraph):
     ''' Escapes HTML and man commands. '''
     # Escape HTML chars
     paragraph = cgi.escape(paragraph)
-    # Replace \-
-    paragraph = re.sub(r'\\-', '-', paragraph)
     # Replace inline fonts
     paragraph = sub_inline_font(paragraph)
 
@@ -223,6 +221,7 @@ class State:
     control_char_nobreak = '\''
     escape_char = '\\'
     no_break = False
+    ignore_until_doubledot = False
 
 class HtmlWriter:
     paragraph_start = '<p>\n'
