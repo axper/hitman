@@ -6,6 +6,12 @@
 # Used man file specifications:
 # groff(7), groff_me(7), groff_man(7), man(7), info groff
 
+# List of similar projects:
+# man2html
+# man2web
+# roffit
+# man -H
+
 
 import mimetypes
 import gzip
@@ -787,9 +793,6 @@ requests = {
 # \f - set font
 # \*(HF - section header font
 # \* - interpolate string (change font size???)
-
-# \(XX - escape sequence name of exactly 2 characters
-# \[X] - long escape sequence name
 
 # dq - "
 # cq - '
