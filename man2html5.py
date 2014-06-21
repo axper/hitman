@@ -8,9 +8,13 @@
 
 # List of similar projects:
 # man2html
+#     text output with everything in black monospace font
 # man2web
+#     same as man2html
 # roffit
+#     can't handle more complex pages with groff commands
 # man -H
+#     can't properly format gcc(1)
 
 
 import mimetypes
