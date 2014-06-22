@@ -27,29 +27,13 @@ from logger import logger
 from logger import logger_escape_text_line
 from tables import chars, section_name
 from program_state import State
+from init_deinit import initialize, deinitialize
 
 
 NORMAL = 0
 BOLD = 1
 ITALIC = 2
 
-
-def open_man_file(filename):
-    ''' Opens file in text mode and unzips if necessary. '''
-    if mimetypes.guess_type(filename)[1] == 'gzip':
-        try:
-            return gzip.open(filename, mode='rt')
-        except FileNotFoundError as err:
-            print(err)
-            logger.exception(err)
-            exit(1)
-    else:
-        try:
-            return open(filename)
-        except FileNotFoundError as err:
-            print(err)
-            logger.exception(err)
-            exit(1)
 
 def split_with_quotes(string):
     ''' Splits string into words and takes quotes into account. '''
@@ -201,30 +185,6 @@ def alternating(st, line, first, second):
     final += ' '
     logger.debug(final)
     html_writer.write_string(final)
-
-def initialize_get_args():
-    ''' Returns command line arguments. '''
-    parser = argparse.ArgumentParser(description='Manpage to HTML5 converter.')
-    parser.add_argument('filename', type=str, help='manpage file to parse')
-    return parser.parse_args()
-
-def initialize():
-    ''' Initializes program - opens files. '''
-    st = State()
-    st.file_manpage = open_man_file(initialize_get_args().filename)
-    try:
-        st.file_html = open('result.html', 'wt')
-    except FileNotFoundError as err:
-        print(err)
-        logger.exception(err)
-        exit(1)
-
-    return st
-
-def deinitialize(st):
-    ''' Closes opened files. '''
-    st.file_html.close()
-    st.file_manpage.close()
 
 
 class HtmlWriter:
