@@ -1284,9 +1284,9 @@ d = logging.debug
 
 d('file:===============' + st.file_manpage.name + '=================')
 
-for line in st.file_manpage.read().splitlines():
+for line in st.file_manpage:
     d('-' * 79)
-    d(line)
+    d(line[:-1])
 
     if not line:
         d('Type: empty line')
