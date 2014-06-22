@@ -19,3 +19,4 @@ gnome-calculator(1)
 	.sp
 logging formatter
 add logging.exception to try-except clauses besides print
+move structs to separate file
