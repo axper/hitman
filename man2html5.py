@@ -49,8 +49,7 @@ def open_man_file(filename):
 
 def split_with_quotes(string):
     ''' Splits string into words and takes quotes into account. '''
-    title_line = string.splitlines()
-    return csv.reader(title_line, quotechar='"', delimiter=' ',
+    return csv.reader(string.splitlines(), quotechar='"', delimiter=' ',
                       quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
 def escape_text_line(paragraph):
