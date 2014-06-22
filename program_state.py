@@ -8,4 +8,5 @@ class State:
     escape_char = '\\'
     no_break = False
     ignore_until_doubledot = False
-
+    inline_font_stack = ['R']
+    inline_code = False

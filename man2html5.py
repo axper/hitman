@@ -26,27 +26,50 @@ def escape_text_line2(text_line):
     # First handle ampersands(&) after escape
     # It must be done before HTML escaping
     text_line = text_line.replace('\\&', '')
-    logger.debug('after&:' + text_line)
 
     # Now escape HTML
     text_line = html.escape(text_line, quote=False)
-    logger.debug('afterH:' + text_line)
+
+    logger.debug('after:' + text_line)
+
+    state.inline_font_stack = ['R']
+    state.inline_code = False
 
     # Now groff escape codes
+    result = ''
     index = 0
-    for index in range(len(text_line)):
+    while index < len(text_line):
         if text_line[index] == state.escape_char:
-            if index == len(text_line) - 1:
+            if index == len(text_line) - 2:
                 logger.info('stub: escape char is the last letter')
+                index += 1
                 continue
 
             escape_code = text_line[index + 1]
 
             if escape_code not in escapes:
                 logger.info('stub:unknown escape code:' + escape_code)
+                index += 1
                 continue
 
-            logger.debug('escape:' + escape_code + '  means: ' + escapes[escape_code][0])
+            escape_info = escapes[escape_code]
+
+            logger.debug('escape code: %s (%s)', escape_code, escape_info[0])
+
+            if len(escape_info) >= 2:
+                rest_of_line = text_line[index + 2:]
+                got = escapes[escape_code][1](rest_of_line)
+                result += got[0]
+                index += got[1]
+            else:
+                logger.info('stub escape code: %s (%s)', escape_code, escape_info[0])
+
+        else:
+            result += text_line[index]
+
+        index += 1
+
+    logger.debug('result:%s', result)
 
 def escape_text_line(paragraph):
     ''' Escapes HTML and man commands. '''
@@ -716,6 +739,142 @@ requests = {
     'TS' : ('end tbl preprocessor', ),
 }
 
+class Escape:
+    def minus_sign(l):
+        return ('-', 1)
+
+    def hypenation_char(l):
+        return ('', 1)
+
+    def insert_char_with_2(l):
+        return (chars[l[:2]], 3)
+
+    def space_char(l):
+        return (' ', 1)
+
+    def current_escape_char(l):
+        return (state.escape_char, 1)
+
+    def change_font(l):
+        '''
+            1 - normal
+            2 - italic
+            3 - bold
+            4 - bold italic
+            5+ - small same
+        '''
+        normal_fonts = ['R', '1']
+        italic_fonts = ['I', '2']
+        bold_fonts = ['B', '3']
+        bold_italic_fonts = ['4']
+        previous_fonts = ['P']
+
+
+        logger.info('>>>>>>>>%s', l)
+
+        ret_length = 2
+
+        new_font = l[0]
+        try:
+            previous_font = state.inline_font_stack[-1]
+        except IndexError:
+            logger.warn('font stack empty, taking roman')
+            previous_font = 'R'
+
+        if new_font in normal_fonts:
+            state.inline_font_stack.append(new_font)
+            logger.debug(state.inline_font_stack)
+
+            if previous_font in normal_fonts:
+                return ('', ret_length)
+            elif previous_font in bold_fonts:
+                return (HtmlWriter.bold_end, ret_length)
+            elif previous_font in italic_fonts:
+                return (HtmlWriter.italic_end, ret_length)
+            else:
+                logger.info('previous font unknown:%s', previous_font)
+            state.inline_code = False
+
+        elif new_font in bold_fonts:
+            state.inline_font_stack.append(new_font)
+            logger.debug(state.inline_font_stack)
+
+            if previous_font in bold_fonts:
+                return ('', ret_length)
+            elif previous_font in normal_fonts:
+                return (HtmlWriter.bold_start, ret_length)
+            elif previous_font in italic_fonts:
+                return ('</i><b>', ret_length)
+            else:
+                logger.info('previous font unknown:%s', previous_font)
+            state.inline_code = True
+
+        elif new_font in italic_fonts:
+            state.inline_font_stack.append(new_font)
+            logger.debug(state.inline_font_stack)
+
+            if previous_font in italic_fonts:
+                return ('', ret_length)
+            elif previous_font in bold_fonts:
+                return ('</b><i>', ret_length)
+            elif previous_font in normal_fonts:
+                return (HtmlWriter.italic_start, ret_length)
+            else:
+                logger.info('previous font unknown:%s', previous_font)
+            state.inline_code = True
+
+        elif new_font in previous_fonts:
+            try:
+                state.inline_font_stack.pop()
+                new_font = state.inline_font_stack[-1]
+                logger.debug(state.inline_font_stack)
+            except IndexError:
+                logger.warn('font stack empty 2, taking roman')
+                new_font = 'R'
+
+            
+            # Dont forget to check new line against new_font instead!!!
+            if new_font in normal_fonts:
+                if previous_font in normal_fonts:
+                    return ('', ret_length)
+                elif previous_font in bold_fonts:
+                    return (HtmlWriter.bold_end, ret_length)
+                elif previous_font in italic_fonts:
+                    return (HtmlWriter.italic_end, ret_length)
+                else:
+                    logger.info('previous font unknown:%s', previous_font)
+                state.inline_code = False
+
+            elif new_font in bold_fonts:
+                if previous_font in bold_fonts:
+                    return ('', ret_length)
+                elif previous_font in normal_fonts:
+                    return (HtmlWriter.bold_start, ret_length)
+                elif previous_font in italic_fonts:
+                    return ('</i><b>', ret_length)
+                else:
+                    logger.info('previous font unknown:%s', previous_font)
+                state.inline_code = True
+
+            elif new_font in italic_fonts:
+                if previous_font in italic_fonts:
+                    return ('', ret_length)
+                elif previous_font in bold_fonts:
+                    return ('</b><i>', ret_length)
+                elif previous_font in normal_fonts:
+                    return (HtmlWriter.italic_start, ret_length)
+                else:
+                    logger.info('previous font unknown:%s', previous_font)
+                state.inline_code = True
+            
+            else:
+                logger.info('new font unknown:%s', new_font)
+
+        else:
+            logger.info('font unknown:%s', new_font)
+
+        return ('', ret_length)
+
 escapes = {
     # 4. Identifiers
     'A' : ('check if valid identifier', ),
@@ -733,7 +892,7 @@ escapes = {
     'p' : ('break and adjust (spread) current line', ),
 
     # 8. Manipulating hypenation
-    '%' : ('insert hypenation char (dash)', ),
+    '%' : ('insert hypenation char (dash)', Escape.hypenation_char),
     ':' : ('break word but dont pring hypenation char', ),
 
     # 9. Manipulating spacing
@@ -743,8 +902,8 @@ escapes = {
     't' : ('tab char (ignored)', ),
 
     # 11. Character translations
-    '\\' : ('if escape char is backslash, print it', ),
-    'e' : ('print current escape char', ),
+    '\\' : ('if escape char is backslash, print it', Escape.current_escape_char),
+    'e' : ('print current escape char', Escape.current_escape_char),
     'E' : ('print current escape char but not in copy mode', ),
     '.' : ('dot char', ),
 
@@ -752,15 +911,15 @@ escapes = {
     'c' : ('ignore everything on current line after this nobreak current', ),
 
     # 17. Fonts and symbols
-    'f' : ('set font or font position', ),
+    'f' : ('set font or font position', Escape.change_font),
     'F' : ('set font family', ),
-    '(' : ('insert char with 2 char name', ),
+    '(' : ('insert char with 2 char name', Escape.insert_char_with_2),
     '[' : ('insert char with name of any lenght 1', ),
     'C' : ('insert char with name of any lenght 2', ),
     'N' : ('insert char specified with its code', ),
     '\'' : ('quote (apostrophe) character', ),
     '`' : ('grave character', ),
-    '-' : ('minus sign', ),
+    '-' : ('minus sign', Escape.minus_sign),
     '_' : ('underline', ),
     'H' : ('set height of current font', ),
     'S' : ('slant current font', ),
@@ -788,7 +947,7 @@ escapes = {
     'u' : ('move (reserve) up 0.5v', ),
     'd' : ('move (reserve) down 0.5v', ),
     'h' : ('move left or right', ),
-    ' ' : ('unpaddable space char nobreak', ),
+    ' ' : ('unpaddable space char nobreak', Escape.space_char),
     '~' : ('unbreakable stretching space char', ),
     '|' : ('small space (1/6)', ),
     '^' : ('small space (1/12)', ),
