@@ -34,6 +34,7 @@ ITALIC = 2
 
 def open_man_file(filename):
     ''' Opens file in text mode and unzips if necessary. '''
+    logging.debug('OPENING:' + filename)
     if mimetypes.guess_type(filename)[1] == 'gzip':
         try:
             return gzip.open(filename, mode='rt')
@@ -51,6 +52,32 @@ def split_with_quotes(string):
     ''' Splits string into words and takes quotes into account. '''
     return csv.reader(string.splitlines(), quotechar='"', delimiter=' ',
                       quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
+
+def escape_text_line2(text_line):
+    # First handle ampersands(&) after escape
+    # It must be done before HTML escaping
+    text_line = text_line.replace('\\&', '&amp;')
+    logging.debug('after&:' + text_line)
+
+    # Now escape HTML
+    text_line = html.escape(text_line)
+    logging.debug('afterH:' + text_line)
+
+    # Now groff escape codes
+    index = 0
+    for index in range(len(text_line)):
+        if text_line[index] == st.escape_char:
+            if index == len(text_line) - 1:
+                logging.info('stub: escape char is the last letter')
+                continue
+
+            escape_code = text_line[index + 1]
+
+            if escape_code not in escapes:
+                d('stub:unknown escape code:' + escape_code)
+                continue
+
+            logging.debug('escape:' + escape_code + '  means: ' + escapes[escape_code][0])
 
 def escape_text_line(paragraph):
     ''' Escapes HTML and man commands. '''
@@ -247,6 +274,9 @@ class HtmlWriter:
         self.html_file.write(s)
 
     def write_html_header(self, title):
+        if title[1] not in section_name:
+            d('stub:unknown section name:' + title[1])
+            return
         self.html_file.write(self.header.format(title[0],
                                                 section_name[title[1]]))
 
@@ -282,6 +312,8 @@ class Request:
         st.par = False
 
     def text_line(st, line):
+        escape_text_line2(line)
+        '''
         linenew = ' '.join(split_with_quotes(escape_text_line(line)))
         linenew += '\n'
 
@@ -295,6 +327,7 @@ class Request:
             st.file_html.write(linenew)
 
         d(linenew)
+        '''
 
     def comment(st, line):
         pass
@@ -785,6 +818,8 @@ requests = {
 # Three single-quotes at beginning of line is a comment
 # Escape followed by newline:
 #     ignore the newline and continue current line
+# This program will misbehave during HTML escaping
+# if an escape code is < or > 
 
 escapes = {
     # 4. Identifiers
@@ -1272,6 +1307,10 @@ for line in st.file_manpage.read().splitlines():
         continue
 
     request = line[1:].split()[0]
+
+    if request not in requests:
+        d('stub:unknown request:' + request)
+        continue
 
     command_info = requests[request]
     d('Type: %s', command_info[0])
