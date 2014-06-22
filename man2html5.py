@@ -200,7 +200,6 @@ def alternating(st, line, first, second):
 
 def initialize_logging():
     ''' Initializes logging library for the program. '''
-    global logger_matches
     global logger_font
 
     logging.basicConfig(filename='log', level=logging.DEBUG)
