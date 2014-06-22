@@ -282,7 +282,7 @@ class Request:
         st.par = False
 
     def text_line(st, line):
-        linenew = escape_text_line(line)
+        linenew = ' '.join(split_with_quotes(escape_text_line(line)))
         linenew += '\n'
 
         if st.par:
