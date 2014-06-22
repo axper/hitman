@@ -17,3 +17,5 @@ gnome-calculator(1)
 	.PD
 gnome-calculator(1)
 	.sp
+logging formatter
+add logging.exception to try-except clauses besides print
