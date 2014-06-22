@@ -26,7 +26,7 @@ import html
 from logger import logger
 from logger import logger_escape_text_line
 from tables import chars, section_name
-
+from program_state import State
 
 
 NORMAL = 0
@@ -223,17 +223,6 @@ def deinitialize(st):
     st.file_html.close()
     st.file_manpage.close()
 
-
-class State:
-    ''' The global state variables. '''
-    file_manpage = None
-    file_html = None
-    par = False
-    control_char = '.'
-    control_char_nobreak = '\''
-    escape_char = '\\'
-    no_break = False
-    ignore_until_doubledot = False
 
 class HtmlWriter:
     paragraph_start = '<p>\n'
