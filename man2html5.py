@@ -208,8 +208,9 @@ def initialize_get_args():
     parser.add_argument('filename', type=str, help='manpage file to parse')
     return parser.parse_args()
 
-def initialize(st):
+def initialize():
     ''' Initializes program - opens files. '''
+    st = State()
     st.file_manpage = open_man_file(initialize_get_args().filename)
     try:
         st.file_html = open('result.html', 'wt')
@@ -217,6 +218,8 @@ def initialize(st):
         print(err)
         logger.exception(err)
         exit(1)
+
+    return st
 
 def deinitialize(st):
     ''' Closes opened files. '''
@@ -899,8 +902,7 @@ escapes = {
 }
 
 
-st = State()
-initialize(st)
+st = initialize()
 html_writer = HtmlWriter(st.file_html)
 
 logger.debug('file:===============' + st.file_manpage.name + '=================')
