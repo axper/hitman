@@ -34,7 +34,6 @@ ITALIC = 2
 
 def open_man_file(filename):
     ''' Opens file in text mode and unzips if necessary. '''
-    logging.debug('OPENING:' + filename)
     if mimetypes.guess_type(filename)[1] == 'gzip':
         try:
             return gzip.open(filename, mode='rt')
@@ -1283,6 +1282,7 @@ initialize(st)
 html_writer = HtmlWriter(st.file_html)
 d = logging.debug
 
+d('file:===============' + st.file_manpage.name + '=================')
 
 for line in st.file_manpage.read().splitlines():
     d('-' * 79)
