@@ -851,7 +851,7 @@ for line in state.file_manpage:
     except_first_char = line[1:].split()
     
     if not except_first_char:
-        logger.warning('Type: dot followed by whitespace')
+        logger.info('Type: escape char, maybe whitespace after')
         Request.empty_line()
         continue
 
