@@ -35,7 +35,7 @@ def escape_text_line2(text_line):
     # Now groff escape codes
     index = 0
     for index in range(len(text_line)):
-        if text_line[index] == st.escape_char:
+        if text_line[index] == state.escape_char:
             if index == len(text_line) - 1:
                 logger.info('stub: escape char is the last letter')
                 continue
@@ -119,7 +119,7 @@ def escape_text_line(paragraph):
 
     return paragraph
 
-def alternating(st, line, first, second):
+def alternating(line, first, second):
     ''' Writes HTML line alternating between first and second styles. '''
 
     bold_start = '<code><b>'
@@ -232,34 +232,34 @@ class HtmlWriter:
 
 class Request:
     ''' Functions to handle requests at beginning of lines. '''
-    def empty_line(st):
-        if st.par:
+    def empty_line():
+        if state.par:
             html_writer.end_paragraph()
 
-        st.par = False
+        state.par = False
 
-    def text_line(st, line):
+    def text_line(line):
         escape_text_line2(line)
         '''
         linenew = ' '.join(split_with_quotes(escape_text_line(line)))
         linenew += '\n'
 
-        if st.par:
+        if state.par:
             logger.debug('already in paragraph')
-            st.file_html.write(linenew)
+            state.file_html.write(linenew)
         else:
             logger.debug('starting paragraph')
             html_writer.start_paragraph()
-            st.par = True
-            st.file_html.write(linenew)
+            state.par = True
+            state.file_html.write(linenew)
 
         logger.debug(linenew)
         '''
 
-    def comment(st, line):
+    def comment(line):
         pass
 
-    def title(st, line):
+    def title(line):
         title = split_with_quotes(line)[1:]
         title[0] = title[0].lower()
 
@@ -267,118 +267,118 @@ class Request:
 
         logger.debug(title)
 
-    def section_title(st, line):
-        if st.par:
+    def section_title(line):
+        if state.par:
             html_writer.end_paragraph()
-            st.par = False
+            state.par = False
 
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
-        st.file_html.write('<h2>' + section_title + '</h2>\n')
+        state.file_html.write('<h2>' + section_title + '</h2>\n')
 
         logger.debug(section_title)
 
-    def subsection_title(st, line):
-        if st.par:
+    def subsection_title(line):
+        if state.par:
             html_writer.end_paragraph()
-            st.par = False
+            state.par = False
 
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
-        st.file_html.write('<h3>' + section_title + '</h3>\n')
+        state.file_html.write('<h3>' + section_title + '</h3>\n')
 
         logger.debug(section_title)
 
-    def new_paragraph(st, line):
-        if st.par:
+    def new_paragraph(line):
+        if state.par:
             html_writer.end_paragraph()
             html_writer.start_paragraph()
         else:
-            st.par = True
+            state.par = True
             html_writer.start_paragraph()
 
-    def hanging_indented_paragraph(st, line):
+    def hanging_indented_paragraph(line):
         logger.info('stub: hanging or indented paragraph (ignoring...)')
 
-        if not st.par:
+        if not state.par:
             html_writer.start_paragraph()
-            st.par = True
+            state.par = True
         else:
             html_writer.end_paragraph()
             html_writer.start_paragraph()
 
-    def alt_bold_italic(st, line):
-        if not st.par:
+    def alt_bold_italic(line):
+        if not state.par:
             html_writer.start_paragraph()
-            st.par = True
+            state.par = True
 
-        alternating(st, line, BOLD, ITALIC)
+        alternating(line, BOLD, ITALIC)
 
-    def alt_italic_bold(st, line):
-        if not st.par:
+    def alt_italic_bold(line):
+        if not state.par:
             html_writer.start_paragraph()
-            st.par = True
+            state.par = True
 
-        alternating(st, line, ITALIC, BOLD)
+        alternating(line, ITALIC, BOLD)
 
-    def alt_bold_normal(st, line):
-        if not st.par:
+    def alt_bold_normal(line):
+        if not state.par:
             html_writer.start_paragraph()
-            st.par = True
+            state.par = True
 
-        alternating(st, line, BOLD, NORMAL)
+        alternating(line, BOLD, NORMAL)
 
-    def alt_normal_bold(st, line):
-        if not st.par:
+    def alt_normal_bold(line):
+        if not state.par:
             html_writer.start_paragraph()
-            st.par = True
+            state.par = True
 
-        alternating(st, line, NORMAL, BOLD)
+        alternating(line, NORMAL, BOLD)
 
-    def alt_italic_normal(st, line):
-        if not st.par:
+    def alt_italic_normal(line):
+        if not state.par:
             html_writer.start_paragraph()
-            st.par = True
+            state.par = True
 
-        alternating(st, line, ITALIC, NORMAL)
+        alternating(line, ITALIC, NORMAL)
 
-    def alt_normal_italic(st, line):
-        if not st.par:
+    def alt_normal_italic(line):
+        if not state.par:
             html_writer.start_paragraph()
-            st.par = True
+            state.par = True
 
-        alternating(st, line, NORMAL, ITALIC)
+        alternating(line, NORMAL, ITALIC)
 
-    def font_italic(st, line):
-        if not st.par:
+    def font_italic(line):
+        if not state.par:
             html_writer.start_paragraph()
-            st.par = True
+            state.par = True
 
         html_writer.start_italic()
         parsed = ' '.join(split_with_quotes(escape_text_line(line))[1:])
-        st.file_html.write(parsed)
+        state.file_html.write(parsed)
         html_writer.end_italic()
-        st.file_html.write(' ')
+        state.file_html.write(' ')
 
-    def font_bold(st, line):
-        if not st.par:
+    def font_bold(line):
+        if not state.par:
             html_writer.start_paragraph()
-            st.par = True
+            state.par = True
 
         html_writer.start_bold()
         parsed = ' '.join(split_with_quotes(escape_text_line(line))[1:])
-        st.file_html.write(parsed)
+        state.file_html.write(parsed)
         html_writer.end_bold()
-        st.file_html.write(' ')
+        state.file_html.write(' ')
 
-    def line_break(st, line):
-        if st.par:
+    def line_break(line):
+        if state.par:
             html_writer.end_paragraph()
 
-        st.par = False
+        state.par = False
 
-    def finalize(st):
-        if st.par:
+    def finalize():
+        if state.par:
             html_writer.end_paragraph()
-            st.par = False
+            state.par = False
 
 
 requests = {
@@ -825,27 +825,27 @@ escapes = {
 }
 
 
-st = initialize()
-html_writer = HtmlWriter(st.file_html)
+state = initialize()
+html_writer = HtmlWriter(state.file_html)
 
-logger.debug('file:===============' + st.file_manpage.name + '=================')
+logger.debug('file:===============' + state.file_manpage.name + '=================')
 
-for line in st.file_manpage:
+for line in state.file_manpage:
     logger.debug('-' * 79)
     logger.debug(line[:-1])
 
     if not line:
         logger.debug('Type: empty line')
-        Request.empty_line(st)
+        Request.empty_line()
         continue
 
-    if line[0] == st.control_char_nobreak:
-        st.no_break = True
-    elif line[0] == st.control_char:
-        st.no_break = False
+    if line[0] == state.control_char_nobreak:
+        state.no_break = True
+    elif line[0] == state.control_char:
+        state.no_break = False
     else:
         logger.debug('Type: text line')
-        Request.text_line(st, line)
+        Request.text_line(line)
         continue
 
     if len(line) == 1:
@@ -862,11 +862,11 @@ for line in st.file_manpage:
     logger.debug('Type: %s', command_info[0])
 
     if len(command_info) >= 2:
-        command_info[1](st, line)
+        command_info[1](line)
     else:
         logger.info('stub: %s', command_info[0])
 
-Request.finalize(st)
+Request.finalize()
 
 html_writer.write_html_footer()
-deinitialize(st)
+deinitialize(state)
