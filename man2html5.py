@@ -834,8 +834,8 @@ for line in state.file_manpage:
     logger.debug('-' * 79)
     logger.debug(line[:-1])
 
-    if not line:
-        logger.debug('Type: empty line')
+    if line == '\n':
+        logger.debug('Type: completely empty line')
         Request.empty_line()
         continue
 
@@ -848,11 +848,14 @@ for line in state.file_manpage:
         Request.text_line(line)
         continue
 
-    if len(line) == 1:
-        logger.debug('Type: single ctrl char, is ignored')
+    except_first_char = line[1:].split()
+    
+    if not except_first_char:
+        logger.warning('Type: dot followed by whitespace')
+        Request.empty_line()
         continue
 
-    request = line[1:].split()[0]
+    request = except_first_char[0]
 
     if request not in requests:
         logger.debug('stub:unknown request:' + request)
