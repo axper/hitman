@@ -21,9 +21,10 @@ import mimetypes
 import gzip
 import csv
 import argparse
-import logging
 import re
 import html
+from logger import logger
+from logger import logger_escape_text_line
 
 
 
@@ -39,12 +40,14 @@ def open_man_file(filename):
             return gzip.open(filename, mode='rt')
         except FileNotFoundError as err:
             print(err)
+            logger.exception(err)
             exit(1)
     else:
         try:
             return open(filename)
         except FileNotFoundError as err:
             print(err)
+            logger.exception(err)
             exit(1)
 
 def split_with_quotes(string):
@@ -56,27 +59,27 @@ def escape_text_line2(text_line):
     # First handle ampersands(&) after escape
     # It must be done before HTML escaping
     text_line = text_line.replace('\\&', '&amp;')
-    logging.debug('after&:' + text_line)
+    logger.debug('after&:' + text_line)
 
     # Now escape HTML
     text_line = html.escape(text_line, quote=False)
-    logging.debug('afterH:' + text_line)
+    logger.debug('afterH:' + text_line)
 
     # Now groff escape codes
     index = 0
     for index in range(len(text_line)):
         if text_line[index] == st.escape_char:
             if index == len(text_line) - 1:
-                logging.info('stub: escape char is the last letter')
+                logger.info('stub: escape char is the last letter')
                 continue
 
             escape_code = text_line[index + 1]
 
             if escape_code not in escapes:
-                d('stub:unknown escape code:' + escape_code)
+                logger.info('stub:unknown escape code:' + escape_code)
                 continue
 
-            logging.debug('escape:' + escape_code + '  means: ' + escapes[escape_code][0])
+            logger.debug('escape:' + escape_code + '  means: ' + escapes[escape_code][0])
 
 def escape_text_line(paragraph):
     ''' Escapes HTML and man commands. '''
@@ -94,58 +97,58 @@ def escape_text_line(paragraph):
 
     i = 0
     while i < len(paragraph) - 2:
-        logger_font.debug(paragraph[i:i+3])
+        logger_escape_text_line.debug(paragraph[i:i+3])
         if paragraph[i:i+3] == r'\fI':
-            logger_font.debug('starting italic!!!')
+            logger_escape_text_line.debug('starting italic!!!')
 
             if not italic:
                 italic = True
                 paragraph = paragraph[:i] + italic_start + paragraph[i+3:]
-                logger_font.debug(paragraph)
+                logger_escape_text_line.debug(paragraph)
                 i += len(italic_start) - 1
             else:
-                logger_font.warning('already italic')
+                logger_escape_text_line.warning('already italic')
 
         elif paragraph[i:i+3] == r'\fB':
-            logger_font.debug('starting bold!!!')
+            logger_escape_text_line.debug('starting bold!!!')
 
             if not bold:
                 bold = True
                 paragraph = paragraph[:i] + bold_start + paragraph[i+3:]
-                logger_font.debug(paragraph)
+                logger_escape_text_line.debug(paragraph)
                 i += len(bold_start) - 1
             else:
-                logger_font.warning('already bold')
+                logger_escape_text_line.warning('already bold')
 
         elif paragraph[i:i+3] in [r'\fR', r'\fP', r'\f1']:
 
             if italic:
                 italic = False
-                logger_font.debug('ending italic')
+                logger_escape_text_line.debug('ending italic')
                 paragraph = paragraph[:i] + italic_end + paragraph[i+3:]
-                logger_font.debug(paragraph)
+                logger_escape_text_line.debug(paragraph)
                 i += len(italic_end) - 1
             elif bold:
                 bold = False
-                logger_font.debug('ending bold')
+                logger_escape_text_line.debug('ending bold')
                 paragraph = paragraph[:i] + bold_end + paragraph[i+3:]
-                logger_font.debug(paragraph)
+                logger_escape_text_line.debug(paragraph)
                 i += len(bold_end) - 1
             else:
-                logger_font.info('deleting non started font command')
+                logger_escape_text_line.info('deleting non started font command')
                 paragraph = paragraph[:i] + paragraph[i+3:]
-                logger_font.debug(paragraph)
+                logger_escape_text_line.debug(paragraph)
 
         i += 1
 
     if italic:
-        logger_font.debug('ending italic (at the end)')
+        logger_escape_text_line.debug('ending italic (at the end)')
         paragraph += italic_end
-        logger_font.debug(paragraph)
+        logger_escape_text_line.debug(paragraph)
     elif bold:
-        logger_font.debug('ending bold (at the end)')
+        logger_escape_text_line.debug('ending bold (at the end)')
         paragraph += bold_end
-        logger_font.debug(paragraph)
+        logger_escape_text_line.debug(paragraph)
 
     return paragraph
 
@@ -168,7 +171,7 @@ def alternating(st, line, first, second):
         even_start = ''
         even_end = ''
     else:
-        logging.error("Incorrect first argument: %s", first)
+        logger.error("Incorrect first argument: %s", first)
 
     if second == BOLD:
         odd_start = bold_start
@@ -180,7 +183,7 @@ def alternating(st, line, first, second):
         odd_start = ''
         odd_end = ''
     else:
-        logging.error("Incorrect second argument: %s", second)
+        logger.error("Incorrect second argument: %s", second)
 
     words = split_with_quotes(escape_text_line(line))
     final = ''
@@ -195,16 +198,8 @@ def alternating(st, line, first, second):
             even = True
 
     final += ' '
-    d(final)
+    logger.debug(final)
     html_writer.write_string(final)
-
-def initialize_logging():
-    ''' Initializes logging library for the program. '''
-    global logger_font
-
-    logging.basicConfig(filename='log', level=logging.DEBUG)
-    logger_font = logging.getLogger("sub_inline_font")
-    logger_font.setLevel(logging.INFO)
 
 def initialize_get_args():
     ''' Returns command line arguments. '''
@@ -213,14 +208,13 @@ def initialize_get_args():
     return parser.parse_args()
 
 def initialize(st):
-    ''' Initializes program: sets up logging and opens files. '''
-    initialize_logging()
-
+    ''' Initializes program - opens files. '''
     st.file_manpage = open_man_file(initialize_get_args().filename)
     try:
         st.file_html = open('result.html', 'wt')
     except FileNotFoundError as err:
         print(err)
+        logger.exception(err)
         exit(1)
 
 def deinitialize(st):
@@ -273,7 +267,7 @@ class HtmlWriter:
 
     def write_html_header(self, title):
         if title[1] not in section_name:
-            d('stub:unknown section name:' + title[1])
+            logger.info('stub:unknown section name:' + title[1])
             return
         self.html_file.write(self.header.format(title[0],
                                                 section_name[title[1]]))
@@ -316,15 +310,15 @@ class Request:
         linenew += '\n'
 
         if st.par:
-            d('already in paragraph')
+            logger.debug('already in paragraph')
             st.file_html.write(linenew)
         else:
-            d('starting paragraph')
+            logger.debug('starting paragraph')
             html_writer.start_paragraph()
             st.par = True
             st.file_html.write(linenew)
 
-        d(linenew)
+        logger.debug(linenew)
         '''
 
     def comment(st, line):
@@ -336,7 +330,7 @@ class Request:
 
         html_writer.write_html_header(title)
 
-        d(title)
+        logger.debug(title)
 
     def section_title(st, line):
         if st.par:
@@ -346,7 +340,7 @@ class Request:
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
         st.file_html.write('<h2>' + section_title + '</h2>\n')
 
-        d(section_title)
+        logger.debug(section_title)
 
     def subsection_title(st, line):
         if st.par:
@@ -356,7 +350,7 @@ class Request:
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
         st.file_html.write('<h3>' + section_title + '</h3>\n')
 
-        d(section_title)
+        logger.debug(section_title)
 
     def new_paragraph(st, line):
         if st.par:
@@ -367,7 +361,7 @@ class Request:
             html_writer.start_paragraph()
 
     def hanging_indented_paragraph(st, line):
-        logging.info('hanging or indented paragraph (ignoring...)')
+        logger.info('stub: hanging or indented paragraph (ignoring...)')
 
         if not st.par:
             html_writer.start_paragraph()
@@ -1279,16 +1273,15 @@ chars = {
 st = State()
 initialize(st)
 html_writer = HtmlWriter(st.file_html)
-d = logging.debug
 
-d('file:===============' + st.file_manpage.name + '=================')
+logger.debug('file:===============' + st.file_manpage.name + '=================')
 
 for line in st.file_manpage:
-    d('-' * 79)
-    d(line[:-1])
+    logger.debug('-' * 79)
+    logger.debug(line[:-1])
 
     if not line:
-        d('Type: empty line')
+        logger.debug('Type: empty line')
         Request.empty_line(st)
         continue
 
@@ -1297,27 +1290,27 @@ for line in st.file_manpage:
     elif line[0] == st.control_char:
         st.no_break = False
     else:
-        d('Type: text line')
+        logger.debug('Type: text line')
         Request.text_line(st, line)
         continue
 
     if len(line) == 1:
-        d('Type: single ctrl char, is ignored')
+        logger.debug('Type: single ctrl char, is ignored')
         continue
 
     request = line[1:].split()[0]
 
     if request not in requests:
-        d('stub:unknown request:' + request)
+        logger.debug('stub:unknown request:' + request)
         continue
 
     command_info = requests[request]
-    d('Type: %s', command_info[0])
+    logger.debug('Type: %s', command_info[0])
 
     if len(command_info) >= 2:
         command_info[1](st, line)
     else:
-        logging.info('Stub: %s', command_info[0])
+        logger.info('stub: %s', command_info[0])
 
 Request.finalize(st)
 
