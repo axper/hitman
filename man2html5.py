@@ -211,14 +211,14 @@ def initialize_logging():
 def initialize_get_args():
     ''' Returns command line arguments. '''
     parser = argparse.ArgumentParser(description='Manpage to HTML5 converter.')
-    parser.add_argument('file', type=str, help='manpage file to parse')
+    parser.add_argument('filename', type=str, help='manpage file to parse')
     return parser.parse_args()
 
 def initialize(st):
     ''' Initializes program: sets up logging and opens files. '''
     initialize_logging()
 
-    st.file_manpage = open_man_file(initialize_get_args().file)
+    st.file_manpage = open_man_file(initialize_get_args().filename)
     try:
         st.file_html = open('result.html', 'wt')
     except FileNotFoundError as err:
