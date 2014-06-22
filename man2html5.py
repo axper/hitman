@@ -25,7 +25,7 @@ def split_with_quotes(string):
 def escape_text_line2(text_line):
     # First handle ampersands(&) after escape
     # It must be done before HTML escaping
-    text_line = text_line.replace('\\&', '&amp;')
+    text_line = text_line.replace('\\&', '')
     logger.debug('after&:' + text_line)
 
     # Now escape HTML
