@@ -59,7 +59,7 @@ def escape_text_line2(text_line):
     logging.debug('after&:' + text_line)
 
     # Now escape HTML
-    text_line = html.escape(text_line)
+    text_line = html.escape(text_line, quote=False)
     logging.debug('afterH:' + text_line)
 
     # Now groff escape codes
