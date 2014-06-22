@@ -2,25 +2,7 @@
 # -*- coding: utf-8 -*-
 ''' This program converts Manpages to HTML5. '''
 
-# This program convets Linux manpages to HTML5 format.
-# Used man file specifications:
-# groff(7), groff_me(7), groff_man(7), man(7), info groff
-
-# List of similar projects:
-# man2html
-#     text output with everything in black monospace font
-# man2web
-#     same as man2html
-# roffit
-#     can't handle more complex pages with groff commands
-# man -H
-#     can't properly format gcc(1)
-
-
-import mimetypes
-import gzip
 import csv
-import argparse
 import re
 import html
 from logger import logger
@@ -399,7 +381,6 @@ class Request:
             st.par = False
 
 
-# Just the control char by itself on the line is ignored
 requests = {
     '.' : ('just a single dot', ),
     '\\"' : ('comment', Request.comment),
@@ -734,24 +715,6 @@ requests = {
     'TS' : ('start tbl preprocessor', ),
     'TS' : ('end tbl preprocessor', ),
 }
-
-# Escapes begin with slash
-# Followed by:
-#     [xyz] for vairables and escape
-#     'xyz' for constants
-# 1-character escape, except '[' and '(':
-#     \x
-# 2-character escape, usually special characters:
-#     \(xy
-# or
-#     \*(xy
-# Arguments are enclosed in single quotes
-# Backslash (\) at the end - continue line
-# Three single-quotes at beginning of line is a comment
-# Escape followed by newline:
-#     ignore the newline and continue current line
-# This program will misbehave during HTML escaping
-# if an escape code is < or > 
 
 escapes = {
     # 4. Identifiers
