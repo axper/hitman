@@ -9,11 +9,7 @@ from logger import logger, logger_escape_text_line, logger_escape_text_line2, lo
 from tables import chars, chars_html_dangerous, section_name
 from program_state import State
 from init_deinit import initialize, deinitialize
-
-
-NORMAL = 0
-BOLD = 1
-ITALIC = 2
+from html_operations import HtmlRequests, HtmlWriter
 
 
 def split_with_quotes(string):
@@ -21,33 +17,36 @@ def split_with_quotes(string):
     return csv.reader(string.splitlines(), quotechar='"', delimiter=' ',
                       quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
-def escape_text_line2(text_line):
-    # First handle ampersands(&) after escape
-    # It must be done before HTML escaping
-    text_line = text_line.replace('\\&', '')
+def escape_text(text):
+    ''' Escapes groff escape codes.
+    
+        1. First handle ampersands(&) after escape
+           must be done before HTML escaping
+        2. Then escape HTML
+        3. Then replace 2 code chars which contain < or >
+        4. Finally escape groff codes
+    '''
+    text = text.replace('\\&', '')
 
-    # Now escape HTML
-    text_line = html.escape(text_line, quote=False)
-    logger_escape_text_line2.debug('&HT:' + text_line)
+    text = html.escape(text, quote=False)
+    logger_escape_text_line2.debug('&HT:' + text)
 
-    # Now replace 2 code chars which contain < or >
-    text_line = replace_2_code_chars(text_line, chars_html_dangerous)
-    logger_escape_text_line2.debug('2CC:' + text_line)
+    text = replace_2_code_chars(text, chars_html_dangerous)
+    logger_escape_text_line2.debug('2CC:' + text)
 
     state.inline_font_stack = ['R']
     state.inline_code = False
 
-    # Now groff escape codes
     result = ''
     index = 0
-    while index < len(text_line):
-        if text_line[index] == state.escape_char:
-            if index == len(text_line) - 2:
+    while index < len(text):
+        if text[index] == state.escape_char:
+            if index == len(text) - 2:
                 logger_escape_text_line2.info('stub: escape char is the last letter')
                 index += 1
                 continue
 
-            escape_code = text_line[index + 1]
+            escape_code = text[index + 1]
 
             if escape_code not in escapes:
                 logger_escape_text_line2.info('stub:unknown escape code:' + escape_code)
@@ -59,7 +58,7 @@ def escape_text_line2(text_line):
             logger_escape_text_line2.debug('escape code: %s (%s)', escape_code, escape_info[0])
 
             if len(escape_info) >= 2:
-                rest_of_line = text_line[index + 2:]
+                rest_of_line = text[index + 2:]
                 got = escapes[escape_code][1](rest_of_line)
                 result += got[0]
                 index += got[1]
@@ -67,84 +66,60 @@ def escape_text_line2(text_line):
                 logger_escape_text_line2.info('stub escape code: %s (%s)', escape_code, escape_info[0])
 
         else:
-            result += text_line[index]
+            result += text[index]
 
         index += 1
 
     return result
 
 
-class HtmlTags:
-    paragraph = 'p'
-    bold = 'b'
-    italic = 'i'
-    code = 'code'
-    pre = 'pre'
-    section = 'h2'
-    subsection = 'h3'
+class Alt:
+    NORMAL = 0
+    BOLD = 1
+    ITALIC = 2
 
     @staticmethod
-    def opening(tag):
-        return '<' + tag + '>'
+    def get(line, style1, style2):
+        if style1 == Alt.BOLD:
+            even_start = bold_start
+            even_end = bold_end
+        elif style1 == ITALIC:
+            even_start = italic_start
+            even_end = italic_end
+        elif style1 == NORMAL:
+            even_start = ''
+            even_end = ''
+        else:
+            logger.error("Incorrect style1 argument: %s", style1)
 
-    @staticmethod
-    def closing(tag):
-        return '</' + tag + '>'
+        if style2 == BOLD:
+            odd_start = bold_start
+            odd_end = bold_end
+        elif style2 == ITALIC:
+            odd_start = italic_start
+            odd_end = italic_end
+        elif style2 == NORMAL:
+            odd_start = ''
+            odd_end = ''
+        else:
+            logger.error("Incorrect style2 argument: %s", style2)
+
+        words = split_with_quotes(escape_text_line(line))
+        final = ''
+
+        even = True
+        for i in words[1:]:
+            if even:
+                final += even_start + i + even_end
+                even = False
+            else:
+                final += odd_start + i + odd_end
+                even = True
+
+        final += ' '
+        logger.debug(final)
 
 
-class HtmlWriter:
-    paragraph_start = '<p>\n'
-    paragraph_end = '</p>\n'
-
-    bold_start = '<code><b>'
-    bold_end = '</b></code>'
-
-    italic_start = '<code><i>'
-    italic_end = '</i></code>'
-
-    header = '<!doctype HTML>\n' \
-            '<html>\n' \
-            '<head>\n' \
-            '<meta charset=\'utf-8\'>\n' \
-            '<title>{0} - {1} - Man page</title>\n' \
-            '<link rel=\'stylesheet\' type=\'text/css\' href=\'style.css\'>\n' \
-            '</head>\n' \
-            '<body>\n' \
-            '<h1>{0}</h1>\n'
-    footer = '</body>\n' \
-            '</html>\n'
-
-    def __init__(self, html_file):
-        self.html_file = html_file
-
-    def write_string(self, s):
-        self.html_file.write(s)
-
-    def write_html_header(self, title):
-        if title[1] not in section_name:
-            logger.info('stub:unknown section name:' + title[1])
-            return
-        self.html_file.write(self.header.format(title[0],
-                                                section_name[title[1]]))
-
-    def write_html_footer(self):
-        self.html_file.write(self.footer)
-
-    def write_section(self, section_title):
-        self.html_file.write(HtmlTags.opening(HtmlTags.section) +
-                             section_title +
-                             HtmlTags.closing(HtmlTags.section))
-
-    def write_subsection(self, subsection_title):
-        self.html_file.write(HtmlTags.opening(HtmlTags.subsection) +
-                             subsection_title +
-                             HtmlTags.closing(HtmlTags.subsection))
-
-    def open(self, tag):
-        self.html_file.write(HtmlTags.opening(tag))
-
-    def close(self, tag):
-        self.html_file.write(HtmlTags.closing(tag))
 
 
 class Request:
@@ -156,7 +131,7 @@ class Request:
         state.par = False
 
     def text_line(line):
-        result = escape_text_line2(line)
+        result = escape_text(line)
         logger.debug(result)
 
         if state.par:
@@ -264,10 +239,10 @@ class Request:
             html_writer.open(HtmlTags.paragraph)
             state.par = True
 
-        html_writer.start_italic()
-        parsed = ' '.join(split_with_quotes(escape_text_line(line))[1:])
+        html_writer.open(HtmlTags.italic)
+        parsed = escape_text(line)
         html_writer.write_string(parsed)
-        html_writer.end_italic()
+        html_writer.close(HtmlTags.italic)
         html_writer.write_string(' ')
 
     def font_bold(line):
@@ -275,10 +250,10 @@ class Request:
             html_writer.open(HtmlTags.paragraph)
             state.par = True
 
-        html_writer.start_bold()
-        parsed = ' '.join(split_with_quotes(escape_text_line(line))[1:])
+        html_writer.open(HtmlTags.bold)
+        parsed = escape_text(line)
         html_writer.write_string(parsed)
-        html_writer.end_bold()
+        html_writer.close(HtmlTags.bold)
         html_writer.write_string(' ')
 
     def line_break(line):
