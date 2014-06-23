@@ -1,14 +1,20 @@
 section_name = {
-    '0' : 'POSIX headers',
+    '0' : 'Headers',
+    '0p' : 'POSIX headers',
     '1' : 'Programs',
+    '1p' : 'POSIX programs',
     '2' : 'System calls',
     '3' : 'Library calls',
+    '3n' : 'Network library calls',
+    '3p' : 'Perl modules',
     '4' : 'Special files',
     '5' : 'File formats',
     '6' : 'Games',
     '7' : 'Misc',
     '8' : 'System administration',
     '9' : 'Kernel routines',
+    'l' : 'Local manpages',
+    'n' : 'New pages',
 }
 
 chars = {
