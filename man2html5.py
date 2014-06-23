@@ -7,7 +7,7 @@ import re
 import html
 from logger import logger
 from logger import logger_escape_text_line
-from tables import chars, section_name
+from tables import chars, chars_html_dangerous, section_name
 from program_state import State
 from init_deinit import initialize, deinitialize
 
@@ -29,8 +29,11 @@ def escape_text_line2(text_line):
 
     # Now escape HTML
     text_line = html.escape(text_line, quote=False)
+    logger.debug('&HT:' + text_line)
 
-    logger.debug('after:' + text_line)
+    # Now replace 2 code chars which contain < or >
+    text_line = replace_2_code_chars(text_line, chars_html_dangerous)
+    logger.debug('2CC:' + text_line)
 
     state.inline_font_stack = ['R']
     state.inline_code = False
@@ -861,6 +864,9 @@ class Escape:
         fp = FontParser()
         return fp.get_result(l)
 
+    def equal_sign(l):
+        return ('=', 1)
+
 escapes = {
     # 4. Identifiers
     'A' : ('check if valid identifier', ),
@@ -967,7 +973,37 @@ escapes = {
     # 30. Postprocessor access
     'X' : ('write control string into output device', ),
     'Y' : ('write control string into output device uninterpreted', ),
+
+    # added from aspell(1):
+    '=' : ('equal sign', Escape.equal_sign),
 }
+
+def replace_2_code_chars(text_line, char_table):
+    result = ''
+    index = 0
+    while index < len(text_line):
+        if text_line[index] == state.escape_char:
+            if index == len(text_line) - 2:
+                logger.info('stub: escape char is the last letter')
+                index += 1
+                continue
+
+            escape_code = text_line[index + 1]
+
+            if escape_code == '(':
+                try:
+                    result += char_table[text_line[index + 2 : index + 4]]
+                except KeyError:
+                    pass
+
+        else:
+            result += text_line[index]
+
+        index += 1
+
+    logger.debug('result:%s', result)
+    return result
+    
 
 
 state = initialize()
