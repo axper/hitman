@@ -20,7 +20,7 @@ class Alt:
     ITALIC = 2
 
     @staticmethod
-    def get(line, style1, style2):
+    def get_alternating(line, style1, style2):
         ''' ...Also changes par state if needed. '''
         if not globstat.state.par:
             globstat.state.write(htmlops.HtmlRequests.open_paragraph())
@@ -141,22 +141,22 @@ class HandleRequest:
             globstat.state.write(htmlops.HtmlRequests.open_paragraph())
 
     def alt_bold_italic(line):
-        globstat.state.write(Alt.get(line, Alt.BOLD, Alt.ITALIC))
+        globstat.state.write(Alt.get_alternating(line, Alt.BOLD, Alt.ITALIC))
 
     def alt_italic_bold(line):
-        globstat.state.write(Alt.get(line, Alt.ITALIC, Alt.BOLD))
+        globstat.state.write(Alt.get_alternating(line, Alt.ITALIC, Alt.BOLD))
 
     def alt_bold_normal(line):
-        globstat.state.write(Alt.get(line, Alt.BOLD, Alt.NORMAL))
+        globstat.state.write(Alt.get_alternating(line, Alt.BOLD, Alt.NORMAL))
 
     def alt_normal_bold(line):
-        globstat.state.write(Alt.get(line, Alt.NORMAL, Alt.BOLD))
+        globstat.state.write(Alt.get_alternating(line, Alt.NORMAL, Alt.BOLD))
 
     def alt_italic_normal(line):
-        globstat.state.write(Alt.get(line, Alt.ITALIC, Alt.NORMAL))
+        globstat.state.write(Alt.get_alternating(line, Alt.ITALIC, Alt.NORMAL))
 
     def alt_normal_italic(line):
-        globstat.state.write(Alt.get(line, Alt.NORMAL, Alt.ITALIC))
+        globstat.state.write(Alt.get_alternating(line, Alt.NORMAL, Alt.ITALIC))
 
     def font_italic(line):
         if not globstat.state.par:

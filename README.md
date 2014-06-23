@@ -51,9 +51,7 @@ TODO
     - italic right after bold shouldn't close <code> chvt(1)
 - add multiple arguments support and delete log file
 - make FontParser static class
-- search for <b> and <i>
 - html elements class
 - add separate logger for other functions
 - decide something about ending newlines
-- rename HtmlWriter.open() to something else
 - add kwargs to write() in State and possibly some other places
