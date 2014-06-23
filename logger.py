@@ -31,3 +31,7 @@ logger_escape_text_line.setLevel(logging.INFO)
 # For escape_text_line2()
 logger_escape_text_line2 = logging.getLogger("man2html5.escape_text_line2")
 logger_escape_text_line2.setLevel(logging.INFO)
+
+# For FontParser
+logger_FontParser = logging.getLogger("man2html5.FontParser")
+logger_FontParser.setLevel(logging.INFO)

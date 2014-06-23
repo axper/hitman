@@ -5,7 +5,7 @@
 import csv
 import re
 import html
-from logger import logger, logger_escape_text_line, logger_escape_text_line2
+from logger import logger, logger_escape_text_line, logger_escape_text_line2, logger_FontParser
 from tables import chars, chars_html_dangerous, section_name
 from program_state import State
 from init_deinit import initialize, deinitialize
@@ -752,7 +752,7 @@ class FontParser:
     def new_is_normal(self, new_font, previous_font, push_to_stack=True):
         if push_to_stack:
             state.inline_font_stack.append(new_font)
-            logger.debug(state.inline_font_stack)
+            logger_FontParser.debug(state.inline_font_stack)
 
         if previous_font in self.normal_fonts:
             return self.ret('')
@@ -761,14 +761,14 @@ class FontParser:
         elif previous_font in self.italic_fonts:
             return self.ret(HtmlWriter.italic_end)
         else:
-            logger.info('previous font unknown:%s', previous_font)
+            logger_FontParser.info('previous font unknown:%s', previous_font)
             state.inline_code = False
             return self.ret('')
 
     def new_is_bold(self, new_font, previous_font, push_to_stack=True):
         if push_to_stack:
             state.inline_font_stack.append(new_font)
-            logger.debug(state.inline_font_stack)
+            logger_FontParser.debug(state.inline_font_stack)
 
         if previous_font in self.bold_fonts:
             return self.ret('')
@@ -777,14 +777,14 @@ class FontParser:
         elif previous_font in self.italic_fonts:
             return self.ret('</i><b>')
         else:
-            logger.info('previous font unknown:%s', previous_font)
+            logger_FontParser.info('previous font unknown:%s', previous_font)
             state.inline_code = True
             return self.ret('')
 
     def new_is_italic(self, new_font, previous_font, push_to_stack=True):
         if push_to_stack:
             state.inline_font_stack.append(new_font)
-            logger.debug(state.inline_font_stack)
+            logger_FontParser.debug(state.inline_font_stack)
 
         if previous_font in self.italic_fonts:
             return self.ret('')
@@ -793,7 +793,7 @@ class FontParser:
         elif previous_font in self.normal_fonts:
             return self.ret(HtmlWriter.italic_start)
         else:
-            logger.info('previous font unknown:%s', previous_font)
+            logger_FontParser.info('previous font unknown:%s', previous_font)
             state.inline_code = True
             return self.ret('')
 
@@ -801,9 +801,9 @@ class FontParser:
         try:
             state.inline_font_stack.pop()
             new_font = state.inline_font_stack[-1]
-            logger.debug(state.inline_font_stack)
+            logger_FontParser.debug(state.inline_font_stack)
         except IndexError:
-            logger.warn('font stack empty 2, taking roman')
+            logger_FontParser.warn('font stack empty 2, taking roman')
             new_font = 'R'
 
         if new_font in self.normal_fonts:
@@ -813,7 +813,7 @@ class FontParser:
         elif new_font in self.italic_fonts:
             return self.new_is_italic(new_font, previous_font, push_to_stack=False)
         else:
-            logger.info('new font unknown:%s', new_font)
+            logger_FontParser.info('new font unknown:%s', new_font)
             return self.ret('')
 
     def get_result(self, text):
@@ -823,7 +823,7 @@ class FontParser:
         try:
             previous_font = state.inline_font_stack[-1]
         except IndexError:
-            logger.warn('font stack empty, taking roman')
+            logger_FontParser.warn('font stack empty, taking roman')
             previous_font = 'R'
 
         if new_font in self.normal_fonts:
@@ -835,7 +835,7 @@ class FontParser:
         elif new_font in self.previous_fonts:
             return self.new_is_previous(new_font, previous_font)
         else:
-            logger.info('font unknown:%s', new_font)
+            logger_FontParser.info('font unknown:%s', new_font)
             return self.ret('')
 
 class Escape:
