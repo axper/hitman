@@ -265,22 +265,17 @@ class Request:
         state.par = False
 
     def text_line(line):
-        escape_text_line2(line)
-        '''
-        linenew = ' '.join(split_with_quotes(escape_text_line(line)))
-        linenew += '\n'
+        result = escape_text_line2(line)
+        logger.debug(result)
 
         if state.par:
             logger.debug('already in paragraph')
-            state.file_html.write(linenew)
+            state.file_html.write(result)
         else:
             logger.debug('starting paragraph')
             html_writer.start_paragraph()
             state.par = True
-            state.file_html.write(linenew)
-
-        logger.debug(linenew)
-        '''
+            state.file_html.write(result)
 
     def comment(line):
         pass
@@ -995,6 +990,9 @@ def replace_2_code_chars(text_line, char_table):
                     result += char_table[text_line[index + 2 : index + 4]]
                 except KeyError:
                     pass
+            
+            else:
+                result += state.escape_char
 
         else:
             result += text_line[index]
