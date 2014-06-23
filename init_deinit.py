@@ -9,7 +9,7 @@ import state_object
 
 def open_man_file(filename):
     ''' Opens file in text mode and unzips if necessary. '''
-    logger = logging.getLogger('man2html5')
+    logger = logging.getLogger('hitman')
     if mimetypes.guess_type(filename)[1] == 'gzip':
         try:
             logger.debug('gzfile:===============' + filename + '=================')
@@ -33,7 +33,7 @@ def initialize_get_args():
 
 def initialize():
     ''' Initializes program - opens files. '''
-    logger = logging.getLogger('man2html5')
+    logger = logging.getLogger('hitman')
     state = state_object.State()
     state.file_manpage = open_man_file(initialize_get_args().filename)
     try:
