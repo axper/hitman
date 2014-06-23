@@ -5,7 +5,7 @@
 import csv
 import re
 import html
-from logger import logger, logger_escape_text_line, logger_escape_text_line2, logger_FontParser
+from logger import logger, logger_escape_text, logger_FontParser
 from tables import chars, chars_html_dangerous, section_name
 from program_state import State
 from init_deinit import initialize, deinitialize
@@ -29,10 +29,10 @@ def escape_text(text):
     text = text.replace('\\&', '')
 
     text = html.escape(text, quote=False)
-    logger_escape_text_line2.debug('&HT:' + text)
+    logger_escape_text.debug('&HT:' + text)
 
     text = replace_2_code_chars(text, chars_html_dangerous)
-    logger_escape_text_line2.debug('2CC:' + text)
+    logger_escape_text.debug('2CC:' + text)
 
     state.inline_font_stack = ['R']
     state.inline_code = False
@@ -42,20 +42,20 @@ def escape_text(text):
     while index < len(text):
         if text[index] == state.escape_char:
             if index == len(text) - 2:
-                logger_escape_text_line2.info('stub: escape char is the last letter')
+                logger_escape_text.info('stub: escape char is the last letter')
                 index += 1
                 continue
 
             escape_code = text[index + 1]
 
             if escape_code not in escapes:
-                logger_escape_text_line2.info('stub:unknown escape code:' + escape_code)
+                logger_escape_text.info('stub:unknown escape code:' + escape_code)
                 index += 1
                 continue
 
             escape_info = escapes[escape_code]
 
-            logger_escape_text_line2.debug('escape code: %s (%s)', escape_code, escape_info[0])
+            logger_escape_text.debug('escape code: %s (%s)', escape_code, escape_info[0])
 
             if len(escape_info) >= 2:
                 rest_of_line = text[index + 2:]
@@ -63,7 +63,7 @@ def escape_text(text):
                 result += got[0]
                 index += got[1]
             else:
-                logger_escape_text_line2.info('stub escape code: %s (%s)', escape_code, escape_info[0])
+                logger_escape_text.info('stub escape code: %s (%s)', escape_code, escape_info[0])
 
         else:
             result += text[index]

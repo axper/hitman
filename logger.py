@@ -24,14 +24,10 @@ log_to_console.setFormatter(logging.Formatter('%(filename)s:'
 logger.addHandler(log_to_console)
 
 
-# For escape_text_line()
-logger_escape_text_line = logging.getLogger("man2html5.escape_text_line")
-logger_escape_text_line.setLevel(logging.INFO)
+# For function escape_text()
+logger_escape_text = logging.getLogger("man2html5.escape_text_line2")
+logger_escape_text.setLevel(logging.INFO)
 
-# For escape_text_line2()
-logger_escape_text_line2 = logging.getLogger("man2html5.escape_text_line2")
-logger_escape_text_line2.setLevel(logging.INFO)
-
-# For FontParser
+# For class FontParser
 logger_FontParser = logging.getLogger("man2html5.FontParser")
 logger_FontParser.setLevel(logging.INFO)

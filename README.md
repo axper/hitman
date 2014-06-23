@@ -56,4 +56,3 @@ TODO
 - add separate logger for other functions
 - decide something about ending newlines
 - rename HtmlWriter.open() to something else
-- rename escape_text()'s logger
