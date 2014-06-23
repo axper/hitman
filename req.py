@@ -37,7 +37,7 @@ class Alt:
             even_start = ''
             even_end = ''
         else:
-            log.logger.error("Incorrect style1 argument: %s", style1)
+            log.LOGGER.error("Incorrect style1 argument: %s", style1)
 
         if style1 == Alt.BOLD:
             odd_start = htmlops.HtmlRequests.open_code_bold()
@@ -49,7 +49,7 @@ class Alt:
             odd_start = ''
             odd_end = ''
         else:
-            log.logger.error("Incorrect style2 argument: %s", style2)
+            log.LOGGER.error("Incorrect style2 argument: %s", style2)
 
         words = split_with_quotes(esc.escape_text(line))
         final = ''
@@ -65,7 +65,7 @@ class Alt:
 
         final += '\n'
 
-        log.logger.debug(final)
+        log.LOGGER.debug(final)
         return final
 
 
@@ -84,16 +84,16 @@ class HandleRequest:
         result = esc.escape_text(line)
 
         if globstat.state.par:
-            log.logger.debug('already in paragraph')
+            log.LOGGER.debug('already in paragraph')
             globstat.state.write(result)
         else:
-            log.logger.debug('starting paragraph')
+            log.LOGGER.debug('starting paragraph')
             globstat.state.write(htmlops.HtmlRequests.open_paragraph())
             globstat.state.write(result + '\n')
 
             globstat.state.par = True
 
-        log.logger.debug(result)
+        log.LOGGER.debug(result)
 
     def comment(line):
         pass
@@ -105,7 +105,7 @@ class HandleRequest:
 
         globstat.state.write(htmlops.HtmlRequests.document_header(title[0],
                                                                   section))
-        log.logger.debug(title)
+        log.LOGGER.debug(title)
 
     def section_title(line):
         if globstat.state.par:
@@ -115,7 +115,7 @@ class HandleRequest:
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
 
         result = htmlops.HtmlRequests.section_title(section_title)
-        log.logger.debug(result)
+        log.LOGGER.debug(result)
         globstat.state.write(result)
 
     def subsection_title(line):
@@ -126,7 +126,7 @@ class HandleRequest:
         subsection_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
 
         result = htmlops.HtmlRequests.subsection_title(subsection_title)
-        log.logger.debug(result)
+        log.LOGGER.debug(result)
         globstat.state.write(result)
 
     def new_paragraph(line):
@@ -138,7 +138,7 @@ class HandleRequest:
             globstat.state.write(htmlops.HtmlRequests.open_paragraph())
 
     def hanging_indented_paragraph(line):
-        log.logger.info('stub: hanging or indented paragraph (ignoring...)')
+        log.LOGGER.info('stub: hanging or indented paragraph (ignoring...)')
 
         if not globstat.state.par:
             globstat.state.write(htmlops.HtmlRequests.open_paragraph())
@@ -173,7 +173,7 @@ class HandleRequest:
         result = htmlops.HtmlRequests.open_code_italic() + \
                  esc.escape_text(line) + \
                  htmlops.HtmlRequests.close_italic_code()
-        log.logger.debug('result:%s', result)
+        log.LOGGER.debug('result:%s', result)
 
         globstat.state.write(result)
 
@@ -185,7 +185,7 @@ class HandleRequest:
         result = htmlops.HtmlRequests.open_code_bold() + \
                  esc.escape_text(line) + \
                  htmlops.HtmlRequests.close_bold_code()
-        log.logger.debug('result:%s', result)
+        log.LOGGER.debug('result:%s', result)
 
         globstat.state.write(result)
 

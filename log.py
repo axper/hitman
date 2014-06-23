@@ -1,27 +1,31 @@
-''' Initializes logging library for the program. '''
+''' Initializes logging library for the program.
+
+    The result is the handle "LOGGER" shared between modules,
+    it is used for general messages.
+'''
 
 # Standard modules
 import logging
 
-logger = logging.getLogger('man2html5')
-logger.setLevel(logging.DEBUG)
+LOGGER = logging.getLogger('man2html5')
+LOGGER.setLevel(logging.DEBUG)
 
-log_to_file = logging.FileHandler('log')
-log_to_file.setLevel(logging.DEBUG)
-log_to_file.setFormatter(logging.Formatter('%(asctime)s '
+LOG_TO_FILE = logging.FileHandler('log')
+LOG_TO_FILE.setLevel(logging.DEBUG)
+LOG_TO_FILE.setFormatter(logging.Formatter('%(asctime)s '
                                            '%(filename)s:'
                                            '%(lineno)4d '
                                            '%(levelname)s:'
                                            '%(message)s'
-                                           ))
-logger.addHandler(log_to_file)
+                                          ))
+LOGGER.addHandler(LOG_TO_FILE)
 
-log_to_console = logging.StreamHandler()
-log_to_console.setLevel(logging.INFO)
-log_to_console.setFormatter(logging.Formatter('%(filename)s:'
+LOG_TO_CONSOLE = logging.StreamHandler()
+LOG_TO_CONSOLE.setLevel(logging.INFO)
+LOG_TO_CONSOLE.setFormatter(logging.Formatter('%(filename)s:'
                                               '%(lineno)4d '
                                               '%(levelname)s:'
                                               '%(message)s'
-                                              ))
-logger.addHandler(log_to_console)
+                                             ))
+LOGGER.addHandler(LOG_TO_CONSOLE)
 
