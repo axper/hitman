@@ -1001,15 +1001,12 @@ def replace_2_code_chars(text_line, char_table):
 
         index += 1
 
-    logger.debug('result:%s', result)
     return result
     
 
 
 state = initialize()
 html_writer = HtmlWriter(state.file_html)
-
-logger.debug('file:===============' + state.file_manpage.name + '=================')
 
 for line in state.file_manpage:
     logger.debug('-' * 79)

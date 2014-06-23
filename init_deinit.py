@@ -9,12 +9,14 @@ def open_man_file(filename):
     logger = getLogger('man2html5')
     if guess_type(filename)[1] == 'gzip':
         try:
+            logger.debug('gzfile:===============' + filename + '=================')
             return gzip.open(filename, mode='rt')
         except FileNotFoundError as err:
             logger.exception(err)
             exit(1)
     else:
         try:
+            logger.debug('normfile:===============' + filename + '=================')
             return open(filename)
         except FileNotFoundError as err:
             logger.exception(err)
@@ -29,18 +31,18 @@ def initialize_get_args():
 def initialize():
     ''' Initializes program - opens files. '''
     logger = getLogger('man2html5')
-    st = State()
-    st.file_manpage = open_man_file(initialize_get_args().filename)
+    state = State()
+    state.file_manpage = open_man_file(initialize_get_args().filename)
     try:
-        st.file_html = open('result.html', 'wt')
+        state.file_html = open('result.html', 'wt')
     except FileNotFoundError as err:
         logger.exception(err)
         exit(1)
 
-    return st
+    return state
 
-def deinitialize(st):
+def deinitialize(state):
     ''' Closes opened files. '''
-    st.file_html.close()
-    st.file_manpage.close()
+    state.file_html.close()
+    state.file_manpage.close()
 
