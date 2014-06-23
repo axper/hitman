@@ -194,6 +194,22 @@ def alternating(line, first, second):
     html_writer.write_string(final)
 
 
+class HtmlTags:
+    paragraph = 'p'
+    bold = 'b'
+    italic = 'i'
+    code = 'code'
+    pre = 'pre'
+
+    @staticmethod
+    def opening(tag):
+        return '<' + tag + '>'
+
+    @staticmethod
+    def closing(tag):
+        return '</' + tag + '>'
+
+
 class HtmlWriter:
     paragraph_start = '<p>\n'
     paragraph_end = '</p>\n'
