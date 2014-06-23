@@ -6,7 +6,7 @@ if [[ $# -ne 1 ]]; then
 fi
 
 rm --force log
-./man2html5.py "./pages/${1}"
+./hitman.py "./pages/${1}"
 
 if [[ $? -ne 0 ]]; then
 	exit
