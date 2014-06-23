@@ -739,6 +739,118 @@ requests = {
     'TS' : ('end tbl preprocessor', ),
 }
 
+class FontParser:
+    normal_fonts = ['R', '1']
+    italic_fonts = ['I', '2']
+    bold_fonts = ['B', '3']
+    bold_italic_fonts = ['4']
+    previous_fonts = ['P']
+
+    def GetResult(self, text):
+        ''' Returns a tuple consisting of text and length of escape. '''
+        ret_length = 2
+
+        new_font = text[0]
+        try:
+            previous_font = state.inline_font_stack[-1]
+        except IndexError:
+            logger.warn('font stack empty, taking roman')
+            previous_font = 'R'
+
+        if new_font in self.normal_fonts:
+            state.inline_font_stack.append(new_font)
+            logger.debug(state.inline_font_stack)
+
+            if previous_font in self.normal_fonts:
+                return ('', ret_length)
+            elif previous_font in self.bold_fonts:
+                return (HtmlWriter.bold_end, ret_length)
+            elif previous_font in self.italic_fonts:
+                return (HtmlWriter.italic_end, ret_length)
+            else:
+                logger.info('previous font unknown:%s', previous_font)
+            state.inline_code = False
+
+        elif new_font in self.bold_fonts:
+            state.inline_font_stack.append(new_font)
+            logger.debug(state.inline_font_stack)
+
+            if previous_font in self.bold_fonts:
+                return ('', ret_length)
+            elif previous_font in self.normal_fonts:
+                return (HtmlWriter.bold_start, ret_length)
+            elif previous_font in self.italic_fonts:
+                return ('</i><b>', ret_length)
+            else:
+                logger.info('previous font unknown:%s', previous_font)
+            state.inline_code = True
+
+        elif new_font in self.italic_fonts:
+            state.inline_font_stack.append(new_font)
+            logger.debug(state.inline_font_stack)
+
+            if previous_font in self.italic_fonts:
+                return ('', ret_length)
+            elif previous_font in self.bold_fonts:
+                return ('</b><i>', ret_length)
+            elif previous_font in self.normal_fonts:
+                return (HtmlWriter.italic_start, ret_length)
+            else:
+                logger.info('previous font unknown:%s', previous_font)
+            state.inline_code = True
+
+        elif new_font in self.previous_fonts:
+            try:
+                state.inline_font_stack.pop()
+                new_font = state.inline_font_stack[-1]
+                logger.debug(state.inline_font_stack)
+            except IndexError:
+                logger.warn('font stack empty 2, taking roman')
+                new_font = 'R'
+
+            
+            # Dont forget to check new line against new_font instead!!!
+            if new_font in self.normal_fonts:
+                if previous_font in self.normal_fonts:
+                    return ('', ret_length)
+                elif previous_font in self.bold_fonts:
+                    return (HtmlWriter.bold_end, ret_length)
+                elif previous_font in self.italic_fonts:
+                    return (HtmlWriter.italic_end, ret_length)
+                else:
+                    logger.info('previous font unknown:%s', previous_font)
+                state.inline_code = False
+
+            elif new_font in self.bold_fonts:
+                if previous_font in self.bold_fonts:
+                    return ('', ret_length)
+                elif previous_font in self.normal_fonts:
+                    return (HtmlWriter.bold_start, ret_length)
+                elif previous_font in self.italic_fonts:
+                    return ('</i><b>', ret_length)
+                else:
+                    logger.info('previous font unknown:%s', previous_font)
+                state.inline_code = True
+
+            elif new_font in self.italic_fonts:
+                if previous_font in self.italic_fonts:
+                    return ('', ret_length)
+                elif previous_font in self.bold_fonts:
+                    return ('</b><i>', ret_length)
+                elif previous_font in self.normal_fonts:
+                    return (HtmlWriter.italic_start, ret_length)
+                else:
+                    logger.info('previous font unknown:%s', previous_font)
+                state.inline_code = True
+            
+            else:
+                logger.info('new font unknown:%s', new_font)
+
+        else:
+            logger.info('font unknown:%s', new_font)
+
+        return ('', ret_length)
+
 class Escape:
     def minus_sign(l):
         return ('-', 1)
@@ -756,124 +868,8 @@ class Escape:
         return (state.escape_char, 1)
 
     def change_font(l):
-        '''
-            1 - normal
-            2 - italic
-            3 - bold
-            4 - bold italic
-            5+ - small same
-        '''
-        normal_fonts = ['R', '1']
-        italic_fonts = ['I', '2']
-        bold_fonts = ['B', '3']
-        bold_italic_fonts = ['4']
-        previous_fonts = ['P']
-
-
-        logger.info('>>>>>>>>%s', l)
-
-        ret_length = 2
-
-        new_font = l[0]
-        try:
-            previous_font = state.inline_font_stack[-1]
-        except IndexError:
-            logger.warn('font stack empty, taking roman')
-            previous_font = 'R'
-
-        if new_font in normal_fonts:
-            state.inline_font_stack.append(new_font)
-            logger.debug(state.inline_font_stack)
-
-            if previous_font in normal_fonts:
-                return ('', ret_length)
-            elif previous_font in bold_fonts:
-                return (HtmlWriter.bold_end, ret_length)
-            elif previous_font in italic_fonts:
-                return (HtmlWriter.italic_end, ret_length)
-            else:
-                logger.info('previous font unknown:%s', previous_font)
-            state.inline_code = False
-
-        elif new_font in bold_fonts:
-            state.inline_font_stack.append(new_font)
-            logger.debug(state.inline_font_stack)
-
-            if previous_font in bold_fonts:
-                return ('', ret_length)
-            elif previous_font in normal_fonts:
-                return (HtmlWriter.bold_start, ret_length)
-            elif previous_font in italic_fonts:
-                return ('</i><b>', ret_length)
-            else:
-                logger.info('previous font unknown:%s', previous_font)
-            state.inline_code = True
-
-        elif new_font in italic_fonts:
-            state.inline_font_stack.append(new_font)
-            logger.debug(state.inline_font_stack)
-
-            if previous_font in italic_fonts:
-                return ('', ret_length)
-            elif previous_font in bold_fonts:
-                return ('</b><i>', ret_length)
-            elif previous_font in normal_fonts:
-                return (HtmlWriter.italic_start, ret_length)
-            else:
-                logger.info('previous font unknown:%s', previous_font)
-            state.inline_code = True
-
-        elif new_font in previous_fonts:
-            try:
-                state.inline_font_stack.pop()
-                new_font = state.inline_font_stack[-1]
-                logger.debug(state.inline_font_stack)
-            except IndexError:
-                logger.warn('font stack empty 2, taking roman')
-                new_font = 'R'
-
-            
-            # Dont forget to check new line against new_font instead!!!
-            if new_font in normal_fonts:
-                if previous_font in normal_fonts:
-                    return ('', ret_length)
-                elif previous_font in bold_fonts:
-                    return (HtmlWriter.bold_end, ret_length)
-                elif previous_font in italic_fonts:
-                    return (HtmlWriter.italic_end, ret_length)
-                else:
-                    logger.info('previous font unknown:%s', previous_font)
-                state.inline_code = False
-
-            elif new_font in bold_fonts:
-                if previous_font in bold_fonts:
-                    return ('', ret_length)
-                elif previous_font in normal_fonts:
-                    return (HtmlWriter.bold_start, ret_length)
-                elif previous_font in italic_fonts:
-                    return ('</i><b>', ret_length)
-                else:
-                    logger.info('previous font unknown:%s', previous_font)
-                state.inline_code = True
-
-            elif new_font in italic_fonts:
-                if previous_font in italic_fonts:
-                    return ('', ret_length)
-                elif previous_font in bold_fonts:
-                    return ('</b><i>', ret_length)
-                elif previous_font in normal_fonts:
-                    return (HtmlWriter.italic_start, ret_length)
-                else:
-                    logger.info('previous font unknown:%s', previous_font)
-                state.inline_code = True
-            
-            else:
-                logger.info('new font unknown:%s', new_font)
-
-        else:
-            logger.info('font unknown:%s', new_font)
-
-        return ('', ret_length)
+        fp = FontParser()
+        return fp.GetResult(l)
 
 escapes = {
     # 4. Identifiers
