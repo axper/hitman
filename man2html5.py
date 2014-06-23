@@ -72,7 +72,7 @@ def escape_text_line2(text_line):
 
         index += 1
 
-    logger.debug('result:%s', result)
+    return result
 
 def escape_text_line(paragraph):
     ''' Escapes HTML and man commands. '''
