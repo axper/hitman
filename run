@@ -13,7 +13,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 gvim log
-#gvim "./pages/${1}"
-#gvim ./result.html
-#urxvt -e zsh -c "source ~/.zshrc && man ./pages/${1}" &
-#firefox -new-window ./result.html &>/dev/null
+gvim "./pages/${1}"
+gvim ./result.html
+urxvt -e zsh -c "source ~/.zshrc && man ./pages/${1}" &
+firefox -new-tab ./result.html &>/dev/null

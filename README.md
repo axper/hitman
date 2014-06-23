@@ -56,3 +56,4 @@ TODO
 - add separate logger for other functions
 - decide something about ending newlines
 - rename HtmlWriter.open() to something else
+- add kwargs to write() in State and possibly some other places

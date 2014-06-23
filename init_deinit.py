@@ -1,13 +1,16 @@
-from logging import getLogger
+# Standard modules
+import logging
 import gzip
-from mimetypes import guess_type
-from argparse import ArgumentParser
-from program_state import State
+import mimetypes
+import argparse
+
+# My modules
+import state_object
 
 def open_man_file(filename):
     ''' Opens file in text mode and unzips if necessary. '''
-    logger = getLogger('man2html5')
-    if guess_type(filename)[1] == 'gzip':
+    logger = logging.getLogger('man2html5')
+    if mimetypes.guess_type(filename)[1] == 'gzip':
         try:
             logger.debug('gzfile:===============' + filename + '=================')
             return gzip.open(filename, mode='rt')
@@ -24,14 +27,14 @@ def open_man_file(filename):
 
 def initialize_get_args():
     ''' Returns command line arguments. '''
-    parser = ArgumentParser(description='Manpage to HTML5 converter.')
+    parser = argparse.ArgumentParser(description='Manpage to HTML5 converter.')
     parser.add_argument('filename', type=str, help='manpage file to parse')
     return parser.parse_args()
 
 def initialize():
     ''' Initializes program - opens files. '''
-    logger = getLogger('man2html5')
-    state = State()
+    logger = logging.getLogger('man2html5')
+    state = state_object.State()
     state.file_manpage = open_man_file(initialize_get_args().filename)
     try:
         state.file_html = open('result.html', 'wt')

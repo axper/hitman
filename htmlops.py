@@ -1,3 +1,5 @@
+import log
+
 class HtmlTags:
     ''' Single HTML tags formatted for opening or closing. '''
     paragraph = 'p'
@@ -49,35 +51,33 @@ class HtmlRequests:
 
     @staticmethod
     def open_code_italic():
-        return HtmlRequests.open_code() +
-               HtmlRequests.open_italic()
+        return HtmlRequests.open_code() + HtmlRequests.open_italic()
     @staticmethod
     def close_italic_code():
-        return HtmlRequests.close_italic() +
-               HtmlRequests.close_code()
+        return HtmlRequests.close_italic() + HtmlRequests.close_code()
 
     @staticmethod
     def open_code_bold():
-        return HtmlRequests.open_code() +
-               HtmlRequests.open_bold()
+        return HtmlRequests.open_code() + HtmlRequests.open_bold()
     @staticmethod
     def close_bold_code():
-        return HtmlRequests.close_bold() +
-               HtmlRequests.close_code()
+        return HtmlRequests.close_bold() + HtmlRequests.close_code()
 
     @staticmethod
     def section_title(title):
-        return HtmlTags.opening(HtmlTags.opening(HtmlTags.header_level_2) +
-                                title +
-                                HtmlTags.closing(HtmlTags.header_level_2) +
-                                '\n')
+        result = HtmlTags.opening(HtmlTags.header_level_2) + \
+                 title + \
+                 HtmlTags.closing(HtmlTags.header_level_2) + \
+                 '\n'
+        return result
 
     @staticmethod
     def subsection_title(title):
-        return HtmlTags.opening(HtmlTags.opening(HtmlTags.header_level_3) +
-                                title +
-                                HtmlTags.closing(HtmlTags.header_level_3) +
-                                '\n')
+        result = HtmlTags.opening(HtmlTags.header_level_3) + \
+                 title + \
+                 HtmlTags.closing(HtmlTags.header_level_3) + \
+                 '\n'
+        return result
 
     @staticmethod
     def document_header(name, man_section):
@@ -91,21 +91,9 @@ class HtmlRequests:
                  '<body>\n' \
                  '<h1>{0}</h1>\n'
         return header.format(name, man_section)
-
     @staticmethod
     def document_footer():
         footer = '</body>\n' \
                  '</html>\n'
         return footer
-
-
-class HtmlWriter:
-    ''' Writes stuff from HtmlRequests. '''
-    html_file = None
-
-    def __init__(self, html_file):
-        self.html_file = html_file
-
-    def write_string(self, something):
-        self.html_file.write(something)
 

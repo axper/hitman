@@ -1,12 +1,23 @@
 class State:
     ''' The global state variables. '''
+    # Files
     file_manpage = None
     file_html = None
-    par = False
+
+    # Control and escape chars
     control_char = '.'
     control_char_nobreak = '\''
     escape_char = '\\'
-    no_break = False
+
+    # Global state
+    par = False
     ignore_until_doubledot = False
+    continue_line = False
+
+    # Inline state, resets on newline
     inline_font_stack = ['R']
     inline_code = False
+
+    def write(self, text):
+        ''' Writes text into HTML file. '''
+        self.file_html.write(text)
