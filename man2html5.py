@@ -73,126 +73,6 @@ def escape_text_line2(text_line):
 
     return result
 
-def escape_text_line(paragraph):
-    ''' Escapes HTML and man commands. '''
-    # Escape HTML chars
-    paragraph = html.escape(paragraph)
-
-    bold_start = '<code><b>'
-    bold_end = '</b></code>'
-
-    italic_start = '<code><i>'
-    italic_end = '</i></code>'
-
-    italic = False
-    bold = False
-
-    i = 0
-    while i < len(paragraph) - 2:
-        logger_escape_text_line.debug(paragraph[i:i+3])
-        if paragraph[i:i+3] == r'\fI':
-            logger_escape_text_line.debug('starting italic!!!')
-
-            if not italic:
-                italic = True
-                paragraph = paragraph[:i] + italic_start + paragraph[i+3:]
-                logger_escape_text_line.debug(paragraph)
-                i += len(italic_start) - 1
-            else:
-                logger_escape_text_line.warning('already italic')
-
-        elif paragraph[i:i+3] == r'\fB':
-            logger_escape_text_line.debug('starting bold!!!')
-
-            if not bold:
-                bold = True
-                paragraph = paragraph[:i] + bold_start + paragraph[i+3:]
-                logger_escape_text_line.debug(paragraph)
-                i += len(bold_start) - 1
-            else:
-                logger_escape_text_line.warning('already bold')
-
-        elif paragraph[i:i+3] in [r'\fR', r'\fP', r'\f1']:
-
-            if italic:
-                italic = False
-                logger_escape_text_line.debug('ending italic')
-                paragraph = paragraph[:i] + italic_end + paragraph[i+3:]
-                logger_escape_text_line.debug(paragraph)
-                i += len(italic_end) - 1
-            elif bold:
-                bold = False
-                logger_escape_text_line.debug('ending bold')
-                paragraph = paragraph[:i] + bold_end + paragraph[i+3:]
-                logger_escape_text_line.debug(paragraph)
-                i += len(bold_end) - 1
-            else:
-                logger_escape_text_line.info('deleting non started font command')
-                paragraph = paragraph[:i] + paragraph[i+3:]
-                logger_escape_text_line.debug(paragraph)
-
-        i += 1
-
-    if italic:
-        logger_escape_text_line.debug('ending italic (at the end)')
-        paragraph += italic_end
-        logger_escape_text_line.debug(paragraph)
-    elif bold:
-        logger_escape_text_line.debug('ending bold (at the end)')
-        paragraph += bold_end
-        logger_escape_text_line.debug(paragraph)
-
-    return paragraph
-
-def alternating(line, first, second):
-    ''' Writes HTML line alternating between first and second styles. '''
-
-    bold_start = '<code><b>'
-    bold_end = '</b></code>'
-
-    italic_start = '<code><i>'
-    italic_end = '</i></code>'
-
-    if first == BOLD:
-        even_start = bold_start
-        even_end = bold_end
-    elif first == ITALIC:
-        even_start = italic_start
-        even_end = italic_end
-    elif first == NORMAL:
-        even_start = ''
-        even_end = ''
-    else:
-        logger.error("Incorrect first argument: %s", first)
-
-    if second == BOLD:
-        odd_start = bold_start
-        odd_end = bold_end
-    elif second == ITALIC:
-        odd_start = italic_start
-        odd_end = italic_end
-    elif second == NORMAL:
-        odd_start = ''
-        odd_end = ''
-    else:
-        logger.error("Incorrect second argument: %s", second)
-
-    words = split_with_quotes(escape_text_line(line))
-    final = ''
-
-    even = True
-    for i in words[1:]:
-        if even:
-            final += even_start + i + even_end
-            even = False
-        else:
-            final += odd_start + i + odd_end
-            even = True
-
-    final += ' '
-    logger.debug(final)
-    html_writer.write_string(final)
-
 
 class HtmlTags:
     paragraph = 'p'
@@ -200,6 +80,8 @@ class HtmlTags:
     italic = 'i'
     code = 'code'
     pre = 'pre'
+    section = 'h2'
+    subsection = 'h3'
 
     @staticmethod
     def opening(tag):
@@ -248,31 +130,28 @@ class HtmlWriter:
     def write_html_footer(self):
         self.html_file.write(self.footer)
 
-    def start_paragraph(self):
-        self.html_file.write(self.paragraph_start)
+    def write_section(self, section_title):
+        self.html_file.write(HtmlTags.opening(HtmlTags.section) +
+                             section_title +
+                             HtmlTags.closing(HtmlTags.section))
 
-    def end_paragraph(self):
-        self.html_file.write(self.paragraph_end)
+    def write_subsection(self, subsection_title):
+        self.html_file.write(HtmlTags.opening(HtmlTags.subsection) +
+                             subsection_title +
+                             HtmlTags.closing(HtmlTags.subsection))
 
-    def start_bold(self):
-        self.html_file.write(self.bold_start)
+    def open(self, tag):
+        self.html_file.write(HtmlTags.opening(tag))
 
-    def end_bold(self):
-        self.html_file.write(self.bold_end)
-
-    def start_italic(self):
-        self.html_file.write(self.italic_start)
-
-    def end_italic(self):
-        self.html_file.write(self.italic_end)
-
+    def close(self, tag):
+        self.html_file.write(HtmlTags.closing(tag))
 
 
 class Request:
     ''' Functions to handle requests at beginning of lines. '''
     def empty_line():
         if state.par:
-            html_writer.end_paragraph()
+            html_writer.close(HtmlTags.paragraph)
 
         state.par = False
 
@@ -282,12 +161,12 @@ class Request:
 
         if state.par:
             logger.debug('already in paragraph')
-            state.file_html.write(result)
+            html_writer.write_string(result)
         else:
             logger.debug('starting paragraph')
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
             state.par = True
-            state.file_html.write(result)
+            html_writer.write_string(result)
 
     def comment(line):
         pass
@@ -302,115 +181,115 @@ class Request:
 
     def section_title(line):
         if state.par:
-            html_writer.end_paragraph()
+            html_writer.close(HtmlTags.paragraph)
             state.par = False
 
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
-        state.file_html.write('<h2>' + section_title + '</h2>\n')
+        html_writer.write_section(section_title)
 
         logger.debug(section_title)
 
     def subsection_title(line):
         if state.par:
-            html_writer.end_paragraph()
+            html_writer.close(HtmlTags.paragraph)
             state.par = False
 
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
-        state.file_html.write('<h3>' + section_title + '</h3>\n')
+        html_writer.write_subsection(section_title)
 
         logger.debug(section_title)
 
     def new_paragraph(line):
         if state.par:
-            html_writer.end_paragraph()
-            html_writer.start_paragraph()
+            html_writer.close(HtmlTags.paragraph)
+            html_writer.open(HtmlTags.paragraph)
         else:
             state.par = True
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
 
     def hanging_indented_paragraph(line):
         logger.info('stub: hanging or indented paragraph (ignoring...)')
 
         if not state.par:
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
             state.par = True
         else:
-            html_writer.end_paragraph()
-            html_writer.start_paragraph()
+            html_writer.close(HtmlTags.paragraph)
+            html_writer.open(HtmlTags.paragraph)
 
     def alt_bold_italic(line):
         if not state.par:
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
             state.par = True
 
         alternating(line, BOLD, ITALIC)
 
     def alt_italic_bold(line):
         if not state.par:
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
             state.par = True
 
         alternating(line, ITALIC, BOLD)
 
     def alt_bold_normal(line):
         if not state.par:
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
             state.par = True
 
         alternating(line, BOLD, NORMAL)
 
     def alt_normal_bold(line):
         if not state.par:
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
             state.par = True
 
         alternating(line, NORMAL, BOLD)
 
     def alt_italic_normal(line):
         if not state.par:
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
             state.par = True
 
         alternating(line, ITALIC, NORMAL)
 
     def alt_normal_italic(line):
         if not state.par:
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
             state.par = True
 
         alternating(line, NORMAL, ITALIC)
 
     def font_italic(line):
         if not state.par:
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
             state.par = True
 
         html_writer.start_italic()
         parsed = ' '.join(split_with_quotes(escape_text_line(line))[1:])
-        state.file_html.write(parsed)
+        html_writer.write_string(parsed)
         html_writer.end_italic()
-        state.file_html.write(' ')
+        html_writer.write_string(' ')
 
     def font_bold(line):
         if not state.par:
-            html_writer.start_paragraph()
+            html_writer.open(HtmlTags.paragraph)
             state.par = True
 
         html_writer.start_bold()
         parsed = ' '.join(split_with_quotes(escape_text_line(line))[1:])
-        state.file_html.write(parsed)
+        html_writer.write_string(parsed)
         html_writer.end_bold()
-        state.file_html.write(' ')
+        html_writer.write_string(' ')
 
     def line_break(line):
         if state.par:
-            html_writer.end_paragraph()
+            html_writer.close(HtmlTags.paragraph)
 
         state.par = False
 
     def finalize():
         if state.par:
-            html_writer.end_paragraph()
+            html_writer.close(HtmlTags.paragraph)
             state.par = False
 
 
