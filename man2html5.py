@@ -204,9 +204,6 @@ class HtmlWriter:
     italic_start = '<code><i>'
     italic_end = '</i></code>'
 
-    # title[0]
-    # title[1]
-    # title[0]
     header = '<!doctype HTML>\n' \
             '<html>\n' \
             '<head>\n' \
