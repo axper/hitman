@@ -101,7 +101,14 @@ class HandleRequest:
     def title(line):
         title = split_with_quotes(line)[1:]
         title[0] = title[0].lower()
-        section = tables.section_name[title[1]]
+
+        section_title = title[1]
+
+        try:
+            section = tables.section_name[section_title]
+        except KeyError:
+            log.LOGGER.warning('Unknown section title: %s', section_title)
+            section = 'UNKNOWN SECTION'
 
         globstat.state.write(htmlops.HtmlRequests.document_header(title[0],
                                                                   section))
