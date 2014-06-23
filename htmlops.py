@@ -23,10 +23,10 @@ class HtmlRequests:
     ''' Returns strings composed of one or more tags. '''
     @staticmethod
     def open_paragraph():
-        return HtmlTags.opening(HtmlTags.paragraph) + '\n'
+        return HtmlTags.opening(HtmlTags.paragraph)
     @staticmethod
     def close_paragraph():
-        return HtmlTags.closing(HtmlTags.paragraph) + '\n'
+        return HtmlTags.closing(HtmlTags.paragraph)
 
     @staticmethod
     def open_code():

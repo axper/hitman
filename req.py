@@ -6,6 +6,7 @@ import log
 import esc
 import htmlops
 import globstat
+import tables
 
 def split_with_quotes(string):
     ''' Splits string into words and takes quotes into account. '''
@@ -62,6 +63,8 @@ class Alt:
                 final += odd_start + i + odd_end
                 even = True
 
+        final += '\n'
+
         log.logger.debug(final)
         return final
 
@@ -79,7 +82,6 @@ class HandleRequest:
 
     def text_line(line):
         result = esc.escape_text(line)
-        log.logger.debug(result)
 
         if globstat.state.par:
             log.logger.debug('already in paragraph')
@@ -87,8 +89,11 @@ class HandleRequest:
         else:
             log.logger.debug('starting paragraph')
             globstat.state.write(htmlops.HtmlRequests.open_paragraph())
+            globstat.state.write(result + '\n')
+
             globstat.state.par = True
-            globstat.state.write(result)
+
+        log.logger.debug(result)
 
     def comment(line):
         pass
@@ -96,13 +101,15 @@ class HandleRequest:
     def title(line):
         title = split_with_quotes(line)[1:]
         title[0] = title[0].lower()
+        section = tables.section_name[title[1]]
 
-        globstat.state.write(htmlops.HtmlRequests.document_header(title[0], title[1]))
+        globstat.state.write(htmlops.HtmlRequests.document_header(title[0],
+                                                                  section))
         log.logger.debug(title)
 
     def section_title(line):
         if globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.close_paragraph())
+            globstat.state.write(htmlops.HtmlRequests.close_paragraph() + '\n')
             globstat.state.par = False
 
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
@@ -113,7 +120,7 @@ class HandleRequest:
 
     def subsection_title(line):
         if globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.close_paragraph())
+            globstat.state.write(htmlops.HtmlRequests.close_paragraph() + '\n')
             globstat.state.par = False
 
         subsection_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
@@ -163,22 +170,24 @@ class HandleRequest:
             globstat.state.write(htmlops.HtmlRequests.open_paragraph())
             globstat.state.par = True
 
-        globstat.state.write(htmlops.HtmlRequests.open_code_italic())
-        parsed = esc.escape_text(line)
-        globstat.state.write(parsed)
-        globstat.state.write(htmlops.HtmlRequests.close_italic_code())
-        globstat.state.write(' ')
+        result = htmlops.HtmlRequests.open_code_italic() + \
+                 esc.escape_text(line) + \
+                 htmlops.HtmlRequests.close_italic_code()
+        log.logger.debug('result:%s', result)
+
+        globstat.state.write(result)
 
     def font_bold(line):
         if not globstat.state.par:
             globstat.state.write(htmlops.HtmlRequests.open_paragraph())
             globstat.state.par = True
 
-        globstat.state.write(htmlops.HtmlRequests.open_code_bold())
-        parsed = esc.escape_text(line)
-        globstat.state.write(parsed)
-        globstat.state.write(htmlops.HtmlRequests.close_bold_code())
-        globstat.state.write(' ')
+        result = htmlops.HtmlRequests.open_code_bold() + \
+                 esc.escape_text(line) + \
+                 htmlops.HtmlRequests.close_bold_code()
+        log.logger.debug('result:%s', result)
+
+        globstat.state.write(result)
 
     def line_break(line):
         if globstat.state.par:

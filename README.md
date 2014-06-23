@@ -43,8 +43,6 @@ TODO
 - synopsis and example sections via pre, especially disdvi()
 - add .TP handling via dl/dt/dd; dd css
 - do not rely on .TH being first command (ppmtouil(1))
-- unknonwn requests: .IX .PD .sp
-- move structs to separate file
 - escapes:
     - handle '\ ' - shouldn't split if space space is escaped
     - \_main rainbow rdx(1)
