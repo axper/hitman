@@ -138,8 +138,6 @@ def replace_2_len_chars(text_line):
                     i += 3
                     continue
 
-                log.info('table index:%s', table_index)
-
                 try:
                     result += tables.chars[table_index]
                 except KeyError:
