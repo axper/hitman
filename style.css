@@ -10,6 +10,10 @@ code, dt {
 	padding-top: 1.26667px;
 }
 
+dl {
+	margin-bottom: 0px;
+}
+
 pre {
 	background-color: #EBF1F5;
 	border-bottom-color: #BCD;
