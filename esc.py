@@ -11,7 +11,7 @@ import htmlops
 log = logging.getLogger('esc')
 log.addHandler(log_handlers.TO_CONSOLE)
 log.addHandler(log_handlers.TO_FILE)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 class FontParser:
     normal_fonts = ['R', '1']
@@ -168,7 +168,7 @@ def escape_text(text):
         4. Finally escape groff codes
     '''
     log_escape_text = logging.getLogger('esc.escape_text')
-    log_escape_text.setLevel(logging.DEBUG)
+    log_escape_text.setLevel(logging.INFO)
 
     text = text.replace('\\&', '')
     text = html.escape(text, quote=False)
