@@ -13,6 +13,8 @@ class State:
     par = False
     ignore_until_doubledot = False
     continue_line = False
+    hanging = False
+    cat_tag = False
 
     # Inline state, resets on newline
     inline_font_stack = ['R']

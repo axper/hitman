@@ -42,13 +42,13 @@ def alternating(line, style1, style2):
     else:
         log.error("Incorrect style1 argument: %s", style1)
 
-    if style1 == BOLD:
+    if style2 == BOLD:
         odd_start = htmlops.HtmlRequests.open_code_bold()
         odd_end = htmlops.HtmlRequests.close_bold_code()
-    elif style1 == ITALIC:
+    elif style2 == ITALIC:
         odd_start = htmlops.HtmlRequests.open_code_italic()
         odd_end = htmlops.HtmlRequests.close_italic_code()
-    elif style1 == NORMAL:
+    elif style2 == NORMAL:
         odd_start = ''
         odd_end = ''
     else:
@@ -181,6 +181,14 @@ class HandleRequest:
         close_par_if_open()
         open_par()
 
+    def hanging_tp(line):
+        close_par_if_open()
+
+        log.debug('hanging=True')
+        globstat.state.hanging = True
+        log.debug('cat_tag=True')
+        globstat.state.cat_tag = True
+
     def alt_bold_italic(line):
         result = alternating(line, BOLD, ITALIC)
         log.debug(result)
@@ -214,8 +222,10 @@ class HandleRequest:
     def font_italic(line):
         open_par_if_closed()
 
+        line = ' '.join(split_with_quotes(esc.escape_text(line))[1:])
+
         result = htmlops.HtmlRequests.open_code_italic() + \
-                 esc.escape_text(line) + \
+                 line + \
                  htmlops.HtmlRequests.close_italic_code()
         log.debug(result)
         globstat.state.write(result)
@@ -223,8 +233,10 @@ class HandleRequest:
     def font_bold(line):
         open_par_if_closed()
 
+        line = ' '.join(split_with_quotes(esc.escape_text(line))[1:])
+
         result = htmlops.HtmlRequests.open_code_bold() + \
-                 esc.escape_text(line) + \
+                 line + \
                  htmlops.HtmlRequests.close_bold_code()
         log.debug(result)
         globstat.state.write(result)
@@ -245,9 +257,9 @@ requests = {
     'LP' : ('new paragraph 1', HandleRequest.new_paragraph),
     'PP' : ('new paragraph 2', HandleRequest.new_paragraph),
     'P' : ('new paragraph 3', HandleRequest.new_paragraph),
-    'TP' : ('new paragraph hanging 1', HandleRequest.hanging_indented_paragraph),
-    'IP' : ('new paragraph hanging 2', HandleRequest.hanging_indented_paragraph),
-    'HP' : ('new paragraph hanging 3', HandleRequest.hanging_indented_paragraph),
+    'TP' : ('new paragraph hanging 1', HandleRequest.hanging_tp),
+    'IP' : ('new paragraph hanging 2', ),
+    'HP' : ('new paragraph hanging 3', ),
     'RS' : ('start indent', ),
     'RE' : ('end indent', ),
 
