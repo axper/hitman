@@ -38,7 +38,7 @@ class FontParser:
         elif previous_font in FontParser.italic_fonts:
             return FontParser.ret(htmlops.HtmlRequests.close_italic_code())
         else:
-            log.info('previous font unknown:%s', previous_font)
+            log.warning('previous font unknown:%s', previous_font)
             globstat.state.inline_code = False
             return FontParser.ret('')
 
@@ -55,7 +55,7 @@ class FontParser:
             return FontParser.ret(htmlops.HtmlRequests.close_italic() +
                                   htmlops.HtmlRequests.open_bold())
         else:
-            log.info('previous font unknown:%s', previous_font)
+            log.warning('previous font unknown:%s', previous_font)
             globstat.state.inline_code = True
             return FontParser.ret('')
 
@@ -72,7 +72,7 @@ class FontParser:
         elif previous_font in FontParser.normal_fonts:
             return FontParser.ret(htmlops.HtmlRequests.open_code_italic())
         else:
-            log.info('previous font unknown:%s', previous_font)
+            log.warning('previous font unknown:%s', previous_font)
             globstat.state.inline_code = True
             return FontParser.ret('')
 
@@ -114,7 +114,7 @@ class FontParser:
         elif new_font in FontParser.previous_fonts:
             return FontParser.new_is_previous(new_font, previous_font)
         else:
-            log.info('font unknown:%s', new_font)
+            log.info('stub: unknown font: %s', new_font)
             return FontParser.ret('')
 
 
