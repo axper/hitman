@@ -80,6 +80,7 @@ def alternating(line, style1, style2):
         log.warning('alternating style has no content')
         return ''
 
+
 def open_par():
     result_open_par = htmlops.HtmlRequests.open_paragraph()
     log.debug(result_open_par)
@@ -88,6 +89,10 @@ def open_par():
     log.debug('par=True')
     globstat.state.par = True
 
+def open_par_if_closed(line=''):
+    if not globstat.state.par:
+        open_par()
+
 def close_par():
     result_close_par = htmlops.HtmlRequests.close_paragraph() + '\n'
     log.debug(result_close_par)
@@ -95,10 +100,6 @@ def close_par():
 
     log.debug('par=False')
     globstat.state.par = False
-
-def open_par_if_closed(line=''):
-    if not globstat.state.par:
-        open_par()
 
 def close_par_if_open(line=''):
     if globstat.state.par:
@@ -116,6 +117,19 @@ def close_data():
 def close_data_if_open():
     if globstat.state.cat_data:
         close_data()
+
+def open_data():
+    result_open_data = htmlops.HtmlRequests.open_definition_data()
+    log.debug(result_open_data)
+    globstat.state.write(result_open_data)
+
+    log.debug('cat_data=True')
+    globstat.state.cat_data = True
+
+def open_data_if_closed():
+    if not globstat.state.cat_data:
+        open_data()
+
 
 def close_deflist():
     result_close_deflist = htmlops.HtmlRequests.close_definition_list() + '\n'
@@ -142,6 +156,32 @@ def open_deflist_if_closed():
         open_deflist()
 
 
+def get_definition_name(text):
+    result = htmlops.HtmlRequests.open_definition_name() + \
+             text + \
+             htmlops.HtmlRequests.close_definition_name() + \
+             '\n'
+    return result
+
+
+def handle_fetch_tag_if_needed(line):
+    if globstat.state.fetch_tag:
+        tag = esc.escape_text(line, False)
+
+        log.debug('fetch_tag=False')
+        globstat.state.fetch_tag = False
+
+        result = get_definition_name(tag)
+        log.debug(result)
+        globstat.state.write(result)
+
+        open_data_if_closed()
+
+        return True
+    else:
+        return False
+
+
 class HandleRequest:
     ''' Functions to handle requests.
         
@@ -152,6 +192,9 @@ class HandleRequest:
 
     def text_line(line):
         result = esc.escape_text(line)
+
+        if handle_fetch_tag_if_needed(line):
+            return
 
         '''
                     probably unnecessary?
@@ -222,6 +265,16 @@ class HandleRequest:
         log.debug('par=True')
         globstat.state.par = True
 
+    def hanging_tp(line):
+        close_par_if_open()
+
+        log.debug('fetch_tag=True')
+        globstat.state.fetch_tag = True
+
+        close_data_if_open()
+
+        open_deflist_if_closed()
+
     def hanging_ip(line):
         close_par_if_open()
 
@@ -237,21 +290,11 @@ class HandleRequest:
 
         open_deflist_if_closed()
 
-        result = htmlops.HtmlRequests.open_definition_name() + \
-                 tag + \
-                 htmlops.HtmlRequests.close_definition_name() + \
-                 '\n'
-
+        result = get_definition_name(tag)
         log.debug(result)
         globstat.state.write(result)
 
-        if not globstat.state.cat_data:
-            open_data = htmlops.HtmlRequests.open_definition_data()
-            log.debug(open_data)
-            globstat.state.write(open_data)
-
-            log.debug('cat_data=True')
-            globstat.state.cat_data = True
+        open_data_if_closed()
 
     def alt_bold_italic(line):
         result = alternating(line, BOLD, ITALIC)
@@ -339,7 +382,7 @@ requests = {
     'LP' : ('new paragraph 1', HandleRequest.new_paragraph),
     'PP' : ('new paragraph 2', HandleRequest.new_paragraph),
     'P' : ('new paragraph 3', HandleRequest.new_paragraph),
-    'TP' : ('new paragraph hanging 1', ),
+    'TP' : ('new paragraph hanging 1', HandleRequest.hanging_tp),
     'IP' : ('new paragraph hanging 2', HandleRequest.hanging_ip),
     'HP' : ('new paragraph hanging 3', ),
     'RS' : ('start indent', HandleRequest.start_indent),
