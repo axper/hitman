@@ -15,6 +15,7 @@ class State:
     pre_mode = False
     dl_mode = False
     cat_data = False
+    fetch_tag = False
 
     # Inline state, resets on newline
     inline_font_stack = ['R']
