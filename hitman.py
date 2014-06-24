@@ -39,7 +39,7 @@ def main():
             try:
                 request_name = re.match(' *([a-zA-Z0-9]+)', line[1:]).group(1)
             except AttributeError:
-                log.debug('type: comment line, fetching next line')
+                log.debug('type: comment, fetching next line')
                 continue
 
             try:
@@ -48,7 +48,7 @@ def main():
                 log.warning('unknown request: %s, fetching next line', request_name)
                 continue
 
-            log.debug('type: request line: %s (%s)', request_name, command_info[0])
+            log.debug('type: request: %s (%s)', request_name, command_info[0])
 
             try:
                 request_handler_function = command_info[1]
@@ -59,7 +59,7 @@ def main():
             request_handler_function(line)
 
         else:
-            log.debug('type: text line')
+            log.debug('type: text')
             req.HandleRequest.text_line(line)
 
 
