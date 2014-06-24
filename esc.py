@@ -127,7 +127,6 @@ def replace_2_len_chars(text_line):
             try:
                 escape_code = text_line[i + 1]
             except IndexError:
-                log.info('escape char is last char on line')
                 result += text_line[i]
                 break
 
