@@ -12,9 +12,6 @@ class State:
     # Global state
     par = False
     ignore_until_doubledot = False
-    continue_line = False
-    hanging = False
-    cat_tag = False
     pre_mode = False
     dl_mode = False
     cat_data = False
