@@ -240,7 +240,8 @@ class HandleRequest:
             log.debug('dl_mode=True')
             globstat.state.dl_mode = True
 
-        escaped = esc.escape_text(line)
+        log.debug(line)
+        escaped = esc.escape_text(line, False)
         tag = split_with_quotes(escaped)[1]
 
         result = htmlops.HtmlRequests.open_definition_name() + \
