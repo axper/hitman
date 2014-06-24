@@ -280,6 +280,9 @@ class HandleEscape:
     def equal_sign(l, with_code=True):
         return ('=', 1)
 
+    def small_space(l, with_code=True):
+        return ('', 1)
+
 escapes = {
     # 4. Identifiers
     'A' : ('check if valid identifier', ),
@@ -354,8 +357,8 @@ escapes = {
     'h' : ('move left or right', ),
     ' ' : ('unpaddable space char nobreak', HandleEscape.space_char),
     '~' : ('unbreakable stretching space char', ),
-    '|' : ('small space (1/6)', ),
-    '^' : ('small space (1/12)', ),
+    '|' : ('small space (1/6)', HandleEscape.small_space),
+    '^' : ('small space (1/12)', HandleEscape.small_space),
     '0' : ('space of size of a number', ),
     'w' : ('get width of string', ),
     'k' : ('store current column position in register', ),
