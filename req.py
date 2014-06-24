@@ -31,11 +31,11 @@ def alternating(line, style1, style2):
     open_par_if_closed()
 
     if style1 == BOLD:
-        even_start = htmlops.HtmlRequests.open_code_bold()
-        even_end = htmlops.HtmlRequests.close_bold_code()
+        even_start = htmlops.HtmlRequests.open_bold()
+        even_end = htmlops.HtmlRequests.close_bold()
     elif style1 == ITALIC:
-        even_start = htmlops.HtmlRequests.open_code_italic()
-        even_end = htmlops.HtmlRequests.close_italic_code()
+        even_start = htmlops.HtmlRequests.open_italic()
+        even_end = htmlops.HtmlRequests.close_italic()
     elif style1 == NORMAL:
         even_start = ''
         even_end = ''
@@ -43,11 +43,11 @@ def alternating(line, style1, style2):
         log.error("Incorrect style1 argument: %s", style1)
 
     if style2 == BOLD:
-        odd_start = htmlops.HtmlRequests.open_code_bold()
-        odd_end = htmlops.HtmlRequests.close_bold_code()
+        odd_start = htmlops.HtmlRequests.open_bold()
+        odd_end = htmlops.HtmlRequests.close_bold()
     elif style2 == ITALIC:
-        odd_start = htmlops.HtmlRequests.open_code_italic()
-        odd_end = htmlops.HtmlRequests.close_italic_code()
+        odd_start = htmlops.HtmlRequests.open_italic()
+        odd_end = htmlops.HtmlRequests.close_italic()
     elif style2 == NORMAL:
         odd_start = ''
         odd_end = ''
@@ -55,21 +55,30 @@ def alternating(line, style1, style2):
         log.error("Incorrect style2 argument: %s", style2)
 
     words = split_with_quotes(esc.escape_text(line))
-    result = ''
+    words2 = words[1:]
 
-    even = True
-    for i in words[1:]:
-        if even:
-            result += even_start + i + even_end
-            even = False
-        else:
-            result += odd_start + i + odd_end
-            even = True
+    if words2:
+        result = ''
+        result += htmlops.HtmlRequests.open_code()
 
-    result += '\n'
+        even = True
+        for i in words2:
+            if even:
+                result += even_start + i + even_end
+                even = False
+            else:
+                result += odd_start + i + odd_end
+                even = True
 
-    log.debug(result)
-    return result
+        result += htmlops.HtmlRequests.close_code()
+        result += '\n'
+
+        log.debug(result)
+        return result
+
+    else:
+        log.warning('alternating style has no content')
+        return ''
 
 def open_par():
     result_open_par = htmlops.HtmlRequests.open_paragraph()
