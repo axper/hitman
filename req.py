@@ -129,6 +129,18 @@ def close_deflist_if_open():
     if globstat.state.dl_mode:
         close_deflist()
 
+def open_deflist():
+    result_open_dl = htmlops.HtmlRequests.open_definition_list() + '\n'
+    log.debug(result_open_dl)
+    globstat.state.write(result_open_dl)
+
+    log.debug('dl_mode=True')
+    globstat.state.dl_mode = True
+
+def open_deflist_if_closed():
+    if not globstat.state.dl_mode:
+        open_deflist()
+
 
 class HandleRequest:
     ''' Functions to handle requests.
@@ -141,6 +153,8 @@ class HandleRequest:
     def text_line(line):
         result = esc.escape_text(line)
 
+        '''
+                    probably unnecessary?
         if globstat.state.continue_line:
             log.debug(result)
             globstat.state.write(result)
@@ -149,6 +163,7 @@ class HandleRequest:
             globstat.state.continue_line = False
 
             return
+        '''
 
         result += '\n'
 
@@ -207,14 +222,6 @@ class HandleRequest:
         log.debug('par=True')
         globstat.state.par = True
 
-    def hanging_tp(line):
-        close_par_if_open()
-
-        log.debug('hanging=True')
-        globstat.state.hanging = True
-        log.debug('cat_tag=True')
-        globstat.state.cat_tag = True
-
     def hanging_ip(line):
         close_par_if_open()
 
@@ -226,21 +233,9 @@ class HandleRequest:
             log.warning('hanging IP has no tag on the line')
             return
 
-        if globstat.state.cat_data:
-            close_data = htmlops.HtmlRequests.close_definition_data() + '\n'
-            log.debug(close_data)
-            globstat.state.write(close_data)
+        close_data_if_open()
 
-            log.debug('cat_data=False')
-            globstat.state.cat_data = False
-
-        if not globstat.state.dl_mode:
-            result_open_dl = htmlops.HtmlRequests.open_definition_list() + '\n'
-            log.debug(result_open_dl)
-            globstat.state.write(result_open_dl)
-
-            log.debug('dl_mode=True')
-            globstat.state.dl_mode = True
+        open_deflist_if_closed()
 
         result = htmlops.HtmlRequests.open_definition_name() + \
                  tag + \
@@ -344,7 +339,7 @@ requests = {
     'LP' : ('new paragraph 1', HandleRequest.new_paragraph),
     'PP' : ('new paragraph 2', HandleRequest.new_paragraph),
     'P' : ('new paragraph 3', HandleRequest.new_paragraph),
-    'TP' : ('new paragraph hanging 1', HandleRequest.hanging_tp),
+    'TP' : ('new paragraph hanging 1', ),
     'IP' : ('new paragraph hanging 2', HandleRequest.hanging_ip),
     'HP' : ('new paragraph hanging 3', ),
     'RS' : ('start indent', HandleRequest.start_indent),
