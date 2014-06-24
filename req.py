@@ -19,16 +19,23 @@ def split_with_quotes(string):
     return csv.reader(string.splitlines(), quotechar='"', delimiter=' ',
                       quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
+def get_rest_of_line(line):
+    rest = re.match('\. *([a-zA-Z0-9]+) *(.*)', line[1:]).group(1)
+    log.debug(rest)
+    return rest
+
+
 NORMAL = 0
 BOLD = 1
 ITALIC = 2
 
-def alternating(line, style1, style2):
+def alternating(line, style1, style2, with_code=True):
     ''' Alternates text between 2 styles.
 
         Also changes par state if needed.
     '''
-    open_par_if_closed()
+    if with_code:
+        open_par_if_closed()
 
     if style1 == BOLD:
         even_start = htmlops.HtmlRequests.open_bold()
@@ -59,7 +66,9 @@ def alternating(line, style1, style2):
 
     if words2:
         result = ''
-        result += htmlops.HtmlRequests.open_code()
+
+        if with_code:
+            result += htmlops.HtmlRequests.open_code()
 
         even = True
         for i in words2:
@@ -70,7 +79,9 @@ def alternating(line, style1, style2):
                 result += odd_start + i + odd_end
                 even = True
 
-        result += htmlops.HtmlRequests.close_code()
+        if with_code:
+            result += htmlops.HtmlRequests.close_code()
+
         result += '\n'
 
         log.debug(result)
@@ -163,20 +174,21 @@ def get_definition_name(text):
              '\n'
     return result
 
+def close_fetch_tag(line):
+    tag = esc.escape_text(line, False)
+
+    log.debug('fetch_tag=False')
+    globstat.state.fetch_tag = False
+
+    result = get_definition_name(tag)
+    log.debug(result)
+    globstat.state.write(result)
+
+    open_data_if_closed()
 
 def handle_fetch_tag_if_needed(line):
     if globstat.state.fetch_tag:
-        tag = esc.escape_text(line, False)
-
-        log.debug('fetch_tag=False')
-        globstat.state.fetch_tag = False
-
-        result = get_definition_name(tag)
-        log.debug(result)
-        globstat.state.write(result)
-
-        open_data_if_closed()
-
+        close_fetch_tag(line)
         return True
     else:
         return False
@@ -285,39 +297,66 @@ class HandleRequest:
         open_data_if_closed()
 
     def alt_bold_italic(line):
-        result = alternating(line, BOLD, ITALIC)
-        log.debug(result)
-        globstat.state.write(result)
+        if globstat.state.fetch_tag:
+            result = alternating(line, BOLD, ITALIC, with_code=False)
+            close_fetch_tag(line)
+        else:
+            result = alternating(line, BOLD, ITALIC)
+            log.debug(result)
+            globstat.state.write(result)
 
     def alt_italic_bold(line):
-        result = alternating(line, ITALIC, BOLD)
-        log.debug(result)
-        globstat.state.write(result)
+        if globstat.state.fetch_tag:
+            result = alternating(line, ITALIC, BOLD, with_code=False)
+            close_fetch_tag(line)
+        else:
+            result = alternating(line, ITALIC, BOLD)
+            log.debug(result)
+            globstat.state.write(result)
 
     def alt_bold_normal(line):
-        result = alternating(line, BOLD, NORMAL)
-        log.debug(result)
-        globstat.state.write(result)
+        if globstat.state.fetch_tag:
+            result = alternating(line, BOLD, NORMAL, with_code=False)
+            close_fetch_tag(line)
+        else:
+            result = alternating(line, BOLD, NORMAL)
+            log.debug(result)
+            globstat.state.write(result)
 
     def alt_normal_bold(line):
-        result = alternating(line, NORMAL, BOLD)
-        log.debug(result)
-        globstat.state.write(result)
+        if globstat.state.fetch_tag:
+            result = alternating(line, NORMAL, BOLD, with_code=False)
+            close_fetch_tag(line)
+        else:
+            result = alternating(line, NORMAL, BOLD)
+            log.debug(result)
+            globstat.state.write(result)
 
     def alt_italic_normal(line):
-        result = alternating(line, ITALIC, NORMAL)
-        log.debug(result)
-        globstat.state.write(result)
+        if globstat.state.fetch_tag:
+            result = alternating(line, ITALIC, NORMAL, with_code=False)
+            close_fetch_tag(line)
+        else:
+            result = alternating(line, ITALIC, NORMAL)
+            log.debug(result)
+            globstat.state.write(result)
 
     def alt_normal_italic(line):
-        result = alternating(line, NORMAL, ITALIC)
-        log.debug(result)
-        globstat.state.write(result)
+        if globstat.state.fetch_tag:
+            result = alternating(line, NORMAL, ITALIC, with_code=False)
+            close_fetch_tag(line)
+        else:
+            result = alternating(line, NORMAL, ITALIC)
+            log.debug(result)
+            globstat.state.write(result)
 
     def font_italic(line):
-        open_par_if_closed()
-
         line = ' '.join(split_with_quotes(esc.escape_text(line))[1:])
+
+        if handle_fetch_tag_if_needed(line):
+            return
+
+        open_par_if_closed()
 
         result = htmlops.HtmlRequests.open_code_italic() + \
                  line + \
@@ -326,9 +365,12 @@ class HandleRequest:
         globstat.state.write(result)
 
     def font_bold(line):
-        open_par_if_closed()
-
         line = ' '.join(split_with_quotes(esc.escape_text(line))[1:])
+
+        if handle_fetch_tag_if_needed(line):
+            return
+
+        open_par_if_closed()
 
         result = htmlops.HtmlRequests.open_code_bold() + \
                  line + \
