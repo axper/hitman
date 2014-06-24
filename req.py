@@ -62,8 +62,7 @@ def alternating(line, style1, style2, with_code=True, open_par=True):
     else:
         log.error("Incorrect style2 argument: %s", style2)
 
-    words = split_with_quotes(esc.escape_text(line))
-    words2 = words[1:]
+    words2 = split_with_quotes(esc.escape_text(line))
 
     if words2:
         result = ''
@@ -195,6 +194,10 @@ def handle_fetch_tag_if_needed(line):
         return False
 
 def alt(line, style1, style2):
+    log.debug(line)
+    line = get_rest_of_line(line)
+    log.debug(line)
+
     if globstat.state.fetch_tag:
         result = alternating(line, style1, style2, True, False)
         close_fetch_tag(line)
@@ -225,7 +228,8 @@ class HandleRequest:
 
         result = htmlops.HtmlRequests.open_code_italic() + \
                  line + \
-                 htmlops.HtmlRequests.close_italic_code()
+                 htmlops.HtmlRequests.close_italic_code() + \
+                 '\n'
         log.debug(result)
         globstat.state.write(result)
 
@@ -241,7 +245,8 @@ class HandleRequest:
 
         result = htmlops.HtmlRequests.open_code_bold() + \
                  line + \
-                 htmlops.HtmlRequests.close_bold_code()
+                 htmlops.HtmlRequests.close_bold_code() + \
+                 '\n'
         log.debug(result)
         globstat.state.write(result)
 
