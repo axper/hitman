@@ -80,7 +80,7 @@ def open_par():
     globstat.state.par = True
 
 def close_par():
-    result_close_par = htmlops.HtmlRequests.close_paragraph()
+    result_close_par = htmlops.HtmlRequests.close_paragraph() + '\n'
     log.debug(result_close_par)
     globstat.state.write(result_close_par)
 
@@ -104,13 +104,13 @@ class HandleRequest:
         close_par_if_open()
 
     def text_line(line):
-        result = esc.escape_text(line)
+        result = esc.escape_text(line) + '\n'
 
         if globstat.state.par:
             log.debug(result)
             globstat.state.write(result)
         else:
-            result = htmlops.HtmlRequests.open_paragraph() + result + '\n'
+            result = htmlops.HtmlRequests.open_paragraph() + result
             log.debug(result)
             globstat.state.write(result)
 
