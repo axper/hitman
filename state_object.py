@@ -15,6 +15,7 @@ class State:
     continue_line = False
     hanging = False
     cat_tag = False
+    pre_mode = False
 
     # Inline state, resets on newline
     inline_font_stack = ['R']

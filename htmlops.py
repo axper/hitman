@@ -42,6 +42,17 @@ class HtmlRequests:
         return result
 
     @staticmethod
+    def open_pre():
+        result = HtmlTags.opening(HtmlTags.pre)
+        log.debug(result)
+        return result
+    @staticmethod
+    def close_pre():
+        result = HtmlTags.closing(HtmlTags.pre)
+        log.debug(result)
+        return result
+
+    @staticmethod
     def open_code():
         result = HtmlTags.opening(HtmlTags.code)
         log.debug(result)

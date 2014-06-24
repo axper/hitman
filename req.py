@@ -126,16 +126,11 @@ class HandleRequest:
 
         result += '\n'
 
-        if globstat.state.par:
-            log.debug(result)
-            globstat.state.write(result)
-        else:
-            result = htmlops.HtmlRequests.open_paragraph() + result
-            log.debug(result)
-            globstat.state.write(result)
+        if not globstat.state.pre_mode:
+            open_par_if_closed()
 
-            log.debug('par=True')
-            globstat.state.par = True
+        log.debug(result)
+        globstat.state.write(result)
 
     def comment(line):
         pass
@@ -250,6 +245,24 @@ class HandleRequest:
         log.debug(result)
         globstat.state.write(result)
 
+    def start_indent(line):
+        close_par_if_open()
+
+        log.debug('pre_mode=True')
+        globstat.state.pre_mode = True
+
+        result = htmlops.HtmlRequests.open_pre() + '\n'
+        log.debug(result)
+        globstat.state.write(result)
+
+    def end_indent(line):
+        log.debug('pre_mode=False')
+        globstat.state.pre_mode = False
+
+        result = htmlops.HtmlRequests.close_pre() + '\n'
+        log.debug(result)
+        globstat.state.write(result)
+
     def finalize():
         close_par_if_open()
 
@@ -269,8 +282,8 @@ requests = {
     'TP' : ('new paragraph hanging 1', HandleRequest.hanging_tp),
     'IP' : ('new paragraph hanging 2', ),
     'HP' : ('new paragraph hanging 3', ),
-    'RS' : ('start indent', ),
-    'RE' : ('end indent', ),
+    'RS' : ('start indent', HandleRequest.start_indent),
+    'RE' : ('end indent', HandleRequest.end_indent),
 
     # 3. Font
     'SM' : ('font small', ),
