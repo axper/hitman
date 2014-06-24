@@ -207,12 +207,6 @@ class HandleRequest:
         log.debug('par=True')
         globstat.state.par = True
 
-    def hanging_indented_paragraph(line):
-        log.info('stub: hanging_indented_paragraph')
-
-        close_par_if_open()
-        open_par()
-
     def hanging_tp(line):
         close_par_if_open()
 
@@ -223,6 +217,14 @@ class HandleRequest:
 
     def hanging_ip(line):
         close_par_if_open()
+
+        escaped = esc.escape_text(line, False)
+
+        try:
+            tag = split_with_quotes(escaped)[1]
+        except IndexError:
+            log.warning('hanging IP has no tag on the line')
+            return
 
         if globstat.state.cat_data:
             close_data = htmlops.HtmlRequests.close_definition_data() + '\n'
@@ -239,10 +241,6 @@ class HandleRequest:
 
             log.debug('dl_mode=True')
             globstat.state.dl_mode = True
-
-        log.debug(line)
-        escaped = esc.escape_text(line, False)
-        tag = split_with_quotes(escaped)[1]
 
         result = htmlops.HtmlRequests.open_definition_name() + \
                  tag + \
