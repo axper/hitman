@@ -18,6 +18,9 @@ class HtmlTags:
     pre = 'pre'
     header_level_2 = 'h2'
     header_level_3 = 'h3'
+    definition_list = 'dl'
+    definition_name = 'dt'
+    definition_data = 'dd'
 
     @staticmethod
     def opening(tag):
@@ -145,4 +148,37 @@ class HtmlRequests:
                  '</html>\n'
         log.debug(footer)
         return footer
+
+    @staticmethod
+    def open_definition_list():
+        result = HtmlTags.opening(HtmlTags.definition_list)
+        log.debug(result)
+        return result
+    @staticmethod
+    def close_definition_list():
+        result = HtmlTags.closing(HtmlTags.definition_list)
+        log.debug(result)
+        return result
+
+    @staticmethod
+    def open_definition_name():
+        result = HtmlTags.opening(HtmlTags.definition_name)
+        log.debug(result)
+        return result
+    @staticmethod
+    def close_definition_name():
+        result = HtmlTags.closing(HtmlTags.definition_name)
+        log.debug(result)
+        return result
+
+    @staticmethod
+    def open_definition_data():
+        result = HtmlTags.opening(HtmlTags.definition_data)
+        log.debug(result)
+        return result
+    @staticmethod
+    def close_definition_data():
+        result = HtmlTags.closing(HtmlTags.definition_data)
+        log.debug(result)
+        return result
 
