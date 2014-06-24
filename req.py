@@ -104,7 +104,18 @@ class HandleRequest:
         close_par_if_open()
 
     def text_line(line):
-        result = esc.escape_text(line) + '\n'
+        result = esc.escape_text(line)
+
+        if globstat.state.continue_line:
+            log.debug(result)
+            globstat.state.write(result)
+
+            log.debug('continue_line=False')
+            globstat.state.continue_line = False
+
+            return
+
+        result += '\n'
 
         if globstat.state.par:
             log.debug(result)

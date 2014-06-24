@@ -190,8 +190,7 @@ def escape_text(text):
             try:
                 escape_code = text[i + 1]
             except IndexError:
-                log_escape_text.info('stub: escape char is last char on line')
-                log_escape_text.info('continue_line=True')
+                log_escape_text.debug('continue_line=True')
                 globstat.state.continue_line = True
                 break
 
