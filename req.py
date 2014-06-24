@@ -196,18 +196,6 @@ class HandleRequest:
         if handle_fetch_tag_if_needed(line):
             return
 
-        '''
-                    probably unnecessary?
-        if globstat.state.continue_line:
-            log.debug(result)
-            globstat.state.write(result)
-
-            log.debug('continue_line=False')
-            globstat.state.continue_line = False
-
-            return
-        '''
-
         result += '\n'
 
         if not globstat.state.pre_mode and not globstat.state.cat_data:
