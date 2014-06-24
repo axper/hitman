@@ -1,4 +1,13 @@
-import log
+# Standard modules
+import logging
+
+# My modules
+import log_handlers
+
+log = logging.getLogger('htmlops')
+log.addHandler(log_handlers.TO_CONSOLE)
+log.addHandler(log_handlers.TO_FILE)
+log.setLevel(logging.INFO)
 
 class HtmlTags:
     ''' Single HTML tags formatted for opening or closing. '''
@@ -23,45 +32,69 @@ class HtmlRequests:
     ''' Returns strings composed of one or more tags. '''
     @staticmethod
     def open_paragraph():
-        return HtmlTags.opening(HtmlTags.paragraph)
+        result = HtmlTags.opening(HtmlTags.paragraph)
+        log.debug(result)
+        return result
     @staticmethod
     def close_paragraph():
-        return HtmlTags.closing(HtmlTags.paragraph)
+        result = HtmlTags.closing(HtmlTags.paragraph)
+        log.debug(result)
+        return result
 
     @staticmethod
     def open_code():
-        return HtmlTags.opening(HtmlTags.code)
+        result = HtmlTags.opening(HtmlTags.code)
+        log.debug(result)
+        return result
     @staticmethod
     def close_code():
-        return HtmlTags.closing(HtmlTags.code)
+        result = HtmlTags.closing(HtmlTags.code)
+        log.debug(result)
+        return result
 
     @staticmethod
     def open_italic():
-        return HtmlTags.opening(HtmlTags.italic)
+        result = HtmlTags.opening(HtmlTags.italic)
+        log.debug(result)
+        return result
     @staticmethod
     def close_italic():
-        return HtmlTags.closing(HtmlTags.italic)
+        result = HtmlTags.closing(HtmlTags.italic)
+        log.debug(result)
+        return result
 
     @staticmethod
     def open_bold():
-        return HtmlTags.opening(HtmlTags.bold)
+        result = HtmlTags.opening(HtmlTags.bold)
+        log.debug(result)
+        return result
     @staticmethod
     def close_bold():
-        return HtmlTags.closing(HtmlTags.bold)
+        result = HtmlTags.closing(HtmlTags.bold)
+        log.debug(result)
+        return result
 
     @staticmethod
     def open_code_italic():
-        return HtmlRequests.open_code() + HtmlRequests.open_italic()
+        result = HtmlRequests.open_code() + HtmlRequests.open_italic()
+        log.debug(result)
+        return result
     @staticmethod
     def close_italic_code():
-        return HtmlRequests.close_italic() + HtmlRequests.close_code()
+        result = HtmlRequests.close_italic() + HtmlRequests.close_code()
+        log.debug(result)
+        return result
 
     @staticmethod
     def open_code_bold():
-        return HtmlRequests.open_code() + HtmlRequests.open_bold()
+        result = HtmlRequests.open_code() + HtmlRequests.open_bold()
+        log.debug(result)
+        return result
     @staticmethod
     def close_bold_code():
-        return HtmlRequests.close_bold() + HtmlRequests.close_code()
+        result = HtmlRequests.close_bold() + HtmlRequests.close_code()
+        log.debug(result)
+        return result
 
     @staticmethod
     def section_title(title):
@@ -69,6 +102,7 @@ class HtmlRequests:
                  title + \
                  HtmlTags.closing(HtmlTags.header_level_2) + \
                  '\n'
+        log.debug(result)
         return result
 
     @staticmethod
@@ -77,6 +111,7 @@ class HtmlRequests:
                  title + \
                  HtmlTags.closing(HtmlTags.header_level_3) + \
                  '\n'
+        log.debug(result)
         return result
 
     @staticmethod
@@ -90,10 +125,13 @@ class HtmlRequests:
                  '</head>\n' \
                  '<body>\n' \
                  '<h1>{0}</h1>\n'
-        return header.format(name, man_section)
+        result = header.format(name, man_section)
+        log.debug(result)
+        return result
     @staticmethod
     def document_footer():
         footer = '</body>\n' \
                  '</html>\n'
+        log.debug(footer)
         return footer
 

@@ -1,73 +1,99 @@
 # Standard modules
 import csv
+import logging
 
 # My modules
-import log
+import log_handlers
 import esc
 import htmlops
 import globstat
 import tables
+
+log = logging.getLogger('req')
+log.addHandler(log_handlers.TO_CONSOLE)
+log.addHandler(log_handlers.TO_FILE)
+log.setLevel(logging.DEBUG)
 
 def split_with_quotes(string):
     ''' Splits string into words and takes quotes into account. '''
     return csv.reader(string.splitlines(), quotechar='"', delimiter=' ',
                       quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
+NORMAL = 0
+BOLD = 1
+ITALIC = 2
 
-class Alt:
-    ''' Alternates text between 2 styles. '''
-    NORMAL = 0
-    BOLD = 1
-    ITALIC = 2
+def alternating(line, style1, style2):
+    ''' Alternates text between 2 styles.
 
-    @staticmethod
-    def get_alternating(line, style1, style2):
-        ''' ...Also changes par state if needed. '''
-        if not globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.open_paragraph())
-            globstat.state.par = True
+        Also changes par state if needed.
+    '''
+    open_par_if_closed()
 
-        if style1 == Alt.BOLD:
-            even_start = htmlops.HtmlRequests.open_code_bold()
-            even_end = htmlops.HtmlRequests.close_bold_code()
-        elif style1 == Alt.ITALIC:
-            even_start = htmlops.HtmlRequests.open_code_italic()
-            even_end = htmlops.HtmlRequests.close_italic_code()
-        elif style1 == Alt.NORMAL:
-            even_start = ''
-            even_end = ''
+    if style1 == BOLD:
+        even_start = htmlops.HtmlRequests.open_code_bold()
+        even_end = htmlops.HtmlRequests.close_bold_code()
+    elif style1 == ITALIC:
+        even_start = htmlops.HtmlRequests.open_code_italic()
+        even_end = htmlops.HtmlRequests.close_italic_code()
+    elif style1 == NORMAL:
+        even_start = ''
+        even_end = ''
+    else:
+        log.error("Incorrect style1 argument: %s", style1)
+
+    if style1 == BOLD:
+        odd_start = htmlops.HtmlRequests.open_code_bold()
+        odd_end = htmlops.HtmlRequests.close_bold_code()
+    elif style1 == ITALIC:
+        odd_start = htmlops.HtmlRequests.open_code_italic()
+        odd_end = htmlops.HtmlRequests.close_italic_code()
+    elif style1 == NORMAL:
+        odd_start = ''
+        odd_end = ''
+    else:
+        log.error("Incorrect style2 argument: %s", style2)
+
+    words = split_with_quotes(esc.escape_text(line))
+    result = ''
+
+    even = True
+    for i in words[1:]:
+        if even:
+            result += even_start + i + even_end
+            even = False
         else:
-            log.LOGGER.error("Incorrect style1 argument: %s", style1)
+            result += odd_start + i + odd_end
+            even = True
 
-        if style1 == Alt.BOLD:
-            odd_start = htmlops.HtmlRequests.open_code_bold()
-            odd_end = htmlops.HtmlRequests.close_bold_code()
-        elif style1 == Alt.ITALIC:
-            odd_start = htmlops.HtmlRequests.open_code_italic()
-            odd_end = htmlops.HtmlRequests.close_italic_code()
-        elif style1 == Alt.NORMAL:
-            odd_start = ''
-            odd_end = ''
-        else:
-            log.LOGGER.error("Incorrect style2 argument: %s", style2)
+    result += '\n'
 
-        words = split_with_quotes(esc.escape_text(line))
-        final = ''
+    log.debug(result)
+    return result
 
-        even = True
-        for i in words[1:]:
-            if even:
-                final += even_start + i + even_end
-                even = False
-            else:
-                final += odd_start + i + odd_end
-                even = True
+def open_par():
+    result_open_par = htmlops.HtmlRequests.open_paragraph()
+    log.debug(result_open_par)
+    globstat.state.write(result_open_par)
 
-        final += '\n'
+    log.debug('par=True')
+    globstat.state.par = True
 
-        log.LOGGER.debug(final)
-        return final
+def close_par():
+    result_close_par = htmlops.HtmlRequests.close_paragraph()
+    log.debug(result_close_par)
+    globstat.state.write(result_close_par)
 
+    log.debug('par=False')
+    globstat.state.par = False
+
+def open_par_if_closed(line=''):
+    if not globstat.state.par:
+        open_par()
+
+def close_par_if_open(line=''):
+    if globstat.state.par:
+        close_par()
 
 class HandleRequest:
     ''' Functions to handle requests.
@@ -75,25 +101,21 @@ class HandleRequest:
         Requests are the lines which start with dot or single quote.
     '''
     def empty_line():
-        if globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.close_paragraph())
-
-        globstat.state.par = False
+        close_par_if_open()
 
     def text_line(line):
         result = esc.escape_text(line)
 
         if globstat.state.par:
-            log.LOGGER.debug('already in paragraph')
+            log.debug(result)
             globstat.state.write(result)
         else:
-            log.LOGGER.debug('starting paragraph')
-            globstat.state.write(htmlops.HtmlRequests.open_paragraph())
-            globstat.state.write(result + '\n')
+            result = htmlops.HtmlRequests.open_paragraph() + result + '\n'
+            log.debug(result)
+            globstat.state.write(result)
 
+            log.debug('par=True')
             globstat.state.par = True
-
-        log.LOGGER.debug(result)
 
     def comment(line):
         pass
@@ -102,110 +124,102 @@ class HandleRequest:
         title = split_with_quotes(line)[1:]
         title[0] = title[0].lower()
 
-        section_title = title[1]
+        man_section_number = title[1]
 
         try:
-            section = tables.section_name[section_title]
+            section = tables.section_name[man_section_number]
         except KeyError:
-            log.LOGGER.warning('Unknown section title: %s', section_title)
+            log.warning('Unknown section title: %s', man_section_number)
             section = 'UNKNOWN SECTION'
 
-        globstat.state.write(htmlops.HtmlRequests.document_header(title[0],
-                                                                  section))
-        log.LOGGER.debug(title)
+        result = htmlops.HtmlRequests.document_header(title[0], section)
+        log.debug(result)
+        globstat.state.write(result)
 
     def section_title(line):
-        if globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.close_paragraph() + '\n')
-            globstat.state.par = False
+        close_par_if_open()
 
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
 
         result = htmlops.HtmlRequests.section_title(section_title)
-        log.LOGGER.debug(result)
+        log.debug(result)
         globstat.state.write(result)
 
     def subsection_title(line):
-        if globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.close_paragraph() + '\n')
-            globstat.state.par = False
+        close_par_if_open()
 
         subsection_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
 
         result = htmlops.HtmlRequests.subsection_title(subsection_title)
-        log.LOGGER.debug(result)
+        log.debug(result)
         globstat.state.write(result)
 
     def new_paragraph(line):
-        if globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.close_paragraph())
-            globstat.state.write(htmlops.HtmlRequests.open_paragraph())
-        else:
-            globstat.state.par = True
-            globstat.state.write(htmlops.HtmlRequests.open_paragraph())
+        close_par_if_open()
+
+        result_open_par = htmlops.HtmlRequests.open_paragraph()
+        log.debug(result_open_par)
+        globstat.state.write(result_open_par)
+
+        log.debug('par=True')
+        globstat.state.par = True
 
     def hanging_indented_paragraph(line):
-        log.LOGGER.info('stub: hanging or indented paragraph (ignoring...)')
+        log.info('stub: hanging_indented_paragraph')
 
-        if not globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.open_paragraph())
-            globstat.state.par = True
-        else:
-            globstat.state.write(htmlops.HtmlRequests.close_paragraph())
-            globstat.state.write(htmlops.HtmlRequests.open_paragraph())
+        close_par_if_open()
+        open_par()
 
     def alt_bold_italic(line):
-        globstat.state.write(Alt.get_alternating(line, Alt.BOLD, Alt.ITALIC))
+        result = alternating(line, BOLD, ITALIC)
+        log.debug(result)
+        globstat.state.write(result)
 
     def alt_italic_bold(line):
-        globstat.state.write(Alt.get_alternating(line, Alt.ITALIC, Alt.BOLD))
+        result = alternating(line, ITALIC, BOLD)
+        log.debug(result)
+        globstat.state.write(result)
 
     def alt_bold_normal(line):
-        globstat.state.write(Alt.get_alternating(line, Alt.BOLD, Alt.NORMAL))
+        result = alternating(line, BOLD, NORMAL)
+        log.debug(result)
+        globstat.state.write(result)
 
     def alt_normal_bold(line):
-        globstat.state.write(Alt.get_alternating(line, Alt.NORMAL, Alt.BOLD))
+        result = alternating(line, NORMAL, BOLD)
+        log.debug(result)
+        globstat.state.write(result)
 
     def alt_italic_normal(line):
-        globstat.state.write(Alt.get_alternating(line, Alt.ITALIC, Alt.NORMAL))
+        result = alternating(line, ITALIC, NORMAL)
+        log.debug(result)
+        globstat.state.write(result)
 
     def alt_normal_italic(line):
-        globstat.state.write(Alt.get_alternating(line, Alt.NORMAL, Alt.ITALIC))
+        result = alternating(line, NORMAL, ITALIC)
+        log.debug(result)
+        globstat.state.write(result)
 
     def font_italic(line):
-        if not globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.open_paragraph())
-            globstat.state.par = True
+        open_par_if_closed()
 
         result = htmlops.HtmlRequests.open_code_italic() + \
                  esc.escape_text(line) + \
                  htmlops.HtmlRequests.close_italic_code()
-        log.LOGGER.debug('result:%s', result)
-
+        log.debug(result)
         globstat.state.write(result)
 
     def font_bold(line):
-        if not globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.open_paragraph())
-            globstat.state.par = True
+        open_par_if_closed()
 
         result = htmlops.HtmlRequests.open_code_bold() + \
                  esc.escape_text(line) + \
                  htmlops.HtmlRequests.close_bold_code()
-        log.LOGGER.debug('result:%s', result)
-
+        log.debug(result)
         globstat.state.write(result)
 
-    def line_break(line):
-        if globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.close_paragraph())
-
-        globstat.state.par = False
-
     def finalize():
-        if globstat.state.par:
-            globstat.state.write(htmlops.HtmlRequests.close_paragraph())
-            globstat.state.par = False
+        close_par_if_open()
 
 
 requests = {
@@ -299,7 +313,7 @@ requests = {
     'af' : ('set register output format', ),
 
     # 7. Manipulating filling and adjusting
-    'br' : ('line break', HandleRequest.line_break),
+    'br' : ('line break', close_par_if_open),
     'fi' : ('enable output fill mode', ),
     'nf' : ('disable output fill mode', ),
     'ad' : ('set line adjusting mode', ),
@@ -325,7 +339,7 @@ requests = {
     'hla' : ('set hypenation language', ),
 
     # 9. Manipulating spacing
-    'sp' : ('skip lines up or down', HandleRequest.line_break),
+    'sp' : ('skip lines up or down', close_par_if_open),
     'ls' : ('print blank lines after each output', ),
     'ns' : ('disable line spacing mode', ),
     'rs' : ('enable line spacing mode', ),

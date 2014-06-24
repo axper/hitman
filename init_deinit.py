@@ -6,23 +6,28 @@ import argparse
 
 # My modules
 import state_object
+import log_handlers
+
+log = logging.getLogger('init_deinit')
+log.addHandler(log_handlers.TO_CONSOLE)
+log.addHandler(log_handlers.TO_FILE)
+log.setLevel(logging.DEBUG)
 
 def open_man_file(filename):
     ''' Opens file in text mode and unzips if necessary. '''
-    logger = logging.getLogger('hitman')
     if mimetypes.guess_type(filename)[1] == 'gzip':
         try:
-            logger.debug('gzfile:===============' + filename + '=================')
+            log.debug('gzfile:===============' + filename + '=================')
             return gzip.open(filename, mode='rt')
         except FileNotFoundError as err:
-            logger.exception(err)
+            log.exception(err)
             exit(1)
     else:
         try:
-            logger.debug('normfile:===============' + filename + '=================')
+            log.debug('normfile:===============' + filename + '=================')
             return open(filename)
         except FileNotFoundError as err:
-            logger.exception(err)
+            log.exception(err)
             exit(1)
 
 def initialize_get_args():
@@ -33,13 +38,12 @@ def initialize_get_args():
 
 def initialize():
     ''' Initializes program - opens files. '''
-    logger = logging.getLogger('hitman')
     state = state_object.State()
     state.file_manpage = open_man_file(initialize_get_args().filename)
     try:
         state.file_html = open('result.html', 'wt')
     except FileNotFoundError as err:
-        logger.exception(err)
+        log.exception(err)
         exit(1)
 
     return state

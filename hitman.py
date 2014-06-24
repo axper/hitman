@@ -4,54 +4,69 @@
 
 # Standard modules
 import re
+import logging
 
 # My modules
-import log
+import log_handlers
 import globstat
 import init_deinit
 import htmlops
 import req
 
-line_number = 1
+log = logging.getLogger('hitman')
+log.addHandler(log_handlers.TO_CONSOLE)
+log.addHandler(log_handlers.TO_FILE)
+log.setLevel(logging.DEBUG)
 
-for line in globstat.state.file_manpage:
-    line = line.rstrip('\n')
+def main():
+    line_number = 1
 
-    log.LOGGER.debug('-'*40 + str(line_number) + '-'*40)
-    line_number += 1
-    log.LOGGER.debug(line)
+    for line in globstat.state.file_manpage:
+        line = line.rstrip('\n')
 
-    try:
-        first_char = line[0]
-    except IndexError:
-        log.LOGGER.debug('empty line')
-        continue
-
-    if first_char in [globstat.state.control_char, globstat.state.control_char_nobreak]:
-        try:
-            current_request = re.match(' *([a-zA-Z0-9]+)', line[1:]).group(1)
-        except AttributeError:
-            log.LOGGER.debug('comment')
-            continue
+        log.debug('-'*40 + str(line_number) + '-'*40)
+        log.debug(line)
+        line_number += 1
 
         try:
-            command_info = req.requests[current_request]
-        except KeyError:
-            log.LOGGER.info('unknown request:%s', current_request)
+            first_char = line[0]
+        except IndexError:
+            log.debug('type: empty line')
+            req.HandleRequest.empty_line()
             continue
-        log.LOGGER.debug('request:%s', command_info)
 
-        if len(command_info) >= 2:
-            command_info[1](line)
+        if first_char in [globstat.state.control_char, globstat.state.control_char_nobreak]:
+            try:
+                request_name = re.match(' *([a-zA-Z0-9]+)', line[1:]).group(1)
+            except AttributeError:
+                log.debug('type: comment line, fetching next line')
+                continue
+
+            try:
+                command_info = req.requests[request_name]
+            except KeyError:
+                log.warning('unknown request: %s, fetching next line', request_name)
+                continue
+
+            log.debug('type: request line: %s (%s)', request_name, command_info[0])
+
+            try:
+                request_handler_function = command_info[1]
+            except IndexError:
+                log.info('stub: request doesnt have handler: %s (%s), fetching next line', request_name, command_info[0])
+                continue
+
+            request_handler_function(line)
+
         else:
-            log.LOGGER.info('stub: %s', command_info[0])
-
-    else:
-        log.LOGGER.debug('Type: text line')
-        req.HandleRequest.text_line(line)
+            log.debug('type: text line')
+            req.HandleRequest.text_line(line)
 
 
-req.HandleRequest.finalize()
+    req.HandleRequest.finalize()
 
-globstat.state.write(htmlops.HtmlRequests.document_footer())
-init_deinit.deinitialize(globstat.state)
+    globstat.state.write(htmlops.HtmlRequests.document_footer())
+    init_deinit.deinitialize(globstat.state)
+
+if __name__ == '__main__':
+    main()

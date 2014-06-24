@@ -1,11 +1,17 @@
 # Standard modules
 import html
+import logging
 
 # My modules
 import tables
 import globstat
-import log
+import log_handlers
 import htmlops
+
+log = logging.getLogger('esc')
+log.addHandler(log_handlers.TO_CONSOLE)
+log.addHandler(log_handlers.TO_FILE)
+log.setLevel(logging.DEBUG)
 
 class FontParser:
     normal_fonts = ['R', '1']
@@ -23,7 +29,7 @@ class FontParser:
     def new_is_normal(new_font, previous_font, push_to_stack=True):
         if push_to_stack:
             globstat.state.inline_font_stack.append(new_font)
-            log.LOGGER.debug(globstat.state.inline_font_stack)
+            log.debug(globstat.state.inline_font_stack)
 
         if previous_font in FontParser.normal_fonts:
             return FontParser.ret('')
@@ -32,14 +38,14 @@ class FontParser:
         elif previous_font in FontParser.italic_fonts:
             return FontParser.ret(htmlops.HtmlRequests.close_italic_code())
         else:
-            log.LOGGER.info('previous font unknown:%s', previous_font)
+            log.info('previous font unknown:%s', previous_font)
             globstat.state.inline_code = False
             return FontParser.ret('')
 
     def new_is_bold(new_font, previous_font, push_to_stack=True):
         if push_to_stack:
             globstat.state.inline_font_stack.append(new_font)
-            log.LOGGER.debug(globstat.state.inline_font_stack)
+            log.debug(globstat.state.inline_font_stack)
 
         if previous_font in FontParser.bold_fonts:
             return FontParser.ret('')
@@ -49,14 +55,14 @@ class FontParser:
             return FontParser.ret(htmlops.HtmlRequests.close_italic() +
                                   htmlops.HtmlRequests.open_bold())
         else:
-            log.LOGGER.info('previous font unknown:%s', previous_font)
+            log.info('previous font unknown:%s', previous_font)
             globstat.state.inline_code = True
             return FontParser.ret('')
 
     def new_is_italic(new_font, previous_font, push_to_stack=True):
         if push_to_stack:
             globstat.state.inline_font_stack.append(new_font)
-            log.LOGGER.debug(globstat.state.inline_font_stack)
+            log.debug(globstat.state.inline_font_stack)
 
         if previous_font in FontParser.italic_fonts:
             return FontParser.ret('')
@@ -66,7 +72,7 @@ class FontParser:
         elif previous_font in FontParser.normal_fonts:
             return FontParser.ret(htmlops.HtmlRequests.open_code_italic())
         else:
-            log.LOGGER.info('previous font unknown:%s', previous_font)
+            log.info('previous font unknown:%s', previous_font)
             globstat.state.inline_code = True
             return FontParser.ret('')
 
@@ -74,9 +80,9 @@ class FontParser:
         try:
             globstat.state.inline_font_stack.pop()
             new_font = globstat.state.inline_font_stack[-1]
-            log.LOGGER.debug(globstat.state.inline_font_stack)
+            log.debug(globstat.state.inline_font_stack)
         except IndexError:
-            log.LOGGER.warn('font stack empty 2, taking roman')
+            log.warn('font stack empty 2, taking roman')
             new_font = 'R'
 
         if new_font in FontParser.normal_fonts:
@@ -86,7 +92,7 @@ class FontParser:
         elif new_font in FontParser.italic_fonts:
             return FontParser.new_is_italic(new_font, previous_font, push_to_stack=False)
         else:
-            log.LOGGER.info('new font unknown:%s', new_font)
+            log.info('new font unknown:%s', new_font)
             return FontParser.ret('')
 
     def get_result(text):
@@ -96,7 +102,7 @@ class FontParser:
         try:
             previous_font = globstat.state.inline_font_stack[-1]
         except IndexError:
-            log.LOGGER.warn('font stack empty, taking roman')
+            log.warn('font stack empty, taking roman')
             previous_font = 'R'
 
         if new_font in FontParser.normal_fonts:
@@ -108,7 +114,7 @@ class FontParser:
         elif new_font in FontParser.previous_fonts:
             return FontParser.new_is_previous(new_font, previous_font)
         else:
-            log.LOGGER.info('font unknown:%s', new_font)
+            log.info('font unknown:%s', new_font)
             return FontParser.ret('')
 
 
@@ -121,7 +127,7 @@ def replace_2_len_chars(text_line):
             try:
                 escape_code = text_line[i + 1]
             except IndexError:
-                log.LOGGER.info('escape char is last char on line')
+                log.info('escape char is last char on line')
                 result += text_line[i]
                 break
 
@@ -129,16 +135,16 @@ def replace_2_len_chars(text_line):
                 try:
                     table_index = text_line[i + 2 : i + 4]
                 except KeyError:
-                    log.LOGGER.info('end of line reached when fetching code')
+                    log.info('end of line reached when fetching code')
                     i += 3
                     continue
 
-                log.LOGGER.info('table index:%s', table_index)
+                log.info('table index:%s', table_index)
 
                 try:
                     result += tables.chars[table_index]
                 except KeyError:
-                    log.LOGGER.info('not found in table:%s', table_index)
+                    log.info('not found in table:%s', table_index)
                     result += globstat.state.escape_char
                     i += 1
                     continue
@@ -155,7 +161,6 @@ def replace_2_len_chars(text_line):
 
     return result
     
-
 def escape_text(text):
     ''' Escapes groff escape codes.
 
@@ -165,15 +170,17 @@ def escape_text(text):
         3. Then replace 2 code chars which contain < or >
         4. Finally escape groff codes
     '''
+    log_escape_text = logging.getLogger('esc.escape_text')
+    log_escape_text.setLevel(logging.DEBUG)
+
     text = text.replace('\\&', '')
-
     text = html.escape(text, quote=False)
-    log.LOGGER.debug('&HT:>>>%s<<<', text)
-
     text = replace_2_len_chars(text)
-    log.LOGGER.debug('2CC:>>>%s<<<', text)
+    log_escape_text.debug(text)
 
     globstat.state.inline_font_stack = ['R']
+
+    log_escape_text.debug('inline_code=False')
     globstat.state.inline_code = False
 
     result = ''
@@ -183,36 +190,42 @@ def escape_text(text):
             try:
                 escape_code = text[i + 1]
             except IndexError:
-                log.LOGGER.info('stub:escape char is last char on line')
+                log_escape_text.info('stub: escape char is last char on line')
+                log_escape_text.info('continue_line=True')
                 globstat.state.continue_line = True
                 break
 
-            if escape_code not in escapes:
-                log.LOGGER.info('stub:unknown escape code:' + escape_code)
+            try:
+                escape_info = escapes[escape_code]
+            except KeyError:
+                log_escape_text.info('stub: unknown escape code: %s', escape_code)
                 i += 1
                 continue
 
-            escape_info = escapes[escape_code]
+            log_escape_text.debug('escape code: %s (%s)', escape_code, escape_info[0])
 
-            log.LOGGER.debug('escape code: %s (%s)', escape_code, escape_info[0])
+            rest_of_line = text[i + 2:]
 
-            if len(escape_info) >= 2:
-                rest_of_line = text[i + 2:]
-                got = escapes[escape_code][1](rest_of_line)
-                result += got[0]
-                i += got[1]
-            else:
-                log.LOGGER.info('stub escape code: %s (%s)', escape_code, escape_info[0])
+            try:
+                replacement_and_length = escape_info[1](rest_of_line)
+            except IndexError:
+                log_escape_text.info('stub: escape code doesnt have handler: %s (%s)', escape_code, escape_info[0])
+                i += 1
+                continue
+
+            result += replacement_and_length[0]
+            i += replacement_and_length[1]
 
         else:
             result += text[i]
 
         i += 1
 
+    log_escape_text.debug(result)
     return result
 
 
-class GetEscapeTuple:
+class HandleEscape:
     ''' Returns tuple consisting of replacement string and the length of
         the original escape, not counting the escape character (the backslash).
     '''
@@ -228,7 +241,7 @@ class GetEscapeTuple:
         try:
             replacement = tables.chars[two_chars]
         except KeyError:
-            log.LOGGER.info('index not found in table:%s', two_chars)
+            log.info('index not found in table:%s', two_chars)
             return (globstat.state.escape_char + '(' + two_chars, 3)
 
         return (replacement, 3)
@@ -262,7 +275,7 @@ escapes = {
     'p' : ('break and adjust (spread) current line', ),
 
     # 8. Manipulating hypenation
-    '%' : ('insert hypenation char (dash)', GetEscapeTuple.hypenation_char),
+    '%' : ('insert hypenation char (dash)', HandleEscape.hypenation_char),
     ':' : ('break word but dont pring hypenation char', ),
 
     # 9. Manipulating spacing
@@ -272,8 +285,8 @@ escapes = {
     't' : ('tab char (ignored)', ),
 
     # 11. Character translations
-    '\\' : ('if escape char is backslash, print it', GetEscapeTuple.current_escape_char),
-    'e' : ('print current escape char', GetEscapeTuple.current_escape_char),
+    '\\' : ('if escape char is backslash, print it', HandleEscape.current_escape_char),
+    'e' : ('print current escape char', HandleEscape.current_escape_char),
     'E' : ('print current escape char but not in copy mode', ),
     '.' : ('dot char', ),
 
@@ -281,15 +294,15 @@ escapes = {
     'c' : ('ignore everything on current line after this nobreak current', ),
 
     # 17. Fonts and symbols
-    'f' : ('set font or font position', GetEscapeTuple.change_font),
+    'f' : ('set font or font position', HandleEscape.change_font),
     'F' : ('set font family', ),
-    '(' : ('insert char with 2 char name', GetEscapeTuple.insert_char_with_2),
+    '(' : ('insert char with 2 char name', HandleEscape.insert_char_with_2),
     '[' : ('insert char with name of any lenght 1', ),
     'C' : ('insert char with name of any lenght 2', ),
     'N' : ('insert char specified with its code', ),
     '\'' : ('quote (apostrophe) character', ),
     '`' : ('grave character', ),
-    '-' : ('minus sign', GetEscapeTuple.minus_sign),
+    '-' : ('minus sign', HandleEscape.minus_sign),
     '_' : ('underline', ),
     'H' : ('set height of current font', ),
     'S' : ('slant current font', ),
@@ -317,7 +330,7 @@ escapes = {
     'u' : ('move (reserve) up 0.5v', ),
     'd' : ('move (reserve) down 0.5v', ),
     'h' : ('move left or right', ),
-    ' ' : ('unpaddable space char nobreak', GetEscapeTuple.space_char),
+    ' ' : ('unpaddable space char nobreak', HandleEscape.space_char),
     '~' : ('unbreakable stretching space char', ),
     '|' : ('small space (1/6)', ),
     '^' : ('small space (1/12)', ),
@@ -353,5 +366,5 @@ escapes = {
     'Y' : ('write control string into output device uninterpreted', ),
 
     # added from aspell(1):
-    '=' : ('equal sign', GetEscapeTuple.equal_sign),
+    '=' : ('equal sign', HandleEscape.equal_sign),
 }
