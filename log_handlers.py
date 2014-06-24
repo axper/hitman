@@ -10,7 +10,7 @@
 # Standard modules
 import logging
 
-FILE_FS = '%(asctime)s %(filename)15s:%(funcName)-13s:%(lineno)-4d    %(levelname)7s:%(message)s'
+FILE_FS = '%(filename)15s:%(funcName)-13s:%(lineno)-4d    %(levelname)7s:%(message)s'
 CONSOLE_FS = '%(filename)15s:%(lineno)-4d    %(levelname)7s:%(message)s'
 
 TO_FILE = logging.FileHandler('log')
