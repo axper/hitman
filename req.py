@@ -104,6 +104,32 @@ def close_par_if_open(line=''):
     if globstat.state.par:
         close_par()
 
+
+def close_data():
+    result_close_data = htmlops.HtmlRequests.close_definition_data() + '\n'
+    log.debug(result_close_data)
+    globstat.state.write(result_close_data)
+
+    log.debug('cat_data=False')
+    globstat.state.cat_data = False
+
+def close_data_if_open():
+    if globstat.state.cat_data:
+        close_data()
+
+def close_deflist():
+    result_close_deflist = htmlops.HtmlRequests.close_definition_list() + '\n'
+    log.debug(result_close_deflist)
+    globstat.state.write(result_close_deflist)
+
+    log.debug('dl_mode=False')
+    globstat.state.dl_mode = False
+
+def close_deflist_if_open():
+    if globstat.state.dl_mode:
+        close_deflist()
+
+
 class HandleRequest:
     ''' Functions to handle requests.
         
@@ -126,7 +152,7 @@ class HandleRequest:
 
         result += '\n'
 
-        if not globstat.state.pre_mode:
+        if not globstat.state.pre_mode and not globstat.state.cat_data:
             open_par_if_closed()
 
         log.debug(result)
@@ -153,6 +179,8 @@ class HandleRequest:
 
     def section_title(line):
         close_par_if_open()
+        close_data_if_open()
+        close_deflist_if_open()
 
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
 
@@ -192,6 +220,44 @@ class HandleRequest:
         globstat.state.hanging = True
         log.debug('cat_tag=True')
         globstat.state.cat_tag = True
+
+    def hanging_ip(line):
+        close_par_if_open()
+
+        if globstat.state.cat_data:
+            close_data = htmlops.HtmlRequests.close_definition_data() + '\n'
+            log.debug(close_data)
+            globstat.state.write(close_data)
+
+            log.debug('cat_data=False')
+            globstat.state.cat_data = False
+
+        if not globstat.state.dl_mode:
+            result_open_dl = htmlops.HtmlRequests.open_definition_list() + '\n'
+            log.debug(result_open_dl)
+            globstat.state.write(result_open_dl)
+
+            log.debug('dl_mode=True')
+            globstat.state.dl_mode = True
+
+        escaped = esc.escape_text(line)
+        tag = split_with_quotes(escaped)[1]
+
+        result = htmlops.HtmlRequests.open_definition_name() + \
+                 tag + \
+                 htmlops.HtmlRequests.close_definition_name() + \
+                 '\n'
+
+        log.debug(result)
+        globstat.state.write(result)
+
+        if not globstat.state.cat_data:
+            open_data = htmlops.HtmlRequests.open_definition_data()
+            log.debug(open_data)
+            globstat.state.write(open_data)
+
+            log.debug('cat_data=True')
+            globstat.state.cat_data = True
 
     def alt_bold_italic(line):
         result = alternating(line, BOLD, ITALIC)
@@ -280,7 +346,7 @@ requests = {
     'PP' : ('new paragraph 2', HandleRequest.new_paragraph),
     'P' : ('new paragraph 3', HandleRequest.new_paragraph),
     'TP' : ('new paragraph hanging 1', HandleRequest.hanging_tp),
-    'IP' : ('new paragraph hanging 2', ),
+    'IP' : ('new paragraph hanging 2', HandleRequest.hanging_ip),
     'HP' : ('new paragraph hanging 3', ),
     'RS' : ('start indent', HandleRequest.start_indent),
     'RE' : ('end indent', HandleRequest.end_indent),
