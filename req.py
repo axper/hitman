@@ -40,7 +40,9 @@ ITALIC = 2
 def get_alternating_text(line, style1, style2, with_code=True, open_par=True):
     ''' Alternates text between 2 styles.
 
-        Also changes par state if needed.
+        This function should not be called directly.
+        Instead it is called by alternating() function, which
+        should be used for requests which alternate font.
     '''
     if open_par:
         open_par_if_closed()
@@ -154,6 +156,24 @@ def open_deflist_if_closed():
 
         log.debug('dl_mode=True')
         glob.state.dl_mode = True
+
+def open_pre():
+    close_par_if_open()
+
+    log.debug('pre_mode=True')
+    glob.state.pre_mode = True
+
+    result = htmlops.HtmlRequests.open_pre() + '\n'
+    log.debug(result)
+    glob.state.write(result)
+
+def close_pre():
+    log.debug('pre_mode=False')
+    glob.state.pre_mode = False
+
+    result = htmlops.HtmlRequests.close_pre() + '\n'
+    log.debug(result)
+    glob.state.write(result)
 
 
 def close_fetch_tag(line):
@@ -357,20 +377,8 @@ class HandleRequest:
     def start_indent(line):
         close_par_if_open()
 
-        log.debug('pre_mode=True')
-        glob.state.pre_mode = True
-
-        result = htmlops.HtmlRequests.open_pre() + '\n'
-        log.debug(result)
-        glob.state.write(result)
-
     def end_indent(line):
-        log.debug('pre_mode=False')
-        glob.state.pre_mode = False
-
-        result = htmlops.HtmlRequests.close_pre() + '\n'
-        log.debug(result)
-        glob.state.write(result)
+        pass
 
     def finalize():
         close_par_if_open()
