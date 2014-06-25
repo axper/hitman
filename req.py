@@ -655,7 +655,7 @@ requests = {
     'cf' : ('transparently print file contents 2', ),
     'nx' : ('force processing the file', ),
     'rd' : ('read from standard output (input?)', ),
-    #'pi' : ('pipe output to shell command', ), # Unsafe*a
+    #'pi' : ('pipe output to shell command', ), # Unsafe
     #'sy' : ('execute shell script', ), # Unsafe
     #'open' : ('open file for writing', ), # Unsafe
     #'opena' : ('open file for writing and appending', ), # Unsafe
