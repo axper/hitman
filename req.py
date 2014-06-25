@@ -172,7 +172,13 @@ def get_alternating_text(line, style1, style2, with_code=True, open_par=True):
     else:
         log.error("Incorrect style2 argument: %s", style2)
 
-    text_list = split_with_quotes(esc.escape_text(line))
+    escaped = esc.escape_text(line)
+
+    if not escaped:
+        log.warning('alternating line is empty')
+        return ''
+
+    text_list = split_with_quotes(escaped)
 
     if text_list:
         result = ''
