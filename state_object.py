@@ -11,7 +11,6 @@ class State:
 
     # Global state
     par = False
-    ignore_until_doubledot = False
     pre_mode = False
     dl_mode = False
     cat_data = False
