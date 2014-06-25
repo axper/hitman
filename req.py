@@ -21,6 +21,17 @@ def split_with_quotes(string):
                       quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
 def get_rest_of_line(line):
+    ''' Returns a text line without the request part at the beginning.
+    
+        Example 1:
+            '.B adsf xxx'
+        becomes:
+            'asdf xxx'
+        Example 2:
+            '.   I     this should be italic'
+        becomes:
+            'this should be italic'
+    '''
     rest = re.match('^\. *[a-zA-Z0-9]+ *(.*)', line).group(1)
     log.debug(rest)
     return rest

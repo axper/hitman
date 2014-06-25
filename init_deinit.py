@@ -1,3 +1,4 @@
+''' init_deinit.py - Initialization and Deinitialization. '''
 # Standard modules
 import logging
 import gzip
@@ -14,7 +15,10 @@ log.addHandler(log_handlers.TO_FILE)
 log.setLevel(logging.DEBUG)
 
 def open_man_file(filename):
-    ''' Opens file in text mode and unzips if necessary. '''
+    ''' Returns a handler to manpage file opened in text mode.
+    
+        The file is unzipped if necessary.
+    '''
     if mimetypes.guess_type(filename)[1] == 'gzip':
         try:
             log.debug('gzfile:===============' + filename + '=================')
@@ -49,7 +53,7 @@ def initialize():
     return state
 
 def deinitialize(state):
-    ''' Closes opened files. '''
+    ''' Closes open files. '''
     state.file_html.close()
     state.file_manpage.close()
 
