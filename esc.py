@@ -1,3 +1,9 @@
+''' Module "Escapes" - escape groff escape codes on a single line.
+    
+    Escape code usually starts with a backslash (\).
+
+    The only function here called from outside is escape_text().
+'''
 # Standard modules
 import html
 import logging
@@ -13,6 +19,7 @@ log.addHandler(log_handlers.TO_CONSOLE)
 log.addHandler(log_handlers.TO_FILE)
 log.setLevel(logging.INFO)
 
+# Used inside class FontParser
 logfp = logging.getLogger('esc.FontParser')
 logfp.addHandler(log_handlers.TO_CONSOLE)
 logfp.addHandler(log_handlers.TO_FILE)
@@ -140,6 +147,13 @@ class FontParser:
 
 
 def replace_2_len_chars(text_line):
+    ''' Replaces escape codes which are used for inserting special chars.
+    
+        The escape code for character insertion is '('.
+        For example, '\(at' is replaced with '@'.
+        The table for replacement is called 'chars' and is located at the
+        module 'tables'.
+    '''
     result = ''
 
     i = 0
