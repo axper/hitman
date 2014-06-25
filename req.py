@@ -37,7 +37,7 @@ NORMAL = 0
 BOLD = 1
 ITALIC = 2
 
-def alternating(line, style1, style2, with_code=True, open_par=True):
+def get_alternating_text(line, style1, style2, with_code=True, open_par=True):
     ''' Alternates text between 2 styles.
 
         Also changes par state if needed.
@@ -173,14 +173,6 @@ def open_deflist_if_closed():
     if not glob.state.dl_mode:
         open_deflist()
 
-
-def get_definition_name(text):
-    result = htmlops.HtmlRequests.open_definition_name() + \
-             text + \
-             htmlops.HtmlRequests.close_definition_name() + \
-             '\n'
-    return result
-
 def close_fetch_tag(line):
     tag = esc.escape_text(line, False)
 
@@ -192,6 +184,13 @@ def close_fetch_tag(line):
     glob.state.write(result)
 
     open_data_if_closed()
+
+def get_definition_name(text):
+    result = htmlops.HtmlRequests.open_definition_name() + \
+             text + \
+             htmlops.HtmlRequests.close_definition_name() + \
+             '\n'
+    return result
 
 def handle_fetch_tag_if_needed(line):
     if glob.state.fetch_tag:
@@ -206,13 +205,13 @@ def alt(line, style1, style2):
     log.debug(line)
 
     if glob.state.fetch_tag:
-        result = alternating(line, style1, style2, True, False)
+        result = get_alternating_text(line, style1, style2, True, False)
         close_fetch_tag(line)
     else:
         if glob.state.cat_data:
-            result = alternating(line, style1, style2, True, False)
+            result = get_alternating_text(line, style1, style2, True, False)
         else:
-            result = alternating(line, style1, style2)
+            result = get_alternating_text(line, style1, style2)
 
         log.debug(result)
         glob.state.write(result)
