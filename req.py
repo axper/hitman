@@ -99,79 +99,62 @@ def get_alternating_text(line, style1, style2, with_code=True, open_par=True):
         return ''
 
 
-def open_par():
-    result_open_par = htmlops.HtmlRequests.open_paragraph()
-    log.debug(result_open_par)
-    glob.state.write(result_open_par)
-
-    log.debug('par=True')
-    glob.state.par = True
-
 def open_par_if_closed(line=''):
     if not glob.state.par:
-        open_par()
+        result_open_par = htmlops.HtmlRequests.open_paragraph()
+        log.debug(result_open_par)
+        glob.state.write(result_open_par)
 
-def close_par():
-    result_close_par = htmlops.HtmlRequests.close_paragraph() + '\n'
-    log.debug(result_close_par)
-    glob.state.write(result_close_par)
-
-    log.debug('par=False')
-    glob.state.par = False
+        log.debug('par=True')
+        glob.state.par = True
 
 def close_par_if_open(line=''):
     if glob.state.par:
-        close_par()
+        result_close_par = htmlops.HtmlRequests.close_paragraph() + '\n'
+        log.debug(result_close_par)
+        glob.state.write(result_close_par)
 
+        log.debug('par=False')
+        glob.state.par = False
 
-def close_data():
-    result_close_data = htmlops.HtmlRequests.close_definition_data() + '\n'
-    log.debug(result_close_data)
-    glob.state.write(result_close_data)
-
-    log.debug('cat_data=False')
-    glob.state.cat_data = False
 
 def close_data_if_open():
     if glob.state.cat_data:
-        close_data()
+        result_close_data = htmlops.HtmlRequests.close_definition_data() + '\n'
+        log.debug(result_close_data)
+        glob.state.write(result_close_data)
 
-def open_data():
-    result_open_data = htmlops.HtmlRequests.open_definition_data()
-    log.debug(result_open_data)
-    glob.state.write(result_open_data)
-
-    log.debug('cat_data=True')
-    glob.state.cat_data = True
+        log.debug('cat_data=False')
+        glob.state.cat_data = False
 
 def open_data_if_closed():
     if not glob.state.cat_data:
-        open_data()
+        result_open_data = htmlops.HtmlRequests.open_definition_data()
+        log.debug(result_open_data)
+        glob.state.write(result_open_data)
 
+        log.debug('cat_data=True')
+        glob.state.cat_data = True
 
-def close_deflist():
-    result_close_deflist = htmlops.HtmlRequests.close_definition_list() + '\n'
-    log.debug(result_close_deflist)
-    glob.state.write(result_close_deflist)
-
-    log.debug('dl_mode=False')
-    glob.state.dl_mode = False
 
 def close_deflist_if_open():
     if glob.state.dl_mode:
-        close_deflist()
+        result_close_deflist = htmlops.HtmlRequests.close_definition_list() + '\n'
+        log.debug(result_close_deflist)
+        glob.state.write(result_close_deflist)
 
-def open_deflist():
-    result_open_dl = htmlops.HtmlRequests.open_definition_list() + '\n'
-    log.debug(result_open_dl)
-    glob.state.write(result_open_dl)
-
-    log.debug('dl_mode=True')
-    glob.state.dl_mode = True
+        log.debug('dl_mode=False')
+        glob.state.dl_mode = False
 
 def open_deflist_if_closed():
     if not glob.state.dl_mode:
-        open_deflist()
+        result_open_dl = htmlops.HtmlRequests.open_definition_list() + '\n'
+        log.debug(result_open_dl)
+        glob.state.write(result_open_dl)
+
+        log.debug('dl_mode=True')
+        glob.state.dl_mode = True
+
 
 def close_fetch_tag(line):
     tag = esc.escape_text(line, False)
