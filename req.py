@@ -379,13 +379,13 @@ class HandleRequest:
     def end_indent(line):
         pass
 
+    def line_break(line):
+        close_par_if_open()
+
+    def skip_lines(line):
+        close_par_if_open()
+
     def finalize():
-        close_par_if_open()
-
-    def line_break():
-        close_par_if_open()
-
-    def skip_lines():
         close_par_if_open()
 
 
