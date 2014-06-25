@@ -394,7 +394,7 @@ class HandleRequest:
 
 
 requests = {
-    '.' : ('just a single dot', ),
+    '.' : ('just a single dot (double dot)', ),
     '\\"' : ('comment', HandleRequest.comment),
 
     ## Man macro package
