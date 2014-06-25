@@ -228,7 +228,6 @@ class HandleRequest:
         Requests are the lines which start with dot or single quote.
     '''
     def font_italic(line):
-        #line = ' '.join(split_with_quotes(esc.escape_text(line))[1:])
         line = get_rest_of_line(line)
 
         if handle_fetch_tag_if_needed(line):
@@ -245,7 +244,6 @@ class HandleRequest:
         glob.state.write(result)
 
     def font_bold(line):
-        #line = ' '.join(split_with_quotes(esc.escape_text(line))[1:])
         line = get_rest_of_line(line)
 
         if handle_fetch_tag_if_needed(line):
@@ -302,18 +300,20 @@ class HandleRequest:
         close_data_if_open()
         close_deflist_if_open()
 
-        section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
+        section_title_string = get_rest_of_line(line)
+        section_title_string = section_title_string.capitalize()
 
-        result = htmlops.HtmlRequests.section_title(section_title) + '\n'
+        result = htmlops.HtmlRequests.section_title(section_title_string) + '\n'
         log.debug(result)
         glob.state.write(result)
 
     def subsection_title(line):
         close_par_if_open()
 
-        subsection_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
+        subsection_title_string = get_rest_of_line(line)
+        subsection_title_string = subsection_title_string.capitalize()
 
-        result = htmlops.HtmlRequests.subsection_title(subsection_title) + '\n'
+        result = htmlops.HtmlRequests.subsection_title(subsection_title_string) + '\n'
         log.debug(result)
         glob.state.write(result)
 
