@@ -199,7 +199,7 @@ def handle_fetch_tag_if_needed(line):
     else:
         return False
 
-def alt(line, style1, style2):
+def alternating(line, style1, style2):
     log.debug(line)
     line = rest_of_line(line)
     log.debug(line)
@@ -354,22 +354,22 @@ class HandleRequest:
         open_data_if_closed()
 
     def alt_bold_italic(line):
-        alt(line, BOLD, ITALIC)
+        alternating(line, BOLD, ITALIC)
 
     def alt_italic_bold(line):
-        alt(line, ITALIC, BOLD)
+        alternating(line, ITALIC, BOLD)
 
     def alt_bold_normal(line):
-        alt(line, BOLD, NORMAL)
+        alternating(line, BOLD, NORMAL)
 
     def alt_normal_bold(line):
-        alt(line, NORMAL, BOLD)
+        alternating(line, NORMAL, BOLD)
 
     def alt_italic_normal(line):
-        alt(line, ITALIC, NORMAL)
+        alternating(line, ITALIC, NORMAL)
 
     def alt_normal_italic(line):
-        alt(line, NORMAL, ITALIC)
+        alternating(line, NORMAL, ITALIC)
 
     def start_indent(line):
         close_par_if_open()
