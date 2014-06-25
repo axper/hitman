@@ -22,95 +22,78 @@ class HtmlTags:
     definition_name = 'dt'
     definition_data = 'dd'
 
-    @staticmethod
     def opening(tag):
         return '<' + tag + '>'
 
-    @staticmethod
     def closing(tag):
         return '</' + tag + '>'
 
 
 class HtmlRequests:
     ''' Returns strings composed of one or more tags. '''
-    @staticmethod
     def open_paragraph():
         result = HtmlTags.opening(HtmlTags.paragraph)
         log.debug(result)
         return result
-    @staticmethod
     def close_paragraph():
         result = HtmlTags.closing(HtmlTags.paragraph)
         log.debug(result)
         return result
 
-    @staticmethod
     def open_pre():
         result = HtmlTags.opening(HtmlTags.pre)
         log.debug(result)
         return result
-    @staticmethod
     def close_pre():
         result = HtmlTags.closing(HtmlTags.pre)
         log.debug(result)
         return result
 
-    @staticmethod
     def open_code():
         result = HtmlTags.opening(HtmlTags.code)
         log.debug(result)
         return result
-    @staticmethod
     def close_code():
         result = HtmlTags.closing(HtmlTags.code)
         log.debug(result)
         return result
 
-    @staticmethod
     def open_italic():
         result = HtmlTags.opening(HtmlTags.italic)
         log.debug(result)
         return result
-    @staticmethod
     def close_italic():
         result = HtmlTags.closing(HtmlTags.italic)
         log.debug(result)
         return result
 
-    @staticmethod
     def open_bold():
         result = HtmlTags.opening(HtmlTags.bold)
         log.debug(result)
         return result
-    @staticmethod
     def close_bold():
         result = HtmlTags.closing(HtmlTags.bold)
         log.debug(result)
         return result
 
-    @staticmethod
     def open_code_italic():
         result = HtmlRequests.open_code() + HtmlRequests.open_italic()
         log.debug(result)
         return result
-    @staticmethod
     def close_italic_code():
         result = HtmlRequests.close_italic() + HtmlRequests.close_code()
         log.debug(result)
         return result
 
-    @staticmethod
     def open_code_bold():
         result = HtmlRequests.open_code() + HtmlRequests.open_bold()
         log.debug(result)
         return result
-    @staticmethod
     def close_bold_code():
         result = HtmlRequests.close_bold() + HtmlRequests.close_code()
         log.debug(result)
         return result
 
-    @staticmethod
     def section_title(title):
         result = HtmlTags.opening(HtmlTags.header_level_2) + \
                  title + \
@@ -119,7 +102,6 @@ class HtmlRequests:
         log.debug(result)
         return result
 
-    @staticmethod
     def subsection_title(title):
         result = HtmlTags.opening(HtmlTags.header_level_3) + \
                  title + \
@@ -128,7 +110,6 @@ class HtmlRequests:
         log.debug(result)
         return result
 
-    @staticmethod
     def document_header(name, man_section):
         header = '<!doctype HTML>\n' \
                  '<html>\n' \
@@ -142,41 +123,34 @@ class HtmlRequests:
         result = header.format(name, man_section)
         log.debug(result)
         return result
-    @staticmethod
     def document_footer():
         footer = '</body>\n' \
                  '</html>\n'
         log.debug(footer)
         return footer
 
-    @staticmethod
     def open_definition_list():
         result = HtmlTags.opening(HtmlTags.definition_list)
         log.debug(result)
         return result
-    @staticmethod
     def close_definition_list():
         result = HtmlTags.closing(HtmlTags.definition_list)
         log.debug(result)
         return result
 
-    @staticmethod
     def open_definition_name():
         result = HtmlTags.opening(HtmlTags.definition_name)
         log.debug(result)
         return result
-    @staticmethod
     def close_definition_name():
         result = HtmlTags.closing(HtmlTags.definition_name)
         log.debug(result)
         return result
 
-    @staticmethod
     def open_definition_data():
         result = HtmlTags.opening(HtmlTags.definition_data)
         log.debug(result)
         return result
-    @staticmethod
     def close_definition_data():
         result = HtmlTags.closing(HtmlTags.definition_data)
         log.debug(result)
