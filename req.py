@@ -7,7 +7,7 @@ import re
 import log_handlers
 import esc
 import htmlops
-import globstat
+import glob
 import tables
 
 log = logging.getLogger('req')
@@ -95,75 +95,75 @@ def alternating(line, style1, style2, with_code=True, open_par=True):
 def open_par():
     result_open_par = htmlops.HtmlRequests.open_paragraph()
     log.debug(result_open_par)
-    globstat.state.write(result_open_par)
+    glob.state.write(result_open_par)
 
     log.debug('par=True')
-    globstat.state.par = True
+    glob.state.par = True
 
 def open_par_if_closed(line=''):
-    if not globstat.state.par:
+    if not glob.state.par:
         open_par()
 
 def close_par():
     result_close_par = htmlops.HtmlRequests.close_paragraph() + '\n'
     log.debug(result_close_par)
-    globstat.state.write(result_close_par)
+    glob.state.write(result_close_par)
 
     log.debug('par=False')
-    globstat.state.par = False
+    glob.state.par = False
 
 def close_par_if_open(line=''):
-    if globstat.state.par:
+    if glob.state.par:
         close_par()
 
 
 def close_data():
     result_close_data = htmlops.HtmlRequests.close_definition_data() + '\n'
     log.debug(result_close_data)
-    globstat.state.write(result_close_data)
+    glob.state.write(result_close_data)
 
     log.debug('cat_data=False')
-    globstat.state.cat_data = False
+    glob.state.cat_data = False
 
 def close_data_if_open():
-    if globstat.state.cat_data:
+    if glob.state.cat_data:
         close_data()
 
 def open_data():
     result_open_data = htmlops.HtmlRequests.open_definition_data()
     log.debug(result_open_data)
-    globstat.state.write(result_open_data)
+    glob.state.write(result_open_data)
 
     log.debug('cat_data=True')
-    globstat.state.cat_data = True
+    glob.state.cat_data = True
 
 def open_data_if_closed():
-    if not globstat.state.cat_data:
+    if not glob.state.cat_data:
         open_data()
 
 
 def close_deflist():
     result_close_deflist = htmlops.HtmlRequests.close_definition_list() + '\n'
     log.debug(result_close_deflist)
-    globstat.state.write(result_close_deflist)
+    glob.state.write(result_close_deflist)
 
     log.debug('dl_mode=False')
-    globstat.state.dl_mode = False
+    glob.state.dl_mode = False
 
 def close_deflist_if_open():
-    if globstat.state.dl_mode:
+    if glob.state.dl_mode:
         close_deflist()
 
 def open_deflist():
     result_open_dl = htmlops.HtmlRequests.open_definition_list() + '\n'
     log.debug(result_open_dl)
-    globstat.state.write(result_open_dl)
+    glob.state.write(result_open_dl)
 
     log.debug('dl_mode=True')
-    globstat.state.dl_mode = True
+    glob.state.dl_mode = True
 
 def open_deflist_if_closed():
-    if not globstat.state.dl_mode:
+    if not glob.state.dl_mode:
         open_deflist()
 
 
@@ -178,16 +178,16 @@ def close_fetch_tag(line):
     tag = esc.escape_text(line, False)
 
     log.debug('fetch_tag=False')
-    globstat.state.fetch_tag = False
+    glob.state.fetch_tag = False
 
     result = get_definition_name(tag)
     log.debug(result)
-    globstat.state.write(result)
+    glob.state.write(result)
 
     open_data_if_closed()
 
 def handle_fetch_tag_if_needed(line):
-    if globstat.state.fetch_tag:
+    if glob.state.fetch_tag:
         close_fetch_tag(line)
         return True
     else:
@@ -198,17 +198,17 @@ def alt(line, style1, style2):
     line = get_rest_of_line(line)
     log.debug(line)
 
-    if globstat.state.fetch_tag:
+    if glob.state.fetch_tag:
         result = alternating(line, style1, style2, True, False)
         close_fetch_tag(line)
     else:
-        if globstat.state.cat_data:
+        if glob.state.cat_data:
             result = alternating(line, style1, style2, True, False)
         else:
             result = alternating(line, style1, style2)
 
         log.debug(result)
-        globstat.state.write(result)
+        glob.state.write(result)
 
 
 class HandleRequest:
@@ -223,7 +223,7 @@ class HandleRequest:
         if handle_fetch_tag_if_needed(line):
             return
 
-        if not globstat.state.cat_data:
+        if not glob.state.cat_data:
             open_par_if_closed()
 
         result = htmlops.HtmlRequests.open_code_italic() + \
@@ -231,7 +231,7 @@ class HandleRequest:
                  htmlops.HtmlRequests.close_italic_code() + \
                  '\n'
         log.debug(result)
-        globstat.state.write(result)
+        glob.state.write(result)
 
     def font_bold(line):
         #line = ' '.join(split_with_quotes(esc.escape_text(line))[1:])
@@ -240,7 +240,7 @@ class HandleRequest:
         if handle_fetch_tag_if_needed(line):
             return
 
-        if not globstat.state.cat_data:
+        if not glob.state.cat_data:
             open_par_if_closed()
 
         result = htmlops.HtmlRequests.open_code_bold() + \
@@ -248,7 +248,7 @@ class HandleRequest:
                  htmlops.HtmlRequests.close_bold_code() + \
                  '\n'
         log.debug(result)
-        globstat.state.write(result)
+        glob.state.write(result)
 
     def empty_line():
         close_par_if_open()
@@ -261,11 +261,11 @@ class HandleRequest:
 
         result += '\n'
 
-        if not globstat.state.pre_mode and not globstat.state.cat_data:
+        if not glob.state.pre_mode and not glob.state.cat_data:
             open_par_if_closed()
 
         log.debug(result)
-        globstat.state.write(result)
+        glob.state.write(result)
 
     def comment(line):
         pass
@@ -284,7 +284,7 @@ class HandleRequest:
 
         result = htmlops.HtmlRequests.document_header(title[0], section)
         log.debug(result)
-        globstat.state.write(result)
+        glob.state.write(result)
 
     def section_title(line):
         close_par_if_open()
@@ -295,7 +295,7 @@ class HandleRequest:
 
         result = htmlops.HtmlRequests.section_title(section_title)
         log.debug(result)
-        globstat.state.write(result)
+        glob.state.write(result)
 
     def subsection_title(line):
         close_par_if_open()
@@ -304,23 +304,23 @@ class HandleRequest:
 
         result = htmlops.HtmlRequests.subsection_title(subsection_title)
         log.debug(result)
-        globstat.state.write(result)
+        glob.state.write(result)
 
     def new_paragraph(line):
         close_par_if_open()
 
         result_open_par = htmlops.HtmlRequests.open_paragraph()
         log.debug(result_open_par)
-        globstat.state.write(result_open_par)
+        glob.state.write(result_open_par)
 
         log.debug('par=True')
-        globstat.state.par = True
+        glob.state.par = True
 
     def hanging_tp(line):
         close_par_if_open()
 
         log.debug('fetch_tag=True')
-        globstat.state.fetch_tag = True
+        glob.state.fetch_tag = True
 
         close_data_if_open()
 
@@ -343,7 +343,7 @@ class HandleRequest:
 
         result = get_definition_name(tag)
         log.debug(result)
-        globstat.state.write(result)
+        glob.state.write(result)
 
         open_data_if_closed()
 
@@ -369,19 +369,19 @@ class HandleRequest:
         close_par_if_open()
 
         log.debug('pre_mode=True')
-        globstat.state.pre_mode = True
+        glob.state.pre_mode = True
 
         result = htmlops.HtmlRequests.open_pre() + '\n'
         log.debug(result)
-        globstat.state.write(result)
+        glob.state.write(result)
 
     def end_indent(line):
         log.debug('pre_mode=False')
-        globstat.state.pre_mode = False
+        glob.state.pre_mode = False
 
         result = htmlops.HtmlRequests.close_pre() + '\n'
         log.debug(result)
-        globstat.state.write(result)
+        glob.state.write(result)
 
     def finalize():
         close_par_if_open()

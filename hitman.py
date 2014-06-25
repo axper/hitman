@@ -8,7 +8,7 @@ import logging
 
 # My modules
 import log_handlers
-import globstat
+import glob
 import init_deinit
 import htmlops
 import req
@@ -21,7 +21,7 @@ log.setLevel(logging.DEBUG)
 def main():
     line_number = 1
 
-    for line in globstat.state.file_manpage:
+    for line in glob.state.file_manpage:
         line = line.rstrip('\n')
 
         log.debug('-'*40 + str(line_number) + '-'*40)
@@ -35,7 +35,7 @@ def main():
             req.HandleRequest.empty_line()
             continue
 
-        if first_char in [globstat.state.control_char, globstat.state.control_char_nobreak]:
+        if first_char in [glob.state.control_char, glob.state.control_char_nobreak]:
             try:
                 request_name = re.match(' *([a-zA-Z0-9]+)', line[1:]).group(1)
             except AttributeError:
@@ -65,8 +65,8 @@ def main():
 
     req.HandleRequest.finalize()
 
-    globstat.state.write(htmlops.HtmlRequests.document_footer())
-    init_deinit.deinitialize(globstat.state)
+    glob.state.write(htmlops.HtmlRequests.document_footer())
+    init_deinit.deinitialize(glob.state)
 
 if __name__ == '__main__':
     main()

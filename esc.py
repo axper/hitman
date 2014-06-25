@@ -10,7 +10,7 @@ import logging
 
 # My modules
 import tables
-import globstat
+import glob
 import log_handlers
 import htmlops
 
@@ -43,8 +43,8 @@ class FontParser:
 
     def new_is_normal(new_font, previous_font, push_to_stack=True, with_code=True):
         if push_to_stack:
-            globstat.state.inline_font_stack.append(new_font)
-            logfp.debug(globstat.state.inline_font_stack)
+            glob.state.inline_font_stack.append(new_font)
+            logfp.debug(glob.state.inline_font_stack)
 
         if previous_font in FontParser.normal_fonts:
             return FontParser.ret('')
@@ -60,13 +60,13 @@ class FontParser:
                 return FontParser.ret(htmlops.HtmlRequests.close_italic())
         else:
             logfp.warning('previous font unknown:%s', previous_font)
-            globstat.state.inline_code = False
+            glob.state.inline_code = False
             return FontParser.ret('')
 
     def new_is_bold(new_font, previous_font, push_to_stack=True, with_code=True):
         if push_to_stack:
-            globstat.state.inline_font_stack.append(new_font)
-            logfp.debug(globstat.state.inline_font_stack)
+            glob.state.inline_font_stack.append(new_font)
+            logfp.debug(glob.state.inline_font_stack)
 
         if previous_font in FontParser.bold_fonts:
             return FontParser.ret('')
@@ -80,13 +80,13 @@ class FontParser:
                                   htmlops.HtmlRequests.open_bold())
         else:
             logfp.warning('previous font unknown:%s', previous_font)
-            globstat.state.inline_code = True
+            glob.state.inline_code = True
             return FontParser.ret('')
 
     def new_is_italic(new_font, previous_font, push_to_stack=True, with_code=True):
         if push_to_stack:
-            globstat.state.inline_font_stack.append(new_font)
-            logfp.debug(globstat.state.inline_font_stack)
+            glob.state.inline_font_stack.append(new_font)
+            logfp.debug(glob.state.inline_font_stack)
 
         if previous_font in FontParser.italic_fonts:
             return FontParser.ret('')
@@ -100,14 +100,14 @@ class FontParser:
                 return FontParser.ret(htmlops.HtmlRequests.open_italic())
         else:
             logfp.warning('previous font unknown:%s', previous_font)
-            globstat.state.inline_code = True
+            glob.state.inline_code = True
             return FontParser.ret('')
 
     def new_is_previous(new_font, previous_font, with_code=True):
         try:
-            globstat.state.inline_font_stack.pop()
-            new_font = globstat.state.inline_font_stack[-1]
-            logfp.debug(globstat.state.inline_font_stack)
+            glob.state.inline_font_stack.pop()
+            new_font = glob.state.inline_font_stack[-1]
+            logfp.debug(glob.state.inline_font_stack)
         except IndexError:
             logfp.warn('font stack empty 2, taking roman')
             new_font = 'R'
@@ -128,7 +128,7 @@ class FontParser:
         new_font = text[0]
 
         try:
-            previous_font = globstat.state.inline_font_stack[-1]
+            previous_font = glob.state.inline_font_stack[-1]
         except IndexError:
             logfp.warn('font stack empty, taking roman')
             previous_font = 'R'
@@ -158,7 +158,7 @@ def replace_2_len_chars(text_line):
 
     i = 0
     while i < len(text_line):
-        if text_line[i] == globstat.state.escape_char:
+        if text_line[i] == glob.state.escape_char:
             try:
                 escape_code = text_line[i + 1]
             except IndexError:
@@ -177,14 +177,14 @@ def replace_2_len_chars(text_line):
                     result += tables.chars[table_index]
                 except KeyError:
                     log.info('not found in table:%s', table_index)
-                    result += globstat.state.escape_char
+                    result += glob.state.escape_char
                     i += 1
                     continue
 
                 i += 3
             
             else:
-                result += globstat.state.escape_char
+                result += glob.state.escape_char
 
         else:
             result += text_line[i]
@@ -210,20 +210,20 @@ def escape_text(text, with_code=True):
     text = replace_2_len_chars(text)
     log_escape_text.debug(text)
 
-    globstat.state.inline_font_stack = ['R']
+    glob.state.inline_font_stack = ['R']
 
     log_escape_text.debug('inline_code=False')
-    globstat.state.inline_code = False
+    glob.state.inline_code = False
 
     result = ''
     i = 0
     while i < len(text):
-        if text[i] == globstat.state.escape_char:
+        if text[i] == glob.state.escape_char:
             try:
                 escape_code = text[i + 1]
             except IndexError:
                 log_escape_text.debug('continue_line=True')
-                globstat.state.continue_line = True
+                glob.state.continue_line = True
                 break
 
             try:
@@ -276,7 +276,7 @@ class HandleEscape:
             replacement = tables.chars[two_chars]
         except KeyError:
             log.info('index not found in table:%s', two_chars)
-            return (globstat.state.escape_char + '(' + two_chars, 3)
+            return (glob.state.escape_char + '(' + two_chars, 3)
 
         return (replacement, 3)
 
@@ -284,7 +284,7 @@ class HandleEscape:
         return (' ', 1)
 
     def current_escape_char(l, with_code=True):
-        return (globstat.state.escape_char, 1)
+        return (glob.state.escape_char, 1)
 
     def change_font(l, with_code=True):
         result = FontParser.get_result(l, with_code)
