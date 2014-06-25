@@ -382,6 +382,12 @@ class HandleRequest:
     def finalize():
         close_par_if_open()
 
+    def line_break():
+        close_par_if_open()
+
+    def skip_lines():
+        close_par_if_open()
+
 
 requests = {
     '.' : ('just a single dot (double dot)', ),
@@ -474,7 +480,7 @@ requests = {
     'af' : ('set register output format', ),
 
     # 7. Manipulating filling and adjusting
-    'br' : ('line break', close_par_if_open),
+    'br' : ('line break', HandleRequest.line_break),
     'fi' : ('enable output fill mode', ),
     'nf' : ('disable output fill mode', ),
     'ad' : ('set line adjusting mode', ),
@@ -500,7 +506,7 @@ requests = {
     'hla' : ('set hypenation language', ),
 
     # 9. Manipulating spacing
-    'sp' : ('skip lines up or down', close_par_if_open),
+    'sp' : ('skip lines up or down', HandleRequest.skip_lines),
     'ls' : ('print blank lines after each output', ),
     'ns' : ('disable line spacing mode', ),
     'rs' : ('enable line spacing mode', ),
