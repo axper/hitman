@@ -33,74 +33,6 @@ def rest_of_line(line):
     return rest
 
 
-NORMAL = 0
-BOLD = 1
-ITALIC = 2
-
-def get_alternating_text(line, style1, style2, with_code=True, open_par=True):
-    ''' Alternates text between 2 styles.
-
-        This function should not be called directly.
-        Instead it is called by alternating() function, which
-        should be used for requests which alternate font.
-    '''
-    if open_par:
-        open_par_if_closed()
-
-    if style1 == BOLD:
-        even_start = htmlops.HtmlRequests.open_bold()
-        even_end = htmlops.HtmlRequests.close_bold()
-    elif style1 == ITALIC:
-        even_start = htmlops.HtmlRequests.open_italic()
-        even_end = htmlops.HtmlRequests.close_italic()
-    elif style1 == NORMAL:
-        even_start = ''
-        even_end = ''
-    else:
-        log.error("Incorrect style1 argument: %s", style1)
-
-    if style2 == BOLD:
-        odd_start = htmlops.HtmlRequests.open_bold()
-        odd_end = htmlops.HtmlRequests.close_bold()
-    elif style2 == ITALIC:
-        odd_start = htmlops.HtmlRequests.open_italic()
-        odd_end = htmlops.HtmlRequests.close_italic()
-    elif style2 == NORMAL:
-        odd_start = ''
-        odd_end = ''
-    else:
-        log.error("Incorrect style2 argument: %s", style2)
-
-    text_list = split_with_quotes(esc.escape_text(line))
-
-    if text_list:
-        result = ''
-
-        if with_code:
-            result += htmlops.HtmlRequests.open_code()
-
-        even = True
-        for i in text_list:
-            if even:
-                result += even_start + i + even_end
-                even = False
-            else:
-                result += odd_start + i + odd_end
-                even = True
-
-        if with_code:
-            result += htmlops.HtmlRequests.close_code()
-
-        result += '\n'
-
-        log.debug(result)
-        return result
-
-    else:
-        log.warning('alternating style has no content')
-        return ''
-
-
 def open_par_if_closed(line=''):
     if not glob.state.par:
         result_open_par = htmlops.HtmlRequests.open_paragraph()
@@ -201,6 +133,73 @@ def handle_fetch_tag_if_needed(line):
         return True
     else:
         return False
+
+NORMAL = 0
+BOLD = 1
+ITALIC = 2
+
+def get_alternating_text(line, style1, style2, with_code=True, open_par=True):
+    ''' Alternates text between 2 styles.
+
+        This function should not be called directly.
+        Instead it is called by alternating() function, which
+        should be used for requests which alternate font.
+    '''
+    if open_par:
+        open_par_if_closed()
+
+    if style1 == BOLD:
+        even_start = htmlops.HtmlRequests.open_bold()
+        even_end = htmlops.HtmlRequests.close_bold()
+    elif style1 == ITALIC:
+        even_start = htmlops.HtmlRequests.open_italic()
+        even_end = htmlops.HtmlRequests.close_italic()
+    elif style1 == NORMAL:
+        even_start = ''
+        even_end = ''
+    else:
+        log.error("Incorrect style1 argument: %s", style1)
+
+    if style2 == BOLD:
+        odd_start = htmlops.HtmlRequests.open_bold()
+        odd_end = htmlops.HtmlRequests.close_bold()
+    elif style2 == ITALIC:
+        odd_start = htmlops.HtmlRequests.open_italic()
+        odd_end = htmlops.HtmlRequests.close_italic()
+    elif style2 == NORMAL:
+        odd_start = ''
+        odd_end = ''
+    else:
+        log.error("Incorrect style2 argument: %s", style2)
+
+    text_list = split_with_quotes(esc.escape_text(line))
+
+    if text_list:
+        result = ''
+
+        if with_code:
+            result += htmlops.HtmlRequests.open_code()
+
+        even = True
+        for i in text_list:
+            if even:
+                result += even_start + i + even_end
+                even = False
+            else:
+                result += odd_start + i + odd_end
+                even = True
+
+        if with_code:
+            result += htmlops.HtmlRequests.close_code()
+
+        result += '\n'
+
+        log.debug(result)
+        return result
+
+    else:
+        log.warning('alternating style has no content')
+        return ''
 
 def alternating(line, style1, style2):
     log.debug(line)
