@@ -69,16 +69,16 @@ def alternating(line, style1, style2, with_code=True, open_par=True):
     else:
         log.error("Incorrect style2 argument: %s", style2)
 
-    words2 = split_with_quotes(esc.escape_text(line))
+    text_list = split_with_quotes(esc.escape_text(line))
 
-    if words2:
+    if text_list:
         result = ''
 
         if with_code:
             result += htmlops.HtmlRequests.open_code()
 
         even = True
-        for i in words2:
+        for i in text_list:
             if even:
                 result += even_start + i + even_end
                 even = False
