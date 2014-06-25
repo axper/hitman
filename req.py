@@ -20,7 +20,7 @@ def split_with_quotes(string):
     return csv.reader(string.splitlines(), quotechar='"', delimiter=' ',
                       quoting=csv.QUOTE_ALL, skipinitialspace=True).__next__()
 
-def get_rest_of_line(line):
+def rest_of_line(line):
     ''' Returns a text line without the request part at the beginning.
     
         Example 1:
@@ -206,7 +206,7 @@ def handle_fetch_tag_if_needed(line):
 
 def alt(line, style1, style2):
     log.debug(line)
-    line = get_rest_of_line(line)
+    line = rest_of_line(line)
     log.debug(line)
 
     if glob.state.fetch_tag:
@@ -228,7 +228,7 @@ class HandleRequest:
         Requests are the lines which start with dot or single quote.
     '''
     def font_italic(line):
-        line = get_rest_of_line(line)
+        line = rest_of_line(line)
 
         if handle_fetch_tag_if_needed(line):
             return
@@ -244,7 +244,7 @@ class HandleRequest:
         glob.state.write(result)
 
     def font_bold(line):
-        line = get_rest_of_line(line)
+        line = rest_of_line(line)
 
         if handle_fetch_tag_if_needed(line):
             return
@@ -300,7 +300,7 @@ class HandleRequest:
         close_data_if_open()
         close_deflist_if_open()
 
-        section_title_string = get_rest_of_line(line)
+        section_title_string = rest_of_line(line)
         section_title_string = section_title_string.capitalize()
 
         result = htmlops.HtmlRequests.section_title(section_title_string) + '\n'
@@ -310,7 +310,7 @@ class HandleRequest:
     def subsection_title(line):
         close_par_if_open()
 
-        subsection_title_string = get_rest_of_line(line)
+        subsection_title_string = rest_of_line(line)
         subsection_title_string = subsection_title_string.capitalize()
 
         result = htmlops.HtmlRequests.subsection_title(subsection_title_string) + '\n'
