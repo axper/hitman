@@ -128,17 +128,15 @@ class HtmlRequests:
         ''' Returns '<h2>TITLE</h2>' '''
         result = HtmlTags.opening(HtmlTags.header_level_2) + \
                  title + \
-                 HtmlTags.closing(HtmlTags.header_level_2) + \
-                 '\n'
+                 HtmlTags.closing(HtmlTags.header_level_2)
         log.debug(result)
         return result
 
     def subsection_title(title):
-        ''' Returns '<h3>TITLE</h3' '''
+        ''' Returns '<h3>TITLE</h3>' '''
         result = HtmlTags.opening(HtmlTags.header_level_3) + \
                  title + \
-                 HtmlTags.closing(HtmlTags.header_level_3) + \
-                 '\n'
+                 HtmlTags.closing(HtmlTags.header_level_3)
         log.debug(result)
         return result
 

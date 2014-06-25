@@ -304,7 +304,7 @@ class HandleRequest:
 
         section_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
 
-        result = htmlops.HtmlRequests.section_title(section_title)
+        result = htmlops.HtmlRequests.section_title(section_title) + '\n'
         log.debug(result)
         glob.state.write(result)
 
@@ -313,7 +313,7 @@ class HandleRequest:
 
         subsection_title = ' '.join(split_with_quotes(line)[1:]).capitalize()
 
-        result = htmlops.HtmlRequests.subsection_title(subsection_title)
+        result = htmlops.HtmlRequests.subsection_title(subsection_title) + '\n'
         log.debug(result)
         glob.state.write(result)
 
