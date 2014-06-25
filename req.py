@@ -24,13 +24,9 @@ def rest_of_line(line):
     ''' Returns a text line without the request part at the beginning.
     
         Example 1:
-            '.B adsf xxx'
-        becomes:
-            'asdf xxx'
+            '.B adsf xxx'  ->  'asdf xxx'
         Example 2:
-            '.   I     this should be italic'
-        becomes:
-            'this should be italic'
+            '.  I   this should be italic'  ->  'this should be italic'
     '''
     rest = re.match('^\. *[a-zA-Z0-9]+ *(.*)', line).group(1)
     log.debug(rest)
