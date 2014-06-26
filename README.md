@@ -1,6 +1,16 @@
 man2html5 - a manpage to HTML5 convertor
 ==============
 
+Usage
+-------------
+    ./hitman.py <manpage-file>
+
+Example:
+	
+	./hitman.py /usr/share/man/man1/intro.1.gz
+
+The output will be written to `result.html` in current directory.
+
 Used groff file specifications
 -------------
 - groff(7)
@@ -53,3 +63,4 @@ TODO
 - add separate logger for other functions
 - decide something about ending newlines
 - add kwargs to write() in State and possibly some other places
+- add output filename option
