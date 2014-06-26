@@ -32,6 +32,10 @@ def rest_of_line(line):
     log.debug(rest)
     return rest
 
+def remove_doublequotes(line):
+    line_without_doublequotes = line.replace('"', '')
+    return line_without_doublequotes
+
 
 def open_par_if_closed(line=''):
     if not glob.state.par:
@@ -274,6 +278,7 @@ class HandleRequest:
         close_deflist_if_open()
 
         section_title_string = rest_of_line(line)
+        section_title_string = remove_doublequotes(section_title_string)
         section_title_string = section_title_string.capitalize()
 
         result = htmlops.HtmlRequests.section_title(section_title_string) + '\n'
@@ -284,6 +289,7 @@ class HandleRequest:
         close_par_if_open()
 
         subsection_title_string = rest_of_line(line)
+        subsection_title_string = remove_doublequotes(subsection_title_string)
         subsection_title_string = subsection_title_string.capitalize()
 
         result = htmlops.HtmlRequests.subsection_title(subsection_title_string) + '\n'
