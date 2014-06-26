@@ -212,6 +212,8 @@ def alternating(line, style1, style2):
     line = rest_of_line(line)
     log.debug(line)
 
+    line = ' '.join(split_with_quotes(line))
+
     if glob.state.fetch_tag:
         result = get_alternating_text(line, style1, style2, True, False)
         close_fetch_tag(line)
@@ -233,6 +235,8 @@ class HandleRequest:
     def font_italic(line):
         line = rest_of_line(line)
 
+        line = ' '.join(split_with_quotes(line))
+
         if handle_fetch_tag_if_needed(line):
             return
 
@@ -248,6 +252,8 @@ class HandleRequest:
 
     def font_bold(line):
         line = rest_of_line(line)
+
+        line = ' '.join(split_with_quotes(line))
 
         if handle_fetch_tag_if_needed(line):
             return
