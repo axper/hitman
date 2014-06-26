@@ -232,42 +232,6 @@ class HandleRequest:
         
         Requests are the lines which start with dot or single quote.
     '''
-    def font_italic(line):
-        line = rest_of_line(line)
-
-        line = ' '.join(split_with_quotes(line))
-
-        if handle_fetch_tag_if_needed(line):
-            return
-
-        if not glob.state.cat_data:
-            open_par_if_closed()
-
-        result = htmlops.HtmlRequests.open_code_italic() + \
-                 line + \
-                 htmlops.HtmlRequests.close_italic_code() + \
-                 '\n'
-        log.debug(result)
-        glob.state.write(result)
-
-    def font_bold(line):
-        line = rest_of_line(line)
-
-        line = ' '.join(split_with_quotes(line))
-
-        if handle_fetch_tag_if_needed(line):
-            return
-
-        if not glob.state.cat_data:
-            open_par_if_closed()
-
-        result = htmlops.HtmlRequests.open_code_bold() + \
-                 line + \
-                 htmlops.HtmlRequests.close_bold_code() + \
-                 '\n'
-        log.debug(result)
-        glob.state.write(result)
-
     def empty_line():
         close_par_if_open()
 
@@ -384,6 +348,42 @@ class HandleRequest:
 
     def alt_normal_italic(line):
         alternating(line, NORMAL, ITALIC)
+
+    def font_italic(line):
+        line = rest_of_line(line)
+
+        line = ' '.join(split_with_quotes(line))
+
+        if handle_fetch_tag_if_needed(line):
+            return
+
+        if not glob.state.cat_data:
+            open_par_if_closed()
+
+        result = htmlops.HtmlRequests.open_code_italic() + \
+                 line + \
+                 htmlops.HtmlRequests.close_italic_code() + \
+                 '\n'
+        log.debug(result)
+        glob.state.write(result)
+
+    def font_bold(line):
+        line = rest_of_line(line)
+
+        line = ' '.join(split_with_quotes(line))
+
+        if handle_fetch_tag_if_needed(line):
+            return
+
+        if not glob.state.cat_data:
+            open_par_if_closed()
+
+        result = htmlops.HtmlRequests.open_code_bold() + \
+                 line + \
+                 htmlops.HtmlRequests.close_bold_code() + \
+                 '\n'
+        log.debug(result)
+        glob.state.write(result)
 
     def start_indent(line):
         close_par_if_open()
