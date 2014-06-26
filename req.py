@@ -357,6 +357,7 @@ class HandleRequest:
 
     def font_italic(line):
         line = rest_of_line(line)
+        line = esc.escape_text(line)
 
         line = ' '.join(split_with_quotes(line))
 
@@ -375,6 +376,7 @@ class HandleRequest:
 
     def font_bold(line):
         line = rest_of_line(line)
+        line = esc.escape_text(line)
 
         line = ' '.join(split_with_quotes(line))
 
