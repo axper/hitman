@@ -1,4 +1,6 @@
-man2html5 - a manpage to HTML5 convertor
+This project is discontinued.
+==============
+See [man2archwiki](https://github.com/axper/man2archwiki) instead.
 ==============
 
 Usage
