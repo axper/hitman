@@ -23,6 +23,10 @@ section_name = {
     'N' : 'New pages',
 }
 
+pre_sections = [
+    'Synopsis',
+]
+
 chars = {
     '-D' : 'Ð',
     'Sd' : 'ð',
